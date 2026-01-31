@@ -70,6 +70,7 @@ function openWaitlist() {
             <form class="waitlist-form" onsubmit="handleWaitlistSubmit(event)">
                 <input 
                     type="email" 
+                    name="email"
                     class="waitlist-input" 
                     placeholder="Enter your email" 
                     required 
@@ -261,29 +262,50 @@ function handleWaitlistSubmit(event) {
 
     const form = event.target;
     const email = form.querySelector('.waitlist-input').value;
+    const btn = form.querySelector('.btn-primary');
 
-    // Simulate submission (replace with actual API call)
-    console.log('Waitlist signup:', email);
+    // Loading state
+    btn.textContent = 'Enrolling...';
+    btn.style.opacity = '0.7';
+    btn.style.pointerEvents = 'none';
 
-    // Show success message
-    const modalContent = document.querySelector('.modal-content');
-    if (modalContent) {
-        modalContent.innerHTML = `
-            <button class="modal-close" onclick="closeWaitlist()" aria-label="Close modal">&times;</button>
-            <div class="success-message">
-                <div class="success-icon">🌿</div>
-                <h3 class="success-title">Welcome to Organizo!</h3>
-                <p class="success-text">
-                    Thank you for joining our waitlist. We'll send you gentle updates as we prepare to launch.
-                </p>
-            </div>
-        `;
-    }
+    // Submit to Netlify
+    fetch("/", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: new URLSearchParams({
+            "form-name": "waitlist",
+            "email": email
+        }).toString(),
+    })
+        .then(() => {
+            // Show success message
+            const modalContent = document.querySelector('.modal-content');
+            if (modalContent) {
+                modalContent.innerHTML = `
+                <button class="modal-close" onclick="closeWaitlist()" aria-label="Close modal">&times;</button>
+                <div class="success-message">
+                    <div class="success-icon">🌿</div>
+                    <h3 class="success-title">You're on the list!</h3>
+                    <p class="success-text">
+                        Thank you for joining Organizo early access. We've saved your spot! <br><br>
+                        <strong>Bonus:</strong> You'll receive <strong>₹20 off Pro</strong> when we launch.
+                    </p>
+                </div>
+            `;
+            }
 
-    // Auto-close after 3 seconds
-    setTimeout(() => {
-        closeWaitlist();
-    }, 3000);
+            // Auto-close after 5 seconds
+            setTimeout(() => {
+                closeWaitlist();
+            }, 5000);
+        })
+        .catch((error) => {
+            console.error('Form submission error:', error);
+            btn.textContent = 'Try Again';
+            btn.style.opacity = '1';
+            btn.style.pointerEvents = 'auto';
+        });
 }
 
 // Add fadeOut animation

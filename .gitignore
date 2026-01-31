@@ -1,0 +1,21 @@
+# OS files
+.DS_Store
+Thumbs.db
+
+# Project artifacts
+PHASE_2_BUILD_PLAN.md
+*.tmp
+*.log
+
+# Deployment
+.netlify/
+dist/
+build/
+node_modules/
+
+# Local Dev
+.vscode/
+.idea/
+.fleet/
+.sublime-project
+.sublime-workspace

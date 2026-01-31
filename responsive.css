@@ -1,0 +1,24 @@
+/* ===========================
+   RESPONSIVE - MOBILE & TABLET
+   =========================== */
+
+@media (max-width: 900px) {
+    .features-grid-simple {
+        grid-template-columns: 1fr;
+        gap: var(--spacing-lg);
+    }
+}
+
+@media (max-width: 768px) {
+    .hero-title {
+        font-size: 2.5rem;
+    }
+
+    .features-grid-simple {
+        grid-template-columns: 1fr;
+    }
+
+    .benefits-grid {
+        grid-template-columns: 1fr;
+    }
+}

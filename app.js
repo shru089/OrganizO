@@ -1272,9 +1272,9 @@ class OrganizOApp {
         const statusDiv = form.querySelector('#feedback-status');
 
         // --- 🔴 REPLACE THESE WITH YOUR ACTUAL EMAILJS KEYS 🔴 ---
-        const EMAILJS_SERVICE_ID = 'YOUR_SERVICE_ID';
-        const EMAILJS_TEMPLATE_ID = 'YOUR_TEMPLATE_ID';
-        const EMAILJS_PUBLIC_KEY = 'YOUR_PUBLIC_KEY';
+        const EMAILJS_SERVICE_ID = 'service_hixicbb';
+        const EMAILJS_TEMPLATE_ID = 'template_n8iicfh';
+        const EMAILJS_PUBLIC_KEY = 'KiOeDXotSGoSAOZJm';
         // --------------------------------------------------------
 
         const payload = {

@@ -4,6 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
     <title>OrganizO - Structure your life, gently.</title>
     <meta name="description"
         content="A calm productivity space to help you plan your life without overwhelm. OrganizO promotes gentle productivity, mental clarity, and structured living without stress.">
@@ -20,6 +22,34 @@
 </head>
 
 <body>
+    <!-- Navigation Header -->
+    <header class="main-header"
+        style="position: fixed; top: 0; left: 0; width: 100%; padding: 1.5rem 5%; display: flex; justify-content: space-between; align-items: center; z-index: 1000; transition: all 0.3s ease;">
+        <div class="header-logo"
+            style="display: flex; align-items: center; gap: 10px; font-family: 'Poppins', sans-serif; font-weight: 700; font-size: 1.5rem; color: var(--color-text);">
+            <div style="width: 32px; height: 32px; color: var(--color-sage);">
+                <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M50 90 Q40 60 55 10" fill="none" stroke="currentColor" stroke-width="4"
+                        stroke-linecap="round" />
+                    <path d="M55 30 Q75 20 80 40 Q65 45 55 30 Z" fill="currentColor" opacity="0.9" />
+                </svg>
+            </div>
+            OrganizO
+        </div>
+        <nav class="header-nav" style="display: flex; gap: 2rem;">
+            <a href="#about" class="nav-item"
+                style="color: var(--color-text); text-decoration: none; font-weight: 500; font-size: 0.9rem;">About</a>
+            <a href="#features" class="nav-item"
+                style="color: var(--color-text); text-decoration: none; font-weight: 500; font-size: 0.9rem;">Features</a>
+            <a href="#coming-soon" class="nav-item"
+                style="color: var(--color-text); text-decoration: none; font-weight: 500; font-size: 0.9rem;">Roadmap</a>
+            <a href="mailto:shru089x@gmail.com" class="nav-item"
+                style="color: var(--color-text); text-decoration: none; font-weight: 600; font-size: 0.9rem;">Contact</a>
+        </nav>
+        <button class="btn-primary" style="padding: 0.6rem 1.5rem; font-size: 0.85rem;"
+            onclick="window.location.href='app.html'">Open App</button>
+    </header>
+
     <!-- Hero Section -->
     <section class="hero" id="hero">
         <div class="hero-content">
@@ -39,7 +69,10 @@
             <p class="hero-subtitle fade-in-delay-2">Structure your life, gently.</p>
             <p class="hero-description fade-in-delay-3">A calm productivity space to help you plan your life without
                 overwhelm.</p>
-            <button class="btn-primary fade-in-delay-4" onclick="window.location.href='app.html'">Try OrganizO</button>
+            <div class="hero-btns fade-in-delay-4" style="display: flex; gap: 1rem; justify-content: center;">
+                <button class="btn-primary" onclick="window.location.href='app.html'">Try OrganizO</button>
+                <button class="btn-secondary" onclick="window.location.href='#features'">See What's Inside</button>
+            </div>
         </div>
         <div class="scroll-indicator"></div>
         <div class="hero-shapes">
@@ -64,7 +97,7 @@
     <section class="section features-section" id="features">
         <div class="container">
             <h2 class="section-title scroll-fade">Everything you need, nothing you don't</h2>
-            <p class="section-subtitle scroll-fade">Five simple tools to organize your life</p>
+            <p class="section-subtitle scroll-fade">Simple tools to organize your life</p>
 
             <div class="features-grid-mvp">
                 <div class="feature-card scroll-fade">
@@ -75,20 +108,6 @@
                 </div>
 
                 <div class="feature-card scroll-fade">
-                    <div class="feature-icon">📓</div>
-                    <h3 class="feature-title">Notes</h3>
-                    <p class="feature-description">Capture thoughts and ideas. Organize with folders, tags, and search.
-                    </p>
-                </div>
-
-                <div class="feature-card scroll-fade">
-                    <div class="feature-icon">🎯</div>
-                    <h3 class="feature-title">Goals</h3>
-                    <p class="feature-description">Set meaningful goals and track your progress. Stay motivated with
-                        visual milestones.</p>
-                </div>
-
-                <div class="feature-card scroll-fade">
                     <div class="feature-icon">✨</div>
                     <h3 class="feature-title">Habits</h3>
                     <p class="feature-description">Build lasting habits with daily tracking and streak counters. Small
@@ -96,10 +115,32 @@
                 </div>
 
                 <div class="feature-card scroll-fade">
+                    <div class="feature-icon">⏱️</div>
+                    <h3 class="feature-title">Focus Timer</h3>
+                    <p class="feature-description">Pomodoro sessions for deep work. Focus, short break, and long break
+                        modes to keep you in flow.</p>
+                </div>
+
+                <div class="feature-card scroll-fade">
+                    <div class="feature-icon">📅</div>
+                    <h3 class="feature-title">Calendar</h3>
+                    <p class="feature-description">Full monthly view with holidays, events, and task tracking. Plan
+                        your days with clarity.</p>
+                </div>
+
+                <div class="feature-card scroll-fade">
                     <div class="feature-icon">📊</div>
                     <h3 class="feature-title">Dashboard</h3>
-                    <p class="feature-description">See your day at a glance. Tasks, goals, and habits in one peaceful
+                    <p class="feature-description">See your day at a glance. Tasks, habits, and focus time in one
+                        peaceful
                         view.</p>
+                </div>
+
+                <div class="feature-card scroll-fade">
+                    <div class="feature-icon">💡</div>
+                    <h3 class="feature-title">Insights</h3>
+                    <p class="feature-description">Track your focus sessions, completed tasks, and recent activity.
+                        Understand your productivity patterns.</p>
                 </div>
             </div>
         </div>
@@ -112,6 +153,52 @@
             <blockquote class="philosophy-quote scroll-fade">
                 "Productivity doesn't have to feel stressful. OrganizO helps you move forward, gently."
             </blockquote>
+        </div>
+    </section>
+
+    <!-- Trust & Science Section -->
+    <section class="section trust-section"
+        style="background: var(--color-warm-white); border-bottom: 1px solid rgba(0,0,0,0.03);">
+        <div class="container" style="max-width: 1000px;">
+            <h2 class="section-title scroll-fade">The Science of Subtle Productivity</h2>
+            <div
+                style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 2rem; margin-top: 4rem;">
+                <!-- Card 1 -->
+                <div class="trust-card scroll-fade">
+                    <div class="trust-icon-container">
+                        <div class="trust-bloom"></div>
+                        🧠
+                    </div>
+                    <h4>Curb Cortisol</h4>
+                    <p style="font-size: 0.95rem; line-height: 1.6; color: var(--color-text-secondary);">Hyper-complex
+                        tools
+                        trigger stress hormones. OrganizO is built on "Low-Load" design principles to keep your mind
+                        quiet while you work.</p>
+                </div>
+                <!-- Card 2 -->
+                <div class="trust-card scroll-fade">
+                    <div class="trust-icon-container">
+                        <div class="trust-bloom" style="background: var(--color-sage-dark);"></div>
+                        🛡️
+                    </div>
+                    <h4>Privacy First</h4>
+                    <p style="font-size: 0.95rem; line-height: 1.6; color: var(--color-text-secondary);">We don't track
+                        your
+                        "productivity scores." Your data stays on your device—we are a tool for you, not a monitor for a
+                        corporation.</p>
+                </div>
+                <!-- Card 3 -->
+                <div class="trust-card scroll-fade">
+                    <div class="trust-icon-container">
+                        <div class="trust-bloom" style="background: #fbbf24;"></div>
+                        🌿
+                    </div>
+                    <h4>Built with Intent</h4>
+                    <p style="font-size: 0.95rem; line-height: 1.6; color: var(--color-text-secondary);">Crafted by an
+                        independent developer who believes productivity should be a sanctuary, not a race. Built for
+                        humanity, not KPIs.</p>
+                </div>
+            </div>
         </div>
     </section>
 
@@ -174,71 +261,62 @@
         </div>
     </section>
 
-    <!-- Pricing Section -->
-    <section class="section pricing-section" id="pricing">
+    <!-- Everything Free Section -->
+    <section class="section free-forever-section" id="free-forever">
         <div class="container">
-            <h2 class="section-title scroll-fade">Simple, honest pricing</h2>
-            <p class="section-subtitle scroll-fade">Choose what works for you</p>
+            <h2 class="section-title scroll-fade">Everything is free. Forever.</h2>
+            <p class="section-subtitle scroll-fade">No paywalls. No limits. No stress. Just you and your goals.</p>
 
-            <div class="pricing-grid">
-                <!-- Free Tier -->
-                <div class="pricing-card scroll-fade">
-                    <div class="pricing-badge">Free</div>
-                    <h3 class="pricing-title">Start Free</h3>
-                    <div class="pricing-price">
-                        <span class="price-amount">₹0</span>
-                        <span class="price-period">forever</span>
-                    </div>
-                    <ul class="pricing-features">
-                        <li>✓ Tasks (unlimited)</li>
-                        <li>✓ Notes (unlimited)</li>
-                        <li>✓ 3 Active Goals</li>
-                        <li>✓ 5 Daily Habits</li>
-                        <li>✓ Dashboard</li>
-                        <li>✓ Local Storage</li>
-                    </ul>
-                    <button class="pricing-button btn-secondary">Try Free</button>
-                </div>
+            <div class="free-card-container scroll-fade">
+                <div class="free-hero-card">
+                    <div class="free-icon">🌿</div>
+                    <h3 class="free-card-title">Your Calm Space, No Strings Attached</h3>
+                    <p class="free-card-description">
+                        We believe productivity tools should never add pressure. OrganizO gives you everything you need
+                        —
+                        unlimited tasks, habits, focus timer, calendar, insights, and daily intentions — completely
+                        free.
+                    </p>
 
-                <!-- Pro Tier -->
-                <div class="pricing-card pricing-card-featured scroll-fade">
-                    <div class="pricing-badge pricing-badge-pro">Most Popular</div>
-                    <h3 class="pricing-title">Pro</h3>
-                    <div class="pricing-price">
-                        <span class="price-amount">₹99</span>
-                        <span class="price-period">/month</span>
+                    <div class="free-features-grid">
+                        <div class="free-feature-item">
+                            <span class="free-check">✓</span>
+                            <span>Unlimited Tasks</span>
+                        </div>
+                        <div class="free-feature-item">
+                            <span class="free-check">✓</span>
+                            <span>Unlimited Habits</span>
+                        </div>
+                        <div class="free-feature-item">
+                            <span class="free-check">✓</span>
+                            <span>Focus Timer</span>
+                        </div>
+                        <div class="free-feature-item">
+                            <span class="free-check">✓</span>
+                            <span>Calendar View</span>
+                        </div>
+                        <div class="free-feature-item">
+                            <span class="free-check">✓</span>
+                            <span>Insights Dashboard</span>
+                        </div>
+                        <div class="free-feature-item">
+                            <span class="free-check">✓</span>
+                            <span>Daily Intentions</span>
+                        </div>
+                        <div class="free-feature-item">
+                            <span class="free-check">✓</span>
+                            <span>Streak Tracking</span>
+                        </div>
+                        <div class="free-feature-item">
+                            <span class="free-check">✓</span>
+                            <span>Privacy First</span>
+                        </div>
                     </div>
-                    <ul class="pricing-features">
-                        <li>✓ Everything in Free</li>
-                        <li>✓ Unlimited Goals & Habits</li>
-                        <li>✓ Export Data</li>
-                        <li>✓ Priority Support</li>
-                        <li>🔜 Calendar View</li>
-                        <li>🔜 Cloud Sync</li>
-                        <li>🔜 All Themes</li>
-                        <li>🔜 Focus Timer</li>
-                    </ul>
-                    <button class="pricing-button btn-primary">Start Pro Trial</button>
-                </div>
 
-                <!-- Supporter Tier -->
-                <div class="pricing-card scroll-fade">
-                    <div class="pricing-badge pricing-badge-supporter">Lifetime</div>
-                    <h3 class="pricing-title">Supporter</h3>
-                    <div class="pricing-price">
-                        <span class="price-amount">₹299</span>
-                        <span class="price-period">one-time</span>
-                    </div>
-                    <ul class="pricing-features">
-                        <li>✓ All Pro Features</li>
-                        <li>✓ Lifetime Access</li>
-                        <li>✓ Supporter Badge 💚</li>
-                        <li>✓ Early Access</li>
-                        <li>✓ Vote on Roadmap</li>
-                        <li>🔜 Exclusive Themes</li>
-                        <li>🔜 AI Insights (first)</li>
-                    </ul>
-                    <button class="pricing-button btn-primary">Support OrganizO</button>
+                    <button class="btn-primary"
+                        style="margin-top: 2.5rem; padding: 1rem 3rem; font-size: 1.1rem; border-radius: 50px;"
+                        onclick="window.location.href='app.html'">Start Organizing — It's Free</button>
+                    <p class="free-note">No sign-up required. No credit card. No catch.</p>
                 </div>
             </div>
         </div>
@@ -252,24 +330,24 @@
 
             <div class="premium-grid">
                 <div class="premium-card scroll-fade">
-                    <div class="premium-icon">📅</div>
-                    <h3 class="premium-title">Calendar View</h3>
-                    <p class="premium-description">Visual weekly and monthly planning.</p>
+                    <div class="premium-icon">📓</div>
+                    <h3 class="premium-title">Notes</h3>
+                    <p class="premium-description">Capture thoughts and ideas.</p>
                     <ul class="premium-list">
-                        <li>Week at a glance</li>
-                        <li>Time blocking</li>
-                        <li>Drag & drop scheduling</li>
+                        <li>Quick capture</li>
+                        <li>Folders & tags</li>
+                        <li>Search & filter</li>
                     </ul>
                 </div>
 
                 <div class="premium-card scroll-fade">
-                    <div class="premium-icon">⏱️</div>
-                    <h3 class="premium-title">Focus Timer</h3>
-                    <p class="premium-description">Pomodoro sessions for deep work.</p>
+                    <div class="premium-icon">🎯</div>
+                    <h3 class="premium-title">Goals</h3>
+                    <p class="premium-description">Set and track meaningful goals.</p>
                     <ul class="premium-list">
-                        <li>25/5 minute sessions</li>
-                        <li>Ambient soundscapes</li>
-                        <li>Session tracking</li>
+                        <li>Visual milestones</li>
+                        <li>Progress tracking</li>
+                        <li>Goal categories</li>
                     </ul>
                 </div>
 
@@ -307,29 +385,20 @@
                 </div>
 
                 <div class="premium-card scroll-fade">
-                    <div class="premium-icon">👥</div>
-                    <h3 class="premium-title">Collaboration</h3>
-                    <p class="premium-description">Work together peacefully.</p>
+                    <div class="premium-icon">📤</div>
+                    <h3 class="premium-title">Data Export</h3>
+                    <p class="premium-description">Take your data wherever you go.</p>
                     <ul class="premium-list">
-                        <li>Shared workspaces</li>
-                        <li>Gentle notifications</li>
-                        <li>Easy permissions</li>
+                        <li>CSV & JSON export</li>
+                        <li>Full backup</li>
+                        <li>Data portability</li>
                     </ul>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- App Coming Soon Section -->
-    <section class="section app-section" id="app-section">
-        <div class="container">
-            <div class="app-content scroll-fade">
-                <h2 class="section-title">OrganizO App — Coming Soon</h2>
-                <p class="section-text">We are building a calm productivity app to support your daily life.</p>
-                <button class="btn-secondary" onclick="openWaitlist()">Join Waitlist</button>
-            </div>
-        </div>
-    </section>
+    <!-- CTA Section -->
 
     <!-- Final CTA Section -->
     <section class="section cta-section" id="cta">
@@ -357,20 +426,24 @@
                 </div>
                 <nav class="footer-nav">
                     <a href="#about" class="footer-link">About</a>
-                    <a href="mailto:organizo089@gmail.com" class="footer-link">Contact</a>
-                    <a href="#" class="footer-link">Privacy Policy</a>
+                    <a href="mailto:shru089x@gmail.com" class="footer-link">Contact</a>
                 </nav>
+                <div style="margin-top: 1rem; color: var(--color-sage-light); font-size: 0.9rem;">
+                    Contact Us - <a href="mailto:organizo089@gmail.com"
+                        style="color: inherit; text-decoration: underline;">organizo089@gmail.com</a>
+                </div>
                 <div class="footer-social">
-                    <a href="#" class="social-link" aria-label="Instagram">
+                    <a href="https://www.instagram.com/Shru_dev089/" target="_blank" class="social-link"
+                        aria-label="Instagram">
                         <svg viewBox="0 0 24 24" fill="currentColor">
                             <path
                                 d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" />
                         </svg>
                     </a>
-                    <a href="#" class="social-link" aria-label="Twitter">
+                    <a href="mailto:organizo089@gmail.com" class="social-link" aria-label="Gmail">
                         <svg viewBox="0 0 24 24" fill="currentColor">
                             <path
-                                d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z" />
+                                d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z" />
                         </svg>
                     </a>
                 </div>

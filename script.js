@@ -43,6 +43,24 @@ document.addEventListener('DOMContentLoaded', () => {
     }, { threshold: 0.1 });
 
     sections.forEach(section => sectionObserver.observe(section));
+
+    // Navigation links smoothing
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            const href = this.getAttribute('href');
+            if (href === '#' || !href.startsWith('#')) return;
+
+            e.preventDefault();
+            const targetId = href.substring(1);
+            const target = document.getElementById(targetId);
+            if (target) {
+                target.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }
+        });
+    });
 });
 
 // Smooth scroll to section
@@ -269,6 +287,25 @@ function handleWaitlistSubmit(event) {
     btn.style.opacity = '0.7';
     btn.style.pointerEvents = 'none';
 
+    const showSuccess = () => {
+        const modalContent = document.querySelector('.modal-content');
+        if (modalContent) {
+            modalContent.innerHTML = `
+                <button class="modal-close" onclick="closeWaitlist()" aria-label="Close modal">&times;</button>
+                <div class="success-message">
+                    <div class="success-icon">🌿</div>
+                    <h3 class="success-title">You're on the list!</h3>
+                    <p class="success-text">
+                        Thank you for joining the Organizo community. We've saved your spot! <br><br>
+                        <strong>Bonus:</strong> You'll be the <strong>first to hear about new features</strong> as we build them.
+                        ${window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' ? '<br><small style="opacity:0.6">(Local Preview: Submission Simulated)</small>' : ''}
+                    </p>
+                </div>
+            `;
+        }
+        setTimeout(() => closeWaitlist(), 5000);
+    };
+
     // Submit to Netlify
     fetch("/", {
         method: "POST",
@@ -278,35 +315,27 @@ function handleWaitlistSubmit(event) {
             "email": email
         }).toString(),
     })
-        .then(() => {
-            // Show success message
-            const modalContent = document.querySelector('.modal-content');
-            if (modalContent) {
-                modalContent.innerHTML = `
-                <button class="modal-close" onclick="closeWaitlist()" aria-label="Close modal">&times;</button>
-                <div class="success-message">
-                    <div class="success-icon">🌿</div>
-                    <h3 class="success-title">You're on the list!</h3>
-                    <p class="success-text">
-                        Thank you for joining Organizo early access. We've saved your spot! <br><br>
-                        <strong>Bonus:</strong> You'll receive <strong>₹20 off Pro</strong> when we launch.
-                    </p>
-                </div>
-            `;
+        .then(response => {
+            if (!response.ok && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')) {
+                // Local preview - simulate success even if fetch 404s
+                showSuccess();
+                return;
             }
-
-            // Auto-close after 5 seconds
-            setTimeout(() => {
-                closeWaitlist();
-            }, 5000);
+            showSuccess();
         })
         .catch((error) => {
-            console.error('Form submission error:', error);
-            btn.textContent = 'Try Again';
-            btn.style.opacity = '1';
-            btn.style.pointerEvents = 'auto';
+            if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+                // Local preview - simulate success
+                showSuccess();
+            } else {
+                console.error('Form submission error:', error);
+                btn.textContent = 'Try Again';
+                btn.style.opacity = '1';
+                btn.style.pointerEvents = 'auto';
+            }
         });
 }
+
 
 // Add fadeOut animation
 const fadeOutStyle = document.createElement('style');
@@ -374,3 +403,20 @@ console.log('%c🌿 Organizo - Structure your life, gently.',
     'color: #A8B5A0; font-size: 16px; font-weight: bold; font-family: Poppins, sans-serif;');
 console.log('%cWelcome to a calmer way of staying productive.',
     'color: #7A8A72; font-size: 12px; font-family: Inter, sans-serif;');
+// Sticky header effect
+window.addEventListener('scroll', () => {
+    const header = document.querySelector('.main-header');
+    if (header) {
+        if (window.scrollY > 50) {
+            header.style.background = 'rgba(255, 255, 255, 0.9)';
+            header.style.backdropFilter = 'blur(10px)';
+            header.style.boxShadow = '0 5px 20px rgba(0,0,0,0.05)';
+            header.style.padding = '1rem 5%';
+        } else {
+            header.style.background = 'transparent';
+            header.style.backdropFilter = 'none';
+            header.style.boxShadow = 'none';
+            header.style.padding = '1.5rem 5%';
+        }
+    }
+});

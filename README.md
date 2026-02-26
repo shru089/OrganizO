@@ -2,6 +2,8 @@
 
 > **Structure your life, gently.**
 
+🌎 **Live App**: [https://organizolife.netlify.app/](https://organizolife.netlify.app/)
+
 OrganizO is a premium, calm productivity application featuring a Sunlit Bamboo Forest aesthetic. It is designed for focus, mental clarity, and an immersive user experience.
 
 ---
@@ -56,4 +58,4 @@ OrganizO/
 
 ---
 
-**Built for focus, designed for peace.** 🎋
+**Built for focus, designed for peace.** 🎋git

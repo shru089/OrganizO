@@ -3,6 +3,8 @@
 ## 📑 Overview
 OrganizO is a **purely client-side productivity web app** that prioritizes user privacy and calm focus. This document provides a technical breakdown for developers and auditors.
 
+🌎 **Live Deployment**: [https://organizolife.netlify.app/](https://organizolife.netlify.app/)
+
 ---
 
 ## 🛡️ Architecture & Security

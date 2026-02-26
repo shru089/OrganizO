@@ -24,6 +24,8 @@ OrganizO is a premium, calm productivity application featuring a Sunlit Bamboo F
 
 OrganizO is built on the principle of **Calm Productivity**. Every design choice — from the emerald green tones to the slow easing functions — is intended to reduce stress and invite focus. 
 
+OrganizO intentionally avoids a backend to maximize privacy, reduce complexity, eliminate server costs, and allow offline usage. 
+
 ---
 
 ## 🛠️ Tech Stack

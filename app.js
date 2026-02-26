@@ -31,6 +31,62 @@ class OrganizOApp {
     init() {
         this.updateGreeting();
         this.updateDate();
+        this.checkOnboarding();
+        this.setupHotkeys(); // Preparing for feature 4
+    }
+
+    checkOnboarding() {
+        const hasSeenOnboarding = localStorage.getItem('organizo_onboarding_seen');
+        if (!hasSeenOnboarding) {
+            // Slight delay so it feels natural
+            setTimeout(() => this.showOnboardingModal(), 500);
+        }
+    }
+
+    showOnboardingModal() {
+        const modal = document.createElement('div');
+        modal.className = 'modal-overlay';
+        modal.innerHTML = `
+            <div class="modal-content" style="max-width: 480px; text-align: center;">
+                <div style="font-size: 3rem; margin-bottom: 1rem;">🌿</div>
+                <h2 style="margin-bottom: 0.5rem; color: var(--text-dark);">Welcome to your sanctuary</h2>
+                <p style="color: var(--text-muted); margin-bottom: 2rem; line-height: 1.6;">
+                    OrganizO is your calm space for productivity. No pressure, no overwhelming lists. Just gentle focus and structure.
+                </p>
+                
+                <div style="display: flex; flex-direction: column; gap: 1rem; margin-bottom: 2rem;">
+                    <button class="btn-focus" id="onboarding-intention-btn" style="background: var(--surface); color: var(--accent-green); border: 2px solid var(--accent-green);">
+                        ✨ Set today's intention
+                    </button>
+                    <button class="btn-focus" id="onboarding-task-btn" style="background: var(--accent-green); color: white;">
+                        📝 Create your first task
+                    </button>
+                </div>
+                
+                <button class="icon-btn" id="onboarding-close-btn" style="font-size: 0.9rem; width: auto; padding: 0.5rem 1rem; border: none; background: transparent; color: var(--text-muted);">
+                    I'll explore on my own
+                </button>
+            </div>
+        `;
+        document.body.appendChild(modal);
+
+        const closeAndMarkSeen = () => {
+            localStorage.setItem('organizo_onboarding_seen', 'true');
+            modal.style.opacity = '0';
+            setTimeout(() => modal.remove(), 300);
+        };
+
+        modal.querySelector('#onboarding-close-btn').addEventListener('click', closeAndMarkSeen);
+
+        modal.querySelector('#onboarding-intention-btn').addEventListener('click', () => {
+            closeAndMarkSeen();
+            this.editIntention();
+        });
+
+        modal.querySelector('#onboarding-task-btn').addEventListener('click', () => {
+            closeAndMarkSeen();
+            this.showAddTaskModal();
+        });
     }
 
     // Security: Sanitize user input to prevent XSS
@@ -290,7 +346,7 @@ class OrganizOApp {
 
     renderTaskList() {
         if (this.tasks.length === 0) {
-            return '<div style="text-align: center; padding: 2rem; color: var(--text-muted);">No tasks yet. Click "+ Add New" to create one.</div>';
+            return '<div style="text-align: center; padding: 2.5rem 1rem; color: var(--text-muted);"><div style="font-size: 2rem; margin-bottom: 0.5rem;">🌱</div>No tasks yet. Add one to begin cultivating focus.</div>';
         }
 
         return this.tasks.slice(0, 5).map(task => `
@@ -571,7 +627,7 @@ class OrganizOApp {
 
             <div class="card">
                 <div class="task-list" id="task-list">
-                    ${this.tasks.length === 0 ? '<div style="text-align: center; padding: 3rem; color: var(--text-muted);">No tasks yet. Create your first task!</div>' : this.renderFullTaskList()}
+                    ${this.tasks.length === 0 ? '<div style="text-align: center; padding: 4rem 1rem; color: var(--text-muted);"><div style="font-size: 2.5rem; margin-bottom: 1rem;">🍃</div>Your task list is a blank canvas.<br>Add a task to start organizing your day.</div>' : this.renderFullTaskList()}
                 </div>
             </div>
         `;
@@ -933,6 +989,39 @@ class OrganizOApp {
     }
 
     // Utility Functions
+    setupHotkeys() {
+        document.addEventListener('keydown', (e) => {
+            // Don't trigger if user is typing in an input, textarea, or contenteditable
+            if (['INPUT', 'TEXTAREA', 'SELECT'].includes(e.target.tagName) || e.target.isContentEditable) {
+                return;
+            }
+
+            switch (e.key.toLowerCase()) {
+                case 'n':
+                    e.preventDefault();
+                    this.showAddTaskModal();
+                    break;
+                case 'f':
+                    e.preventDefault();
+                    if (this.currentView !== 'timer') {
+                        this.switchView('timer');
+                    } else {
+                        if (this.timer.isRunning) {
+                            this.pauseTimer();
+                        } else {
+                            this.startTimer();
+                        }
+                    }
+                    break;
+                case '/':
+                    e.preventDefault();
+                    const searchInput = document.getElementById('search-input');
+                    if (searchInput) searchInput.focus();
+                    break;
+            }
+        });
+    }
+
     setupSearchFilter() {
         const searchInput = document.getElementById('search-input');
         if (searchInput) {
@@ -1049,9 +1138,15 @@ class OrganizOApp {
                 <input type="text" id="edit-user-name" value="${this.sanitize(this.userData.name)}" placeholder="Your Name" class="input-field" style="width: 100%; padding: 12px; border: 1px solid #E2E8F0; border-radius: 8px; margin-bottom: 1rem;">
                 <input type="text" id="edit-user-initials" value="${this.sanitize(this.userData.initials)}" maxlength="2" placeholder="Initials (e.g. JS)" class="input-field" style="width: 100%; padding: 12px; border: 1px solid #E2E8F0; border-radius: 8px; margin-bottom: 1.5rem;">
                 
-                <div style="display: flex; gap: 1rem;">
+                <div style="display: flex; gap: 1rem; margin-bottom: 1.5rem;">
                     <button id="save-profile-btn" class="btn-primary" style="flex: 1; padding: 12px; border-radius: 8px;">Save Changes</button>
                     <button id="close-profile-modal" class="btn-secondary" style="flex: 1; padding: 12px; border-radius: 8px; background: #f1f5f9;">Cancel</button>
+                </div>
+                
+                <div style="border-top: 1px solid #E2E8F0; padding-top: 1.5rem;">
+                    <button id="export-data-btn" class="btn-secondary" style="width: 100%; padding: 10px; border-radius: 8px; font-size: 0.9rem; color: var(--text-muted); display: flex; align-items: center; justify-content: center; gap: 8px;">
+                        <span>📥</span> Export Backup (JSON)
+                    </button>
                 </div>
             </div>
         `;
@@ -1071,7 +1166,35 @@ class OrganizOApp {
             }
         });
 
+        modal.querySelector('#export-data-btn').addEventListener('click', () => {
+            this.exportData();
+        });
+
         document.body.appendChild(modal);
+    }
+
+    exportData() {
+        // Gather all organizo_ prefixed data
+        const backupData = {};
+        for (let i = 0; i < localStorage.length; i++) {
+            const key = localStorage.key(i);
+            if (key.startsWith('organizo_')) {
+                try {
+                    backupData[key] = JSON.parse(localStorage.getItem(key));
+                } catch (e) {
+                    backupData[key] = localStorage.getItem(key);
+                }
+            }
+        }
+
+        // Create Blob and Download
+        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(backupData, null, 2));
+        const downloadAnchorNode = document.createElement('a');
+        downloadAnchorNode.setAttribute("href", dataStr);
+        downloadAnchorNode.setAttribute("download", `organizo-backup-${new Date().toISOString().split('T')[0]}.json`);
+        document.body.appendChild(downloadAnchorNode); // required for firefox
+        downloadAnchorNode.click();
+        downloadAnchorNode.remove();
     }
 
     updateUserUI() {

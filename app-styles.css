@@ -80,3 +80,85 @@
     border-color: var(--accent-green) !important;
     box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
 }
+
+/* ========================================================================= */
+/* MOBILE OPTIMIZATION OVERRIDES FOR DASHBOARD                               */
+/* ========================================================================= */
+
+@media (max-width: 900px) {
+
+    .dashboard-grid,
+    .calendar-grid {
+        grid-template-columns: 1fr !important;
+    }
+}
+
+@media (max-width: 768px) {
+    .app-container {
+        flex-direction: column !important;
+        overflow-y: auto !important;
+    }
+
+    .sidebar {
+        width: 100% !important;
+        padding: 1rem !important;
+        border-right: none !important;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        z-index: 10;
+        background: rgba(255, 255, 255, 0.8) !important;
+    }
+
+    .sidebar-logo {
+        margin-bottom: 1rem !important;
+    }
+
+    .nav-list {
+        display: flex !important;
+        flex-direction: row !important;
+        gap: 8px;
+        overflow-x: auto;
+        padding-bottom: 8px;
+        width: 100%;
+        justify-content: flex-start;
+    }
+
+    .nav-link {
+        margin-bottom: 0 !important;
+        white-space: nowrap;
+        padding: 8px 12px !important;
+    }
+
+    /* Hide the bottom user section on mobile since there's an avatar in top-nav */
+    .sidebar-user {
+        display: none !important;
+    }
+
+    .main-content {
+        padding: 1.5rem 1rem !important;
+        overflow-y: visible !important;
+        height: auto !important;
+    }
+
+    .header-section h1 {
+        font-size: 2rem !important;
+    }
+
+    .intention-card {
+        padding: 1.5rem !important;
+    }
+
+    .intention-text {
+        font-size: 1.4rem !important;
+    }
+
+    /* Modals need to fit mobile screens perfectly */
+    .modal-content {
+        padding: 1.5rem !important;
+        width: 95% !important;
+        max-width: 100% !important;
+        border-radius: 16px !important;
+    }
+}

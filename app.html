@@ -454,6 +454,14 @@
                 </ul>
             </nav>
 
+            <div class="sidebar-feedback" style="margin-bottom: 1.5rem;">
+                <button class="btn-secondary"
+                    style="width: 100%; border-radius: 12px; font-weight: 500; display: flex; align-items: center; justify-content: center; gap: 8px; border: 1px dashed var(--accent-green); color: var(--accent-green); background: transparent; padding: 10px;"
+                    onclick="window.organizoApp && window.organizoApp.showFeedbackModal()">
+                    💌 Send Feedback
+                </button>
+            </div>
+
             <div class="sidebar-user profile-edit-trigger"
                 onclick="window.organizoApp && window.organizoApp.showProfileModal()" style="cursor: pointer;">
                 <div class="user-avatar">JS</div>

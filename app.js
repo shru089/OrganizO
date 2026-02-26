@@ -1197,6 +1197,128 @@ class OrganizOApp {
         downloadAnchorNode.remove();
     }
 
+    showFeedbackModal() {
+        const modal = document.createElement('div');
+        modal.className = 'modal-overlay';
+        modal.innerHTML = `
+            <div class="modal-content" style="max-width: 500px; text-align: left;">
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem;">
+                    <h3 style="margin: 0; display: flex; align-items: center; gap: 8px;">💌 Send Feedback</h3>
+                    <button id="close-feedback-btn" style="background: none; border: none; font-size: 1.5rem; color: var(--text-muted); cursor: pointer;">×</button>
+                </div>
+                <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.5rem; background: var(--app-bg); padding: 10px; border-radius: 8px; border-left: 3px solid var(--accent-green);">
+                    🔒 <strong>Privacy Note:</strong> Your feedback goes directly to the creator. No third-party tracking.
+                </p>
+                
+                <form id="feedback-form" style="display: flex; flex-direction: column; gap: 1rem;">
+                    <div style="display: flex; gap: 1rem;">
+                        <div style="flex: 1;">
+                            <label style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 4px; display: block;">Name (Optional)</label>
+                            <input type="text" id="feedback-name" placeholder="Your Name" class="input-field" style="width: 100%; padding: 10px; border: 1px solid #E2E8F0; border-radius: 8px;">
+                        </div>
+                        <div style="flex: 1;">
+                            <label style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 4px; display: block;">Email (Optional)</label>
+                            <input type="email" id="feedback-email" placeholder="Your Email" class="input-field" style="width: 100%; padding: 10px; border: 1px solid #E2E8F0; border-radius: 8px;">
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 4px; display: block;">Feature Requests? (Optional)</label>
+                        <input type="text" id="feedback-feature" placeholder="What should I build next?" class="input-field" style="width: 100%; padding: 10px; border: 1px solid #E2E8F0; border-radius: 8px;">
+                    </div>
+                    
+                    <div>
+                        <label style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 4px; display: block;">Feedback Message ⭐ <span style="color: #EF4444;">*</span></label>
+                        <textarea id="feedback-message" required placeholder="How is OrganizO helping you focus?" class="input-field" style="width: 100%; padding: 10px; border: 1px solid #E2E8F0; border-radius: 8px; min-height: 100px; resize: vertical; font-family: inherit;"></textarea>
+                    </div>
+                    
+                    <div>
+                        <label style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 4px; display: block;">Rating (Optional)</label>
+                        <select id="feedback-rating" class="input-field" style="width: 100%; padding: 10px; border: 1px solid #E2E8F0; border-radius: 8px; background: white;">
+                            <option value="">Select a rating</option>
+                            <option value="5">⭐⭐⭐⭐⭐ - Loving it!</option>
+                            <option value="4">⭐⭐⭐⭐ - Really good</option>
+                            <option value="3">⭐⭐⭐ - It's okay</option>
+                            <option value="2">⭐⭐ - Needs work</option>
+                            <option value="1">⭐ - Not for me</option>
+                        </select>
+                    </div>
+
+                    <div id="feedback-status" style="font-size: 0.85rem; margin-top: 4px; display: none;"></div>
+                    
+                    <button type="submit" id="submit-feedback-btn" class="btn-focus" style="width: 100%; margin-top: 0.5rem; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                        Send Message 🚀
+                    </button>
+                </form>
+            </div>
+        `;
+
+        document.body.appendChild(modal);
+
+        modal.querySelector('#close-feedback-btn').addEventListener('click', () => modal.remove());
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) modal.remove();
+        });
+
+        const form = modal.querySelector('#feedback-form');
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            this.submitFeedback(form, modal);
+        });
+    }
+
+    async submitFeedback(form, modal) {
+        const btn = form.querySelector('#submit-feedback-btn');
+        const statusDiv = form.querySelector('#feedback-status');
+
+        // --- 🔴 REPLACE THESE WITH YOUR ACTUAL EMAILJS KEYS 🔴 ---
+        const EMAILJS_SERVICE_ID = 'YOUR_SERVICE_ID';
+        const EMAILJS_TEMPLATE_ID = 'YOUR_TEMPLATE_ID';
+        const EMAILJS_PUBLIC_KEY = 'YOUR_PUBLIC_KEY';
+        // --------------------------------------------------------
+
+        const payload = {
+            service_id: EMAILJS_SERVICE_ID,
+            template_id: EMAILJS_TEMPLATE_ID,
+            user_id: EMAILJS_PUBLIC_KEY,
+            template_params: {
+                from_name: this.sanitize(form.querySelector('#feedback-name').value) || 'Anonymous Zen Seeker',
+                reply_to: this.sanitize(form.querySelector('#feedback-email').value) || 'No Email Provided',
+                message: this.sanitize(form.querySelector('#feedback-message').value),
+                feature_request: this.sanitize(form.querySelector('#feedback-feature').value) || 'None',
+                rating: form.querySelector('#feedback-rating').value || 'Not Rated'
+            }
+        };
+
+        btn.disabled = true;
+        btn.innerHTML = '<div class="zen-loader" style="font-size: 1rem; margin: 0; animation: pulse 1s infinite;">🌿</div> Sending...';
+        statusDiv.style.display = 'none';
+
+        try {
+            const response = await fetch('https://api.emailjs.com/api/v1.0/email/send', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(payload)
+            });
+
+            if (response.ok) {
+                btn.innerHTML = '✅ Sent Successfully!';
+                btn.style.background = 'var(--accent-green)';
+                setTimeout(() => modal.remove(), 2000);
+            } else {
+                throw new Error('Failed to send');
+            }
+        } catch (error) {
+            btn.disabled = false;
+            btn.innerHTML = 'Try Again 🚀';
+            statusDiv.style.display = 'block';
+            statusDiv.style.color = '#EF4444';
+            statusDiv.textContent = '❌ Failed to connect to EmailJS. Have you replaced the API keys in app.js?';
+        }
+    }
+
     updateUserUI() {
         // Update greeting
         const greeting = document.getElementById('greeting');

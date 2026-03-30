@@ -637,21 +637,21 @@ class OrganizOApp {
                         </div>
                         <div style="margin-bottom: 1.25rem;">
                             ${t.tasks.map(task => `
-                                <div style="display: flex; align-items: center; gap: 8px; padding: 6px 0; border-bottom: 1px solid #F8FAFC; font-size: 0.85rem;">
-                                    <span style="color: ${t.color}; font-size: 0.8rem;">◦</span>
-                                    <span>${task.name}</span>
+                                <div style="display: flex; align-items: center; gap: 8px; padding: 6px 0; border-bottom: 1px solid rgba(0,0,0,0.05); font-size: 0.85rem;">
+                                    <span style="color: var(--accent-green); font-size: 0.8rem;">◦</span>
+                                    <span style="color: var(--text-dark);">${task.name}</span>
                                     ${task.priority === 'High' ? `<span style="margin-left: auto; font-size: 0.65rem; background: #FEF2F2; color: #EF4444; border-radius: 4px; padding: 1px 6px; font-weight: 600;">HIGH</span>` : ''}
                                 </div>
                             `).join('')}
                         </div>
-                        <button class="btn-focus apply-template-btn" data-template-id="${t.id}" style="width: 100%; background: ${t.color};">
-                            Load ${t.name} Tasks
+                        <button class="btn-focus apply-template-btn" data-template-id="${t.id}" style="width: 100%; background: var(--accent-green); white-space: nowrap; font-size: 0.85rem; padding: 10px 5px;">
+                            Load ${t.name}
                         </button>
                     </div>
                 `).join('')}
             </div>
 
-            <div style="margin-top: 2rem; padding: 1.5rem; background: #F0FDF4; border-radius: 16px; text-align: center;">
+            <div class="info-box">
                 <div style="font-size: 1.5rem; margin-bottom: 0.5rem;">💡</div>
                 <div style="font-weight: 600; margin-bottom: 0.25rem;">Templates add tasks to your existing list</div>
                 <div style="color: var(--text-muted); font-size: 0.9rem;">You can edit, delete, or complete them just like any other task. Mix and match!</div>

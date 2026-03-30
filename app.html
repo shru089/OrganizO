@@ -117,6 +117,7 @@
             color: white !important; 
             border-color: rgba(255,255,255,0.1) !important; 
         }
+        body.theme-midnight .search-box input { background: transparent !important; color: white !important; }
         body.theme-midnight .modal-content { background: #1E293B; border: 1px solid rgba(255,255,255,0.1); color: white; }
         body.theme-midnight .month-header, body.theme-midnight .day-header { color: #F8FAFC; }
         body.theme-midnight .day-cell { border-color: rgba(255,255,255,0.05); }
@@ -137,6 +138,11 @@
         body.theme-midnight .ring-bg { stroke: var(--ring-bg) !important; }
         body.theme-midnight .nav-link { color: #94A3B8; }
         body.theme-midnight .nav-link:hover, body.theme-midnight .nav-link.active { color: var(--accent-green); background: rgba(255,255,255,0.05); }
+        
+        /* Themed info boxes */
+        .info-box { background: rgba(16, 185, 129, 0.05); border-radius: 16px; padding: 1.5rem; text-align: center; }
+        body.theme-midnight .info-box { background: rgba(255, 255, 255, 0.05); color: white; }
+        body.theme-midnight .info-box div { color: #E2E8F0; }
 
         body.theme-midnight {
             --streak-bg: rgba(56, 189, 248, 0.15);

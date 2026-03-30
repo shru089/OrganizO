@@ -16,7 +16,7 @@ With a beautiful glassmorphic interface inspired by bamboo forests, OrganizO tur
 
 ---
 
-**✨ WHAT YOU GET (100% Free, No Sign-Up)**
+**✨ WHAT YOU GET (Free, No Sign-Up Required)**
 
 📋 **Tasks** — Capture everything that matters. Add, complete, and organize your day with simple, beautiful to-do lists with priority tags.
 
@@ -50,20 +50,28 @@ Your data never leaves your device. No accounts, no servers, no tracking. Organi
 
 ---
 
-**🚀 COMPLETELY FREE FOREVER**
+**💚 FREE — ALWAYS**
 
-No paywalls. No premium tiers. No subscriptions. Everything in OrganizO is free because we believe calm productivity should be accessible to everyone.
+The full OrganizO experience is free. No account required, no credit card, no hidden limits. Core features — tasks, habits, focus timer, calendar, insights, streak tracking, weekly reports, and routine templates — will always be free.
 
 ---
 
-**🗺️ COMING SOON**
+**⭐ ORGANIZO PRO — COMING SOON (₹99/month)**
+
+For users who want to go deeper. Pro features are in development and will be offered at an honest, fair price:
+
+- 🌙 Dark Mode — For late-night planning sessions
+- 🎨 Custom Themes — 8 calming color palettes
+- 🛡️ Streak Freeze — Protect your streak once a week
+- ☁️ Cloud Sync — Access from anywhere
+- 📤 Advanced Data Export — CSV & PDF
+
+---
+
+**🗺️ FREE ROADMAP**
 
 - 📓 Notes — Quick capture and organized folders
 - 🎯 Goals — Visual milestone tracking
-- 🤖 AI Insights — Smart productivity suggestions
-- ☁️ Cloud Sync — Access from anywhere
-- 🎨 Themes — Multiple calming color palettes
-- 🌙 Dark Mode — For late-night planning sessions
 
 ---
 

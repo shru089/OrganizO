@@ -498,16 +498,16 @@ class OrganizOApp {
                     <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">🌿</div>
                     <h2 style="margin: 0; font-size: 1.5rem;">OrganizO Pro</h2>
                     <p style="margin: 8px 0 0; opacity: 0.85; font-size: 0.9rem;">Everything you need to grow — gently.</p>
-                    <div style="font-size: 2rem; font-weight: 800; margin-top: 1rem;">₹99<span style="font-size: 1rem; font-weight: 400; opacity: 0.8;">/month</span></div>
+                    <div style="font-size: 2rem; font-weight: 800; margin-top: 1rem;">₹49<span style="font-size: 1rem; font-weight: 400; opacity: 0.8;">/month</span></div>
                 </div>
 
                 <div style="text-align: left; margin-bottom: 1.5rem;">
                     ${[
                         ['🌙', 'Dark Mode', 'For late-night planning sessions'],
-                        ['☁️', 'Cloud Sync', 'Access from any device, anytime'],
-                        ['🎨', 'Custom Themes', '8 calming color palettes'],
+                        ['📓', 'Quiet Notes', 'Your private daily scratchpad'],
+                        ['🎨', 'Custom Palettes', 'Matcha, Sakura, Slate, Ocean & Sandstone'],
                         ['🛡️', 'Streak Freeze', 'Protect your streak once a week'],
-                        ['📊', 'Advanced Weekly Reports', 'Deep dive into your patterns'],
+                        ['📊', 'Advanced Reports', 'Deep dive into your patterns'],
                         ['📤', 'Data Export', 'CSV & PDF export anytime'],
                     ].map(([icon, title, desc]) => `
                         <div style="display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid #F1F5F9;">

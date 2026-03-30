@@ -56,21 +56,21 @@ The full OrganizO experience is free. No account required, no credit card, no hi
 
 ---
 
-**⭐ ORGANIZO PRO — COMING SOON (₹99/month)**
+**⭐ ORGANIZO PRO — COMING SOON (₹49/month)**
 
 For users who want to go deeper. Pro features are in development and will be offered at an honest, fair price:
 
-- 🌙 Dark Mode — For late-night planning sessions
-- 🎨 Custom Themes — 8 calming color palettes
+- 🌙 Dark Mode — Sleek midnight look for late-night planning
+- 📓 Quiet Notes — A private daily scratchpad for quick braindumps
+- 🎨 Custom Palettes — Match your exact vibe (Matcha, Sakura, Slate, Ocean, Sandstone)
 - 🛡️ Streak Freeze — Protect your streak once a week
-- ☁️ Cloud Sync — Access from anywhere
-- 📤 Advanced Data Export — CSV & PDF
+- 📊 Advanced Reports — Deep dive into your productivity patterns
+- 📤 Data Export — Full secure JSON/CSV backups, you own your data
 
 ---
 
 **🗺️ FREE ROADMAP**
 
-- 📓 Notes — Quick capture and organized folders
 - 🎯 Goals — Visual milestone tracking
 
 ---

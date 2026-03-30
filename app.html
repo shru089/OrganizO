@@ -33,6 +33,9 @@
             --intention-bg: white;
             --input-bg: white;
             --ring-bg: #E2E8F0;
+            --streak-bg: linear-gradient(135deg, #065F46 0%, #10B981 100%);
+            --streak-text: white;
+            --streak-pill: rgba(0, 0, 0, 0.05);
         }
 
         body.app-body {
@@ -59,9 +62,10 @@
         body.theme-ocean {
             --accent-green: #0ea5e9;
             --accent-green-glow: rgba(14, 165, 233, 0.4);
-            --text-dark: #082F49;
+            --text-dark: #075985;
+            --text-muted: #334155;
             background-image:
-                linear-gradient(rgba(248, 250, 249, 0.8), rgba(248, 250, 249, 0.8)),
+                linear-gradient(rgba(240, 249, 255, 0.85), rgba(240, 249, 255, 0.85)),
                 url('./images/ocean.png');
         }
         body.theme-sandstone {
@@ -76,9 +80,10 @@
         body.theme-sunset {
             --accent-green: #a855f7;
             --accent-green-glow: rgba(168, 85, 247, 0.4);
-            --text-dark: #3B0764;
+            --text-dark: #4C1D95;
+            --text-muted: #4B5563;
             background-image:
-                linear-gradient(rgba(248, 250, 249, 0.8), rgba(248, 250, 249, 0.8)),
+                linear-gradient(rgba(250, 245, 255, 0.85), rgba(250, 245, 255, 0.85)),
                 url('./images/sunset.png');
         }
         body.theme-midnight {
@@ -128,6 +133,18 @@
         body.theme-midnight .ring-bg { stroke: var(--ring-bg) !important; }
         body.theme-midnight .nav-link { color: #94A3B8; }
         body.theme-midnight .nav-link:hover, body.theme-midnight .nav-link.active { color: var(--accent-green); background: rgba(255,255,255,0.05); }
+
+        body.theme-midnight {
+            --streak-bg: rgba(56, 189, 248, 0.15);
+            --streak-text: #38BDF8;
+            --streak-pill: rgba(255, 255, 255, 0.05);
+            --text-dark: #FFFFFF;
+            --text-muted: #CBD5E1;
+        }
+        body.theme-midnight .streak-card {
+            border: 1px solid rgba(56, 189, 248, 0.2);
+            box-shadow: 0 10px 30px rgba(56, 189, 248, 0.1);
+        }
 
         .app-container {
             display: flex;
@@ -417,6 +434,7 @@
             display: flex;
             align-items: center;
             gap: 8px;
+            color: var(--text-dark);
         }
 
         .add-btn {

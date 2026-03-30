@@ -308,7 +308,7 @@ class OrganizOApp {
     renderStreakMiniCard() {
         const { currentStreak, bestStreak } = this.streakData;
         return `
-            <div class="card streak-card" style="background: linear-gradient(135deg, #065F46 0%, #10B981 100%); color: white; cursor: pointer;" onclick="window.organizoApp.showStreakModal()">
+            <div class="card streak-card" style="background: var(--streak-bg); color: var(--streak-text); cursor: pointer;" onclick="window.organizoApp.showStreakModal()">
                 <div style="display: flex; justify-content: space-between; align-items: center;">
                     <div>
                         <div style="font-size: 0.7rem; font-weight: 700; letter-spacing: 1px; opacity: 0.8; text-transform: uppercase;">Day Streak</div>
@@ -333,7 +333,7 @@ class OrganizOApp {
             d.setDate(d.getDate() - i);
             const dStr = d.toDateString();
             const active = this.streakData.history.includes(dStr);
-            dots.push(`<div style="width: 10px; height: 10px; border-radius: 50%; background: ${active ? 'white' : 'rgba(255,255,255,0.25)'};"></div>`);
+            dots.push(`<div style="width: 10px; height: 10px; border-radius: 50%; background: ${active ? 'var(--streak-text)' : 'var(--streak-pill)'};"></div>`);
         }
         return dots.join('');
     }
@@ -348,13 +348,13 @@ class OrganizOApp {
                 <h2 style="margin-bottom: 0.5rem;">${currentStreak} Day Streak!</h2>
                 <p style="color: var(--text-muted); margin-bottom: 2rem;">You're on a roll. Keep showing up, gently.</p>
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 2rem;">
-                    <div style="background: #F0FDF4; border-radius: 12px; padding: 1rem;">
+                    <div style="background: var(--streak-pill); border-radius: 12px; padding: 1rem;">
                         <div style="font-size: 0.7rem; color: var(--text-muted); font-weight: 700; letter-spacing: 1px;">CURRENT</div>
-                        <div style="font-size: 2rem; font-weight: 800; color: #10B981;">${currentStreak}</div>
+                        <div style="font-size: 2rem; font-weight: 800; color: var(--accent-green);">${currentStreak}</div>
                     </div>
-                    <div style="background: #F0FDF4; border-radius: 12px; padding: 1rem;">
+                    <div style="background: var(--streak-pill); border-radius: 12px; padding: 1rem;">
                         <div style="font-size: 0.7rem; color: var(--text-muted); font-weight: 700; letter-spacing: 1px;">BEST</div>
-                        <div style="font-size: 2rem; font-weight: 800; color: #10B981;">${bestStreak}</div>
+                        <div style="font-size: 2rem; font-weight: 800; color: var(--accent-green);">${bestStreak}</div>
                     </div>
                 </div>
                 <div style="text-align: left; margin-bottom: 2rem;">

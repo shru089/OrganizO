@@ -135,8 +135,8 @@ class OrganizOApp {
 
     // Event Listeners
     setupEventListeners() {
-        // Navigation
-        document.querySelectorAll('.nav-link').forEach(link => {
+        // Navigation (Sidebar & Mobile Nav)
+        document.querySelectorAll('.nav-link, .mobile-nav-link').forEach(link => {
             link.addEventListener('click', (e) => {
                 e.preventDefault();
                 const view = e.currentTarget.dataset.view;
@@ -233,10 +233,14 @@ class OrganizOApp {
     // View Management
     switchView(view) {
         this.currentView = view;
-        document.querySelectorAll('.nav-link').forEach(link => {
+        // Reset both desktop & mobile navs
+        document.querySelectorAll('.nav-link, .mobile-nav-link').forEach(link => {
             link.classList.remove('active');
         });
-        document.querySelector(`[data-view="${view}"]`)?.classList.add('active');
+        // Set active on matching view
+        document.querySelectorAll(`[data-view="${view}"]`).forEach(link => {
+            link.classList.add('active');
+        });
 
         const mainContent = document.querySelector('.main-content');
 
@@ -441,17 +445,17 @@ class OrganizOApp {
                 </div>
 
                 <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 1.5rem;">
-                    <div style="background: #F0FDF4; border-radius: 12px; padding: 1rem; text-align: center;">
+                    <div style="background: var(--streak-pill); border-radius: 12px; padding: 1rem; text-align: center;">
                         <div style="font-size: 0.7rem; color: var(--text-muted); font-weight: 700; letter-spacing: 1px;">TASKS DONE</div>
-                        <div style="font-size: 2rem; font-weight: 800; color: #10B981;">${completedThisWeek.length}</div>
+                        <div style="font-size: 2rem; font-weight: 800; color: var(--accent-green);">${completedThisWeek.length}</div>
                     </div>
-                    <div style="background: #F0FDF4; border-radius: 12px; padding: 1rem; text-align: center;">
+                    <div style="background: var(--streak-pill); border-radius: 12px; padding: 1rem; text-align: center;">
                         <div style="font-size: 0.7rem; color: var(--text-muted); font-weight: 700; letter-spacing: 1px;">FOCUS TIME</div>
-                        <div style="font-size: 2rem; font-weight: 800; color: #10B981;">${this.formatMinutes(focusMins)}</div>
+                        <div style="font-size: 2rem; font-weight: 800; color: var(--accent-green);">${this.formatMinutes(focusMins)}</div>
                     </div>
-                    <div style="background: #F0FDF4; border-radius: 12px; padding: 1rem; text-align: center;">
+                    <div style="background: var(--streak-pill); border-radius: 12px; padding: 1rem; text-align: center;">
                         <div style="font-size: 0.7rem; color: var(--text-muted); font-weight: 700; letter-spacing: 1px;">STREAK</div>
-                        <div style="font-size: 2rem; font-weight: 800; color: #10B981;">${this.streakData.currentStreak}🔥</div>
+                        <div style="font-size: 2rem; font-weight: 800; color: var(--accent-green);">${this.streakData.currentStreak}🔥</div>
                     </div>
                 </div>
 
@@ -460,25 +464,25 @@ class OrganizOApp {
                     <div style="display: flex; align-items: flex-end; gap: 8px; height: 80px;">
                         ${dayBars.map(d => `
                             <div style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px;">
-                                <div style="width: 100%; background: ${d.count > 0 ? '#10B981' : '#E2E8F0'}; border-radius: 4px 4px 0 0; height: ${Math.max(4, (d.count / maxCount) * 60)}px; transition: height 0.4s ease;"></div>
+                                <div style="width: 100%; background: ${d.count > 0 ? 'var(--accent-green)' : 'var(--border-color)'}; border-radius: 4px 4px 0 0; height: ${Math.max(4, (d.count / maxCount) * 60)}px; transition: height 0.4s ease;"></div>
                                 <div style="font-size: 0.65rem; color: var(--text-muted);">${d.day}</div>
-                                ${d.count > 0 ? `<div style="font-size: 0.7rem; font-weight: 700; color: #10B981;">${d.count}</div>` : ''}
+                                ${d.count > 0 ? `<div style="font-size: 0.7rem; font-weight: 700; color: var(--accent-green);">${d.count}</div>` : ''}
                             </div>
                         `).join('')}
                     </div>
                 </div>
 
-                <div style="background: #F0FDF4; border-radius: 12px; padding: 1rem; margin-bottom: 1.5rem;">
+                <div style="background: var(--streak-pill); border-radius: 12px; padding: 1rem; margin-bottom: 1.5rem;">
                     <div style="font-size: 0.75rem; font-weight: 700; color: var(--text-muted); letter-spacing: 1px; margin-bottom: 0.5rem;">HABIT RATE TODAY</div>
                     <div style="display: flex; align-items: center; gap: 12px;">
-                        <div style="flex: 1; background: #E2E8F0; border-radius: 8px; height: 8px; overflow: hidden;">
-                            <div style="background: #10B981; width: ${habitRate}%; height: 100%; border-radius: 8px; transition: width 0.6s ease;"></div>
+                        <div style="flex: 1; background: var(--border-color); border-radius: 8px; height: 8px; overflow: hidden;">
+                            <div style="background: var(--accent-green); width: ${habitRate}%; height: 100%; border-radius: 8px; transition: width 0.6s ease;"></div>
                         </div>
-                        <span style="font-weight: 700; color: #10B981; font-size: 0.9rem;">${habitRate}%</span>
+                        <span style="font-weight: 700; color: var(--accent-green); font-size: 0.9rem;">${habitRate}%</span>
                     </div>
                 </div>
 
-                <div style="background: linear-gradient(135deg, #065F46, #10B981); border-radius: 12px; padding: 1rem; color: white; text-align: center; margin-bottom: 1.5rem;">
+                <div style="background: var(--accent-green); border-radius: 12px; padding: 1rem; color: white; text-align: center; margin-bottom: 1.5rem;">
                     <div style="font-size: 0.85rem; opacity: 0.9; margin-bottom: 4px;">✨ Zen Insight</div>
                     <div style="font-style: italic; font-size: 0.95rem;">${this.getWeeklyInsight(completedThisWeek.length, focusMins, this.streakData.currentStreak)}</div>
                 </div>
@@ -1988,8 +1992,8 @@ class OrganizOApp {
 
         modal.innerHTML = `
             <div class="modal-content" style="max-width: 450px; text-align: left; position: relative;">
-                <button class="close-modal-btn btn-focus" style="position: absolute; top: 15px; right: 15px; width: 32px; height: 32px; padding: 0; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.05); color: var(--text-dark); border-radius: 50%;">×</button>
-                <div style="font-size: 2.5rem; margin-bottom: 0.5rem; text-align: center;">🎨</div>
+                <button class="close-modal-btn btn-focus" style="position: absolute; top: 15px; right: 15px; width: 32px; height: 32px; padding: 0; display: flex; align-items: center; justify-content: center; background: var(--streak-pill); color: var(--text-dark); border-radius: 50%;">×</button>
+                <div id="dev-pro-toggle" style="font-size: 2.5rem; margin-bottom: 0.5rem; text-align: center; cursor: pointer; user-select: none;">🎨</div>
                 <h2 style="margin-bottom: 0.5rem; text-align: center; color: var(--text-dark);">Customize Your Space</h2>
                 <p style="color: var(--text-muted); text-align: center; margin-bottom: 1.5rem; font-size: 0.9rem;">Select a theme to match your current vibe</p>
                 
@@ -2023,6 +2027,20 @@ class OrganizOApp {
         modal.querySelector('.close-modal-btn').addEventListener('click', () => modal.remove());
         modal.addEventListener('click', (e) => {
             if (e.target === modal) modal.remove();
+        });
+
+        // Developer Secret: Toggle Pro by clicking palette 5 times
+        let clickCount = 0;
+        modal.querySelector('#dev-pro-toggle').addEventListener('click', () => {
+            clickCount++;
+            if (clickCount >= 5) {
+                this.isPro = !this.isPro;
+                this.saveData('isPro', this.isPro);
+                alert(this.isPro ? "🌿 OrganizO Pro Unlocked!" : "OrganizO Free Mode");
+                this.updateUserUI();
+                modal.remove();
+                this.showProfileModal(); // reopen to see changes
+            }
         });
     }
 

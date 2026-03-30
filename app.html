@@ -501,6 +501,14 @@
         body.theme-midnight .badge-event { background: rgba(14, 165, 233, 0.1); color: #7DD3FC; border-color: #0EA5E9; }
         body.theme-midnight .badge-deadline { background: rgba(239, 68, 68, 0.1); color: #FCA5A5; border-color: #EF4444; }
 
+        /* Minimalist Scrollbars */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.1); border-radius: 10px; }
+        body.theme-midnight ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); }
+        * { scrollbar-width: thin; scrollbar-color: rgba(0,0,0,0.1) transparent; }
+        body.theme-midnight * { scrollbar-color: rgba(255,255,255,0.1) transparent; }
+
         .card-title {
             font-weight: 700;
             font-size: 1.1rem;
@@ -613,6 +621,61 @@
         .dot.active {
             background: var(--accent-green);
         }
+
+        /* 📱 RESPONSIVE - MOBILE NAV */
+        .mobile-nav {
+            display: none;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(20px);
+            border-top: 1px solid rgba(0, 0, 0, 0.05);
+            padding: 10px 0;
+            z-index: 1000;
+            justify-content: space-around;
+            align-items: center;
+        }
+
+        body.theme-midnight .mobile-nav {
+            background: rgba(15, 23, 42, 0.9);
+            border-top-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .mobile-nav-link {
+            text-decoration: none;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            color: var(--text-muted);
+            font-size: 0.65rem;
+            font-weight: 600;
+            opacity: 0.6;
+        }
+
+        .mobile-nav-link.active {
+            color: var(--accent-green);
+            opacity: 1;
+        }
+
+        .mobile-nav-icon { font-size: 1.25rem; }
+
+        @media (max-width: 768px) {
+            .app-container { flex-direction: column; }
+            .sidebar { display: none !important; }
+            .mobile-nav { display: flex; }
+            .main-content { padding: 1.5rem 1rem 5rem 1rem !important; }
+            .search-box { width: 100% !important; margin-bottom: 1rem; }
+            .top-nav { flex-direction: column; gap: 1rem; align-items: flex-start; }
+            .header-section h1, .dashboard-header h1 { font-size: 1.75rem !important; }
+            .dashboard-grid { grid-template-columns: 1fr !important; }
+            .calendar-grid { gap: 5px !important; }
+            .calendar-day-card { min-height: 50px !important; padding: 4px !important; }
+            .day-num { font-size: 0.8rem !important; }
+            .intention-text { font-size: 1.25rem !important; }
+        }
     </style>
 </head>
 
@@ -719,6 +782,30 @@
             </div>
         </main>
     </div>
+
+    <!-- 📱 MOBILE BOTTOM NAV -->
+    <nav class="mobile-nav">
+        <a href="#" class="mobile-nav-link active" data-view="dashboard">
+            <span class="mobile-nav-icon">📊</span>
+            <span>Home</span>
+        </a>
+        <a href="#" class="mobile-nav-link" data-view="calendar">
+            <span class="mobile-nav-icon">📅</span>
+            <span>Events</span>
+        </a>
+        <a href="#" class="mobile-nav-link" data-view="tasks">
+            <span class="mobile-nav-icon">✅</span>
+            <span>Tasks</span>
+        </a>
+        <a href="#" class="mobile-nav-link" data-view="timer">
+            <span class="mobile-nav-icon">⏱️</span>
+            <span>Focus</span>
+        </a>
+        <a href="#" class="mobile-nav-link" data-view="notes">
+            <span class="mobile-nav-icon">📓</span>
+            <span>Notes</span>
+        </a>
+    </nav>
 
     <style>
         .zen-loader {

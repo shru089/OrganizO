@@ -36,6 +36,8 @@
             --streak-bg: linear-gradient(135deg, #065F46 0%, #10B981 100%);
             --streak-text: white;
             --streak-pill: rgba(0, 0, 0, 0.05);
+            --card-bg: white;
+            --border-color: rgba(0,0,0,0.05);
         }
 
         body.app-body {
@@ -135,9 +137,12 @@
         body.theme-midnight .add-btn { color: var(--accent-green); }
         body.theme-midnight .task-item { border-bottom: 1px solid rgba(255,255,255,0.05); }
         body.theme-midnight .task-name { color: #E2E8F0; }
-        body.theme-midnight .ring-bg { stroke: var(--ring-bg) !important; }
-        body.theme-midnight .nav-link { color: #94A3B8; }
-        body.theme-midnight .nav-link:hover, body.theme-midnight .nav-link.active { color: var(--accent-green); background: rgba(255,255,255,0.05); }
+        body.theme-midnight .btn-focus { background: var(--accent-green); color: #0F172A; }
+        body.theme-midnight .btn-focus[style*="background: white"], body.theme-midnight .cancel-modal-btn { 
+            background: rgba(255,255,255,0.05) !important; 
+            color: white !important; 
+            border-color: rgba(255,255,255,0.1) !important; 
+        }
         
         /* Themed info boxes */
         .info-box { background: rgba(16, 185, 129, 0.05); border-radius: 16px; padding: 1.5rem; text-align: center; }
@@ -150,7 +155,19 @@
             --streak-pill: rgba(255, 255, 255, 0.05);
             --text-dark: #FFFFFF;
             --text-muted: #CBD5E1;
+            --card-bg: rgba(255, 255, 255, 0.05);
+            --border-color: rgba(255, 255, 255, 0.1);
+            --input-bg: rgba(255, 255, 255, 0.05);
         }
+        body.theme-midnight .calendar-day-card { background: var(--card-bg) !important; border-color: var(--border-color) !important; color: white; }
+        body.theme-midnight .calendar-day-card .day-num { color: white !important; }
+        body.theme-midnight .calendar-day-card:hover { background: rgba(255,255,255,0.1) !important; }
+        body.theme-midnight .calendar-day-card.today { border-color: var(--accent-green) !important; }
+        body.theme-midnight .empty-day { background: rgba(0,0,0,0.2) !important; border-color: rgba(255,255,255,0.05) !important; }
+        body.theme-midnight .calendar-header h1 { color: white !important; }
+        body.theme-midnight .calendar-grid div[style*="text-align: center"] { color: #94A3B8 !important; }
+        body.theme-midnight .holiday-banner { background: rgba(239, 68, 68, 0.1) !important; color: #FCA5A5 !important; border: 1px solid rgba(239, 68, 68, 0.2) !important; }
+        
         body.theme-midnight .streak-card {
             border: 1px solid rgba(56, 189, 248, 0.2);
             box-shadow: 0 10px 30px rgba(56, 189, 248, 0.1);
@@ -437,6 +454,52 @@
             align-items: center;
             margin-bottom: 1.5rem;
         }
+
+        .calendar-day-card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 10px;
+            height: 120px;
+            border: 1px solid var(--border-color);
+            cursor: pointer;
+            transition: all 0.2s;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .calendar-day-card.today {
+            border-color: var(--accent-green);
+        }
+
+        .badge-event {
+            font-size: 0.65rem;
+            background: #F0F9FF;
+            color: #0369A1;
+            border-radius: 4px;
+            padding: 2px 4px;
+            border-left: 3px solid #0369A1;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 2px;
+        }
+
+        .badge-deadline {
+            font-size: 0.65rem;
+            background: #FEF2F2;
+            color: #EF4444;
+            border-radius: 4px;
+            padding: 2px 4px;
+            border-left: 3px solid #EF4444;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 2px;
+        }
+
+        body.theme-midnight .badge-event { background: rgba(14, 165, 233, 0.1); color: #7DD3FC; border-color: #0EA5E9; }
+        body.theme-midnight .badge-deadline { background: rgba(239, 68, 68, 0.1); color: #FCA5A5; border-color: #EF4444; }
 
         .card-title {
             font-weight: 700;

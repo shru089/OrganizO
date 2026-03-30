@@ -885,7 +885,7 @@ class OrganizOApp {
             return '<div style="text-align: center; padding: 2.5rem 1rem; color: var(--text-muted);"><div style="font-size: 2rem; margin-bottom: 0.5rem;">🌱</div>No tasks yet. Add one to begin cultivating focus.</div>';
         }
 
-        return this.tasks.slice(0, 5).map(task => `
+        return this.tasks.map(task => `
             <div class="task-item" data-task-id="${task.id}">
                 <div class="checkbox ${task.completed ? 'checked' : ''}">${task.completed ? '✓' : ''}</div>
                 <div class="task-info">
@@ -1242,24 +1242,24 @@ class OrganizOApp {
 
             return `
                         <div class="calendar-day-card ${isToday ? 'today' : ''}" 
-                             data-date="${dateStr}"
-                             style="background: white; border-radius: 12px; padding: 10px; height: 120px; border: 1px solid ${isToday ? 'var(--accent-green)' : 'rgba(0,0,0,0.05)'}; cursor: pointer; transition: all 0.2s; overflow: hidden; display: flex; flex-direction: column;">
+                             data-date="${dateStr}">
                             
                             <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-                                <div style="font-size: 1.1rem; font-weight: 700; color: ${isToday ? 'var(--accent-green)' : 'var(--text-dark)'};">${day.getDate()}</div>
+                                <div class="day-num" style="font-size: 1.1rem; font-weight: 700; color: ${isToday ? 'var(--accent-green)' : 'var(--text-dark)'};">${day.getDate()}</div>
                                 ${holiday ? `<span title="${holiday}" style="font-size: 1rem;">🎁</span>` : ''}
                             </div>
                             
-                            <div style="display: flex; flex-direction: column; gap: 4px; margin-top: 5px; flex-grow: 1;">
+                            <div style="display: flex; flex-direction: column; gap: px; margin-top: 5px; flex-grow: 1;">
                                 ${this.renderCalendarTasks(day)}
                                 ${dailyEvents.map(ev => `
-                                    <div style="font-size: 0.6rem; background: ${ev.type === 'Deadline' ? '#FFFBEB' : '#F0F9FF'}; color: ${ev.type === 'Deadline' ? '#B45309' : '#0369A1'}; border-radius: 4px; padding: 2px 4px; border-left: 3px solid ${ev.type === 'Deadline' ? '#B45309' : '#0369A1'}; display: flex; justify-content: space-between;">
+                                    <div class="${ev.type === 'Deadline' ? 'badge-deadline' : 'badge-event'}">
                                         <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${this.sanitize(ev.name)}</span>
+                                        <span class="delete-event" data-event-id="${ev.id}" style="cursor: pointer; padding-left: 4px; padding-right: 2px;">×</span>
                                     </div>
                                 `).join('')}
                             </div>
                             
-                            ${holiday ? `<div style="font-size: 0.55rem; color: #EF4444; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${holiday}</div>` : ''}
+                            ${holiday ? `<div style="font-size: 0.52rem; color: #EF4444; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${holiday}</div>` : ''}
                         </div>
                     `}).join('')}
             </div>
@@ -1324,7 +1324,7 @@ class OrganizOApp {
             <div class="modal-content" style="max-width: 450px; padding: 2.5rem;">
                 <h3 style="margin-bottom: 0.5rem; font-family: 'Playfair Display', serif;">Plan for ${dateStr}</h3>
                 
-                ${holiday ? `<div style="background: #FEF2F2; color: #EF4444; border-radius: 8px; padding: 12px; margin-bottom: 1.5rem; font-weight: 600; font-size: 0.9rem; display: flex; align-items: center; gap: 10px;"><span>🎁</span> ${holiday}</div>` : ''}
+                ${holiday ? `<div class="holiday-banner" style="background: #FEF2F2; color: #EF4444; border-radius: 8px; padding: 12px; margin-bottom: 1.5rem; font-weight: 600; font-size: 0.9rem; display: flex; align-items: center; gap: 10px;"><span>🎁</span> ${holiday}</div>` : ''}
 
                 ${tasksForDay.length > 0 ? `
                 <div style="margin-bottom: 2rem; border-top: 1px solid #f1f5f9; padding-top: 1.5rem;">

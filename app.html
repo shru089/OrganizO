@@ -93,56 +93,59 @@
                 url('./images/sunset.png');
         }
         body.theme-midnight {
-            --app-bg: #0F172A;
-            --accent-green: #38BDF8;
-            --accent-green-glow: rgba(56, 189, 248, 0.4);
-            --text-dark: #F8FAFC;
+            --app-bg: #0B1120;
+            --accent-green: #2DD4BF;
+            --accent-green-glow: rgba(45, 212, 191, 0.4);
+            --text-dark: #F1F5F9;
             --text-muted: #94A3B8;
-            --glass-white: rgba(30, 41, 59, 0.7);
-            --card-bg: rgba(30, 41, 59, 0.6);
-            --intention-bg: rgba(30, 41, 59, 0.8);
-            --input-bg: rgba(0, 0, 0, 0.3);
-            --ring-bg: rgba(255, 255, 255, 0.1);
+            --glass-white: rgba(15, 23, 42, 0.8);
+            --card-bg: rgba(30, 41, 59, 0.7);
+            --intention-bg: rgba(15, 23, 42, 0.9);
+            --input-bg: rgba(0, 0, 0, 0.4);
+            --ring-bg: rgba(255, 255, 255, 0.05);
             background-image:
-                linear-gradient(rgba(15, 23, 42, 0.85), rgba(15, 23, 42, 0.85)),
+                linear-gradient(rgba(11, 17, 32, 0.95), rgba(11, 17, 32, 0.95)),
                 url('./images/midnight-slate.png');
         }
         /* Midnight Dark Mode Overrides */
-        body.theme-midnight .sidebar { border-right: 1px solid rgba(255,255,255,0.05); background: rgba(15, 23, 42, 0.4) !important; }
+        body.theme-midnight .sidebar { border-right: 1px solid rgba(255,255,255,0.05); background: rgba(11, 17, 32, 0.6) !important; }
         body.theme-midnight .card, body.theme-midnight .stat-card, body.theme-midnight .intention-card { 
-            border: 1px solid rgba(255,255,255,0.05); 
+            border: 1px solid rgba(255,255,255,0.08); 
             background: var(--card-bg); 
-            box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
         }
         body.theme-midnight .input-field, body.theme-midnight .search-box { 
             background: var(--input-bg) !important; 
-            color: white !important; 
+            color: #F1F5F9 !important; 
             border-color: rgba(255,255,255,0.1) !important; 
         }
-        body.theme-midnight .search-box input { background: transparent !important; color: white !important; }
-        body.theme-midnight .modal-content { background: #1E293B; border: 1px solid rgba(255,255,255,0.1); color: white; }
+        body.theme-midnight .search-box input { background: transparent !important; color: #F1F5F9 !important; }
+        body.theme-midnight .modal-content { background: #1E293B; border: 1px solid rgba(255,255,255,0.1); color: #F1F5F9; box-shadow: 0 20px 60px rgba(0,0,0,0.6); }
         body.theme-midnight .month-header, body.theme-midnight .day-header { color: #F8FAFC; }
         body.theme-midnight .day-cell { border-color: rgba(255,255,255,0.05); }
         body.theme-midnight .nav-item:hover, body.theme-midnight .day-cell:hover, body.theme-midnight .nav-link:hover, body.theme-midnight .nav-link.active { 
-            background: rgba(255,255,255,0.05); 
+            background: rgba(255,255,255,0.08); 
         }
         body.theme-midnight .nav-item.active { background: rgba(255,255,255,0.1); color: white; }
         body.theme-midnight .timer-mode-btn { background: rgba(255,255,255,0.05) !important; color: white !important; border-color: rgba(255,255,255,0.1) !important; }
-        body.theme-midnight .timer-mode-btn.active { background: var(--accent-green) !important; border-color: var(--accent-green) !important; color: #0F172A !important; }
+        body.theme-midnight .timer-mode-btn.active { background: var(--accent-green) !important; border-color: var(--accent-green) !important; color: #0B1120 !important; }
         body.theme-midnight .sidebar-brand, body.theme-midnight .user-name { color: white; }
         body.theme-midnight #greeting, body.theme-midnight .header-section h1 { color: #F8FAFC; }
-        body.theme-midnight .header-section p, body.theme-midnight .dashboard-header p { color: var(--text-muted); }
+        body.theme-midnight .header-section p, body.theme-midnight .dashboard-header p { color: #94A3B8; }
         body.theme-midnight .intention-text { color: white; }
-        body.theme-midnight .btn-secondary { background: rgba(255,255,255,0.1) !important; color: white !important; border-color: rgba(255,255,255,0.2) !important; }
+        body.theme-midnight .btn-secondary { background: rgba(255,255,255,0.08) !important; color: white !important; border-color: rgba(255,255,255,0.1) !important; }
         body.theme-midnight .add-btn { color: var(--accent-green); }
         body.theme-midnight .task-item { border-bottom: 1px solid rgba(255,255,255,0.05); }
         body.theme-midnight .task-name { color: #E2E8F0; }
-        body.theme-midnight .btn-focus { background: var(--accent-green); color: #0F172A; }
+        body.theme-midnight .btn-focus { background: var(--accent-green); color: #0B1120; font-weight: 700; }
         body.theme-midnight .btn-focus[style*="background: white"], body.theme-midnight .cancel-modal-btn { 
-            background: rgba(255,255,255,0.05) !important; 
+            background: rgba(255,255,255,0.06) !important; 
             color: white !important; 
             border-color: rgba(255,255,255,0.1) !important; 
         }
+        body.theme-midnight #notes-area { color: #F1F5F9 !important; }
+        body.theme-midnight .mobile-nav { background: rgba(11, 17, 32, 0.95) !important; border-color: rgba(255,255,255,0.08) !important; }
+        body.theme-midnight .mobile-nav-link.active { color: #2DD4BF !important; }
         
         /* Themed info boxes */
         .info-box { background: rgba(16, 185, 129, 0.05); border-radius: 16px; padding: 1.5rem; text-align: center; }

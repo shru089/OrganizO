@@ -391,7 +391,7 @@ class OrganizOApp {
         const color = pct >= 80 ? '#10B981' : pct >= 50 ? '#F59E0B' : '#94A3B8';
         return `
             <svg width="72" height="72" style="transform: rotate(-90deg);">
-                <circle cx="36" cy="36" r="${r}" fill="none" stroke="#E2E8F0" stroke-width="5"/>
+                <circle class="ring-bg" cx="36" cy="36" r="${r}" fill="none" stroke="#E2E8F0" stroke-width="5"/>
                 <circle cx="36" cy="36" r="${r}" fill="none" class="completion-circle" stroke="${color}" stroke-width="5"
                     stroke-dasharray="0 ${c}" stroke-linecap="round"
                     data-target="${filled} ${c - filled}"
@@ -812,7 +812,7 @@ class OrganizOApp {
 
                 <div style="display: flex; justify-content: center; gap: 1rem;">
                     <button class="btn-focus start-timer-btn">${this.timer.isRunning ? 'Pause Timer' : 'Start Focus Session'}</button>
-                    <button class="btn-focus edit-intention-btn" style="background: white; color: var(--text-dark); border: 1px solid #E2E8F0; box-shadow: none;">Edit Intention</button>
+                    <button class="btn-focus edit-intention-btn btn-secondary">Edit Intention</button>
                 </div>
             </section>
 
@@ -827,7 +827,7 @@ class OrganizOApp {
                             ${this.renderTaskList()}
                         </div>
                         <!-- Daily Completion % -->
-                        <div style="margin-top: 1.5rem; display: flex; align-items: center; gap: 1rem; padding: 1rem; background: #F8FAF9; border-radius: 12px;">
+                        <div style="margin-top: 1.5rem; display: flex; align-items: center; gap: 1rem; padding: 1rem; background: rgba(0,0,0,0.03); border-radius: 12px; border: 1px solid rgba(0,0,0,0.02);">
                             <div style="position: relative; flex-shrink: 0;">
                                 ${this.renderCompletionRing(completion.pct)}
                                 <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 0.75rem; font-weight: 800; color: var(--text-dark);">${completion.pct}%</div>

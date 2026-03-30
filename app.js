@@ -616,6 +616,66 @@ class OrganizOApp {
                     { name: 'Schedule / post content', category: 'Work', priority: 'Low' },
                 ]
             },
+            {
+                id: 'zen-morning',
+                icon: '🧘',
+                name: 'Zen Morning',
+                desc: 'A calm start for clarity and focus',
+                color: '#10B981',
+                bg: '#F0FDF4',
+                tasks: [
+                    { name: 'Meditation / Mindfulness (10 mins)', category: 'Health', priority: 'High' },
+                    { name: 'Set daily intentions in app', category: 'Personal', priority: 'High' },
+                    { name: 'Light reading / inspiration (15 mins)', category: 'Personal', priority: 'Normal' },
+                    { name: 'Nutritious breakfast', category: 'Health', priority: 'Normal' },
+                    { name: 'Deep breathing (3 mins)', category: 'Health', priority: 'Low' },
+                ]
+            },
+            {
+                id: 'evening-reset',
+                icon: '🌙',
+                name: 'Evening Reset',
+                desc: 'Digital detox and peaceful wind-down',
+                color: '#6366F1',
+                bg: '#EEF2FF',
+                tasks: [
+                    { name: 'Digital Detox (Phone away at 9PM)', category: 'Health', priority: 'High' },
+                    { name: 'Review today\'s achievements', category: 'Personal', priority: 'Normal' },
+                    { name: 'Journaling in Quiet Notes', category: 'Personal', priority: 'Normal' },
+                    { name: 'Prepare outfit for tomorrow', category: 'Personal', priority: 'Normal' },
+                    { name: 'Chamomile tea / reading', category: 'Health', priority: 'Low' },
+                ]
+            },
+            {
+                id: 'business',
+                icon: '🏢',
+                name: 'Business Lead',
+                desc: 'For entrepreneurs and marketing leaders',
+                color: '#0EA5E9',
+                bg: '#F0F9FF',
+                tasks: [
+                    { name: 'Clear high-priority email block (45 mins)', category: 'Work', priority: 'High' },
+                    { name: 'Marketing / Sales outreach (5 contacts)', category: 'Work', priority: 'High' },
+                    { name: 'Review KPIs / Business stats', category: 'Work', priority: 'Normal' },
+                    { name: 'Content strategy planning', category: 'Work', priority: 'Normal' },
+                    { name: 'Update CRM / Project boards', category: 'Work', priority: 'Low' },
+                ]
+            },
+            {
+                id: 'self-care',
+                icon: '🌿',
+                name: 'Self-Care Solo',
+                desc: 'A weekend recharge for your soul',
+                color: '#EC4899',
+                bg: '#FDF2F8',
+                tasks: [
+                    { name: 'Digital disconnection day', category: 'Health', priority: 'High' },
+                    { name: 'Long nature walk (45 mins+)', category: 'Health', priority: 'High' },
+                    { name: 'Clean and refresh workspace', category: 'Personal', priority: 'Normal' },
+                    { name: 'Cook a new healthy recipe', category: 'Health', priority: 'Normal' },
+                    { name: 'Spend 1 hour on a hobby', category: 'Creativity', priority: 'Normal' },
+                ]
+            },
         ];
 
         mainContent.innerHTML = `

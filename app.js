@@ -388,7 +388,7 @@ class OrganizOApp {
     renderCompletionRing(pct) {
         const r = 28, c = 2 * Math.PI * r;
         const filled = (pct / 100) * c;
-        const color = pct >= 80 ? '#10B981' : pct >= 50 ? '#F59E0B' : '#94A3B8';
+        const color = pct >= 80 ? 'var(--accent-green)' : pct >= 50 ? '#F59E0B' : '#94A3B8';
         return `
             <svg width="72" height="72" style="transform: rotate(-90deg);">
                 <circle class="ring-bg" cx="36" cy="36" r="${r}" fill="none" stroke="#E2E8F0" stroke-width="5"/>
@@ -838,7 +838,7 @@ class OrganizOApp {
                             <div>
                                 <div style="font-weight: 700; font-size: 0.9rem;">Daily Completion</div>
                                 <div style="font-size: 0.8rem; color: var(--text-muted);">${completion.done} of ${completion.total} tasks today</div>
-                                ${completion.pct === 100 ? '<div style="font-size: 0.8rem; color: #10B981; font-weight: 600; margin-top: 2px;">🎉 Perfect day!</div>' : ''}
+                                ${completion.pct === 100 ? '<div style="font-size: 0.8rem; color: var(--accent-green); font-weight: 600; margin-top: 2px;">🎉 Perfect day!</div>' : ''}
                             </div>
                             <button onclick="window.organizoApp.showWeeklyReport()" style="margin-left: auto; background: none; border: none; color: var(--accent-green); font-size: 0.8rem; font-weight: 600; cursor: pointer;">View Report →</button>
                         </div>
@@ -855,7 +855,7 @@ class OrganizOApp {
                         </div>
                         <div style="text-align: center;">
                             <div style="font-size: 2rem; font-weight: 700; color: var(--accent-green);">${this.formatFocusTime()}</div>
-                            <div style="font-size: 0.8rem; color: #10B981; margin-top: 4px;">${this.focusTime.sessions.filter(s => this.isToday(s.completedAt)).length} sessions completed</div>
+                            <div style="font-size: 0.8rem; color: var(--accent-green); margin-top: 4px;">${this.focusTime.sessions.filter(s => this.isToday(s.completedAt)).length} sessions completed</div>
                         </div>
                     </div>
 

@@ -369,10 +369,14 @@ class OrganizOApp {
 
     // ─── DAILY COMPLETION % ──────────────────────────────────────
     getDailyCompletion() {
-        const todayTasks = this.tasks.filter(t => this.isToday(t.createdAt));
-        if (todayTasks.length === 0) return { pct: 0, done: 0, total: 0 };
-        const done = todayTasks.filter(t => t.completed).length;
-        return { pct: Math.round((done / todayTasks.length) * 100), done, total: todayTasks.length };
+        const activeTasks = this.tasks.filter(t => !t.completed);
+        const completedToday = this.tasks.filter(t => t.completed && t.completedAt && this.isToday(t.completedAt));
+        
+        const relevantTasks = [...activeTasks, ...completedToday];
+        
+        if (relevantTasks.length === 0) return { pct: 0, done: 0, total: 0 };
+        const done = completedToday.length;
+        return { pct: Math.round((done / relevantTasks.length) * 100), done, total: relevantTasks.length };
     }
 
     renderCompletionRing(pct) {
@@ -382,9 +386,10 @@ class OrganizOApp {
         return `
             <svg width="72" height="72" style="transform: rotate(-90deg);">
                 <circle cx="36" cy="36" r="${r}" fill="none" stroke="#E2E8F0" stroke-width="5"/>
-                <circle cx="36" cy="36" r="${r}" fill="none" stroke="${color}" stroke-width="5"
-                    stroke-dasharray="${filled} ${c - filled}" stroke-linecap="round"
-                    style="transition: stroke-dasharray 0.6s ease;"/>
+                <circle cx="36" cy="36" r="${r}" fill="none" class="completion-circle" stroke="${color}" stroke-width="5"
+                    stroke-dasharray="0 ${c}" stroke-linecap="round"
+                    data-target="${filled} ${c - filled}"
+                    style="transition: stroke-dasharray 1s cubic-bezier(0.34, 1.56, 0.64, 1), stroke 1s ease;"/>
             </svg>
         `;
     }
@@ -527,7 +532,7 @@ class OrganizOApp {
         document.body.appendChild(modal);
         modal.addEventListener('click', e => { if (e.target === modal) modal.remove(); });
         modal.querySelector('#pro-waitlist-btn').addEventListener('click', () => {
-            window.open('mailto:organizo089@gmail.com?subject=OrganizO Pro Waitlist&body=Hi! I want early access to OrganizO Pro.', '_blank');
+            window.location.href = 'mailto:organizo089@gmail.com?subject=OrganizO Pro Waitlist&body=Hi! I want early access to OrganizO Pro.';
         });
     }
 
@@ -792,6 +797,12 @@ class OrganizOApp {
         this.updateGreeting();
         this.updateDate();
         this.setupSearchFilter();
+
+        // Trigger ring animation
+        setTimeout(() => {
+            const circle = mainContent.querySelector('.completion-circle');
+            if (circle) circle.setAttribute('stroke-dasharray', circle.getAttribute('data-target'));
+        }, 50);
     }
 
     renderTaskList() {

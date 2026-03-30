@@ -1,9 +1,12 @@
-// OrganizO Service Worker v1.0
-// Enables offline support and PWA installation
+// OrganizO Service Worker v2.0
+// Smart caching: always-fresh for logic, offline-ready for assets
 
-const CACHE_NAME = 'organizo-v1.0';
+const CACHE_VERSION = 'organizo-v2.0';
+const STATIC_CACHE = `${CACHE_VERSION}-static`;
+const DYNAMIC_CACHE = `${CACHE_VERSION}-dynamic`;
+
+// Core app shell — cached on install
 const CORE_ASSETS = [
-    '/',
     '/index.html',
     '/app.html',
     '/app.js',
@@ -16,66 +19,87 @@ const CORE_ASSETS = [
     '/images/icon-512.png',
 ];
 
-// Install: cache all core assets
+// These patterns use network-first so users ALWAYS get the latest version
+const NETWORK_FIRST_PATTERNS = [
+    /\.html$/,
+    /\.js$/,
+    /\.css$/,
+    /manifest\.json$/,
+];
+
+// Install: pre-cache core assets
 self.addEventListener('install', event => {
-    console.log('[OrganizO SW] Installing...');
+    console.log('[OrganizO SW v2] Installing...');
     event.waitUntil(
-        caches.open(CACHE_NAME).then(cache => {
+        caches.open(STATIC_CACHE).then(cache => {
             return cache.addAll(CORE_ASSETS);
         }).then(() => {
-            console.log('[OrganizO SW] All assets cached.');
+            console.log('[OrganizO SW v2] Core assets cached.');
             return self.skipWaiting();
         })
     );
 });
 
-// Activate: clean up old caches
+// Activate: delete ALL old caches from previous versions
 self.addEventListener('activate', event => {
-    console.log('[OrganizO SW] Activating...');
+    console.log('[OrganizO SW v2] Activating, pruning old caches...');
     event.waitUntil(
         caches.keys().then(keys => {
             return Promise.all(
-                keys.filter(key => key !== CACHE_NAME)
-                    .map(key => caches.delete(key))
+                keys
+                    .filter(key => !key.startsWith(CACHE_VERSION))
+                    .map(key => {
+                        console.log('[OrganizO SW v2] Deleting old cache:', key);
+                        return caches.delete(key);
+                    })
             );
         }).then(() => self.clients.claim())
     );
 });
 
-// Fetch: serve from cache, fall back to network
+// Fetch: smart strategy per resource type
 self.addEventListener('fetch', event => {
-    // Skip non-GET requests and browser extension requests
-    if (event.request.method !== 'GET' || !event.request.url.startsWith('http')) {
-        return;
-    }
+    if (event.request.method !== 'GET' || !event.request.url.startsWith('http')) return;
 
-    // For Google Fonts and external resources, use network-first strategy
-    if (event.request.url.includes('fonts.googleapis.com') ||
-        event.request.url.includes('fonts.gstatic.com')) {
+    const url = event.request.url;
+
+    // External fonts — network-first, no offline fallback needed
+    if (url.includes('fonts.googleapis.com') || url.includes('fonts.gstatic.com')) {
         event.respondWith(
             fetch(event.request).catch(() => caches.match(event.request))
         );
         return;
     }
 
-    // For everything else, cache-first strategy
+    // App logic files (HTML/JS/CSS) — NETWORK-FIRST
+    // Users always get the latest version; cache is fallback for offline only
+    const isAppFile = NETWORK_FIRST_PATTERNS.some(p => p.test(url));
+    if (isAppFile) {
+        event.respondWith(
+            fetch(event.request)
+                .then(response => {
+                    const clone = response.clone();
+                    caches.open(STATIC_CACHE).then(cache => cache.put(event.request, clone));
+                    return response;
+                })
+                .catch(() => {
+                    return caches.match(event.request).then(cached => cached || caches.match('/app.html'));
+                })
+        );
+        return;
+    }
+
+    // Static assets (images, icons) — CACHE-FIRST for performance
     event.respondWith(
         caches.match(event.request).then(cached => {
             if (cached) return cached;
-
             return fetch(event.request).then(response => {
-                // Cache valid responses
-                if (response && response.status === 200 && response.type === 'basic') {
-                    const responseClone = response.clone();
-                    caches.open(CACHE_NAME).then(cache => {
-                        cache.put(event.request, responseClone);
-                    });
+                if (response && response.status === 200) {
+                    const clone = response.clone();
+                    caches.open(DYNAMIC_CACHE).then(cache => cache.put(event.request, clone));
                 }
                 return response;
-            }).catch(() => {
-                // Offline fallback
-                return caches.match('/app.html');
-            });
+            }).catch(() => caches.match('/app.html'));
         })
     );
 });

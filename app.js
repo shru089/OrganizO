@@ -257,7 +257,12 @@ class OrganizOApp {
                 this.renderInsightsView();
                 break;
             case 'templates':
-                this.renderTemplatesView();
+                if (this.isPro) {
+                    this.renderTemplatesView();
+                } else {
+                    this.showProModal();
+                    this.renderDashboard(); // Fallback
+                }
                 break;
             case 'notes':
                 this.renderNotesView();
@@ -504,7 +509,8 @@ class OrganizOApp {
                     <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">🌿</div>
                     <h2 style="margin: 0; font-size: 1.5rem;">OrganizO Pro</h2>
                     <p style="margin: 8px 0 0; opacity: 0.85; font-size: 0.9rem;">Everything you need to grow — gently.</p>
-                    <div style="font-size: 2rem; font-weight: 800; margin-top: 1rem;">₹49<span style="font-size: 1rem; font-weight: 400; opacity: 0.8;">/month</span></div>
+                    <div style="font-size: 2rem; font-weight: 800; margin-top: 1rem;">₹19<span style="font-size: 1rem; font-weight: 400; opacity: 0.8;">/month</span></div>
+                    <div style="font-size: 0.8rem; opacity: 0.6; margin-top: 4px;">or ₹99 for a full year (Limited Offer)</div>
                 </div>
 
                 <div style="text-align: left; margin-bottom: 1.5rem;">
@@ -1413,8 +1419,46 @@ class OrganizOApp {
                 <h3 style="margin-bottom: 1.5rem;">Recent Activity</h3>
                 ${this.renderRecentActivity()}
             </div>
+
+            ${this.isPro ? `
+                <div class="card" style="margin-top: 1.5rem; text-align: center;">
+                    <h3 style="margin-bottom: 0.5rem; font-size: 1.1rem;">🛡️ Data Portability</h3>
+                    <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.25rem;">Download a full JSON backup of your tasks, habits, and focus logs.</p>
+                    <button class="btn-focus" id="export-data-btn" style="background: var(--accent-green); width: 100%; max-width: 300px;">Download Data Backup</button>
+                </div>
+            ` : ''}
         `;
+        
+        if (this.isPro) {
+            setTimeout(() => {
+                document.getElementById('export-data-btn')?.addEventListener('click', () => this.exportData());
+            }, 100);
+        }
         this.setupSearchFilter();
+    }
+
+    exportData() {
+        const fullData = {
+            tasks: this.tasks,
+            habits: this.habits,
+            events: this.events,
+            theme: this.theme,
+            isPro: this.isPro,
+            dailyIntention: this.dailyIntention,
+            streakData: this.streakData,
+            notes: this.notes,
+            exportDate: new Date().toISOString()
+        };
+
+        const blob = new Blob([JSON.stringify(fullData, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `organizo_backup_${new Date().toLocaleDateString().replace(/\//g, '-')}.json`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
     }
 
     renderRecentActivity() {

@@ -6,6 +6,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="referrer" content="strict-origin-when-cross-origin">
+    <!-- PWA / Play Store -->
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#10B981">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="OrganizO">
+    <link rel="apple-touch-icon" href="/images/icon-192.png">
     <title>OrganizO - Structure your life, gently.</title>
     <meta name="description"
         content="A calm productivity space to help you plan your life without overwhelm. OrganizO promotes gentle productivity, mental clarity, and structured living without stress.">
@@ -460,6 +468,14 @@
     </form>
 
     <script src="script.js"></script>
+    <script>
+        // Register Service Worker for PWA / Play Store support
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/sw.js')
+                .then(reg => console.log('[OrganizO] SW registered:', reg.scope))
+                .catch(err => console.warn('[OrganizO] SW failed:', err));
+        }
+    </script>
 </body>
 
 </html>

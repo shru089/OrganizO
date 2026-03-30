@@ -19,6 +19,7 @@ class OrganizOApp {
         // OrganizO Pro
         this.isPro = this.loadData('isPro') || false;
         this.theme = this.loadData('theme') || 'bamboo';
+        this.notes = this.loadData('notes') || '';
         this.timer = {
             minutes: 25,
             seconds: 0,
@@ -257,6 +258,9 @@ class OrganizOApp {
                 break;
             case 'templates':
                 this.renderTemplatesView();
+                break;
+            case 'notes':
+                this.renderNotesView();
                 break;
         }
     }
@@ -505,12 +509,12 @@ class OrganizOApp {
 
                 <div style="text-align: left; margin-bottom: 1.5rem;">
                     ${[
-                        ['🌙', 'Dark Mode', 'For late-night planning sessions'],
                         ['📓', 'Quiet Notes', 'Your private daily scratchpad'],
-                        ['🎨', 'Custom Palettes', 'Purple Sunset, Sakura, Slate, Ocean & Sandstone'],
+                        ['🎨', '6 Calming Themes', 'Including the new Minimal Dark mode'],
                         ['🛡️', 'Streak Freeze', 'Protect your streak once a week'],
                         ['📊', 'Advanced Reports', 'Deep dive into your patterns'],
                         ['📤', 'Data Export', 'CSV & PDF export anytime'],
+                        ['📜', 'Early Access', 'To all upcoming roadmap features'],
                     ].map(([icon, title, desc]) => `
                         <div style="display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid #F1F5F9;">
                             <span style="font-size: 1.3rem; width: 30px;">${icon}</span>
@@ -662,6 +666,72 @@ class OrganizOApp {
                 if (tpl) this.applyTemplate(tpl);
             });
         });
+    }
+
+    // ─── QUIET NOTES ──────────────────────────────────────────────
+    renderNotesView() {
+        const mainContent = document.querySelector('.main-content');
+        mainContent.innerHTML = `
+            <div style="max-width: 800px; margin: 0 auto; height: calc(100vh - 120px); display: flex; flex-direction: column; padding: 2rem 0;">
+                <header class="header-section" style="margin-bottom: 2rem;">
+                    <h1>📓 Quiet Notes</h1>
+                    <p>A private space for your brain dumps, journals, and raw thoughts. Saved only on your device.</p>
+                </header>
+                
+                <div class="card" style="flex: 1; display: flex; flex-direction: column; padding: 2rem; margin-bottom: 1rem; border-radius: 24px;">
+                    <textarea id="notes-area" 
+                        style="flex: 1; border: none; outline: none; font-family: 'Inter', sans-serif; font-size: 1.15rem; line-height: 1.9; color: var(--text-dark); background: transparent; resize: none;" 
+                        placeholder="Start writing gently..."
+                    >${this.sanitize(this.notes)}</textarea>
+                    
+                    <div style="margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid #F1F5F9; display: flex; justify-content: space-between; align-items: center; font-size: 0.85rem; color: var(--text-muted);">
+                        <div id="notes-status" style="display: flex; align-items: center; gap: 6px;">
+                            <span class="status-icon">✓</span>
+                            <span class="status-text">Saved locally</span>
+                        </div>
+                        <div id="notes-word-count" style="font-weight: 500;">
+                            ${this.notes.trim() === "" ? 0 : this.notes.split(/\s+/).filter(Boolean).length} words
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="text-align: center; font-size: 0.8rem; color: var(--text-muted); opacity: 0.7;">
+                    Pro Tip: Use this for morning pages or end-of-day reflection. 🌿
+                </div>
+            </div>
+        `;
+
+        const notesArea = document.getElementById('notes-area');
+        const statusText = document.querySelector('.status-text');
+        const statusIcon = document.querySelector('.status-icon');
+        const wordCount = document.getElementById('notes-word-count');
+        
+        notesArea.addEventListener('input', (e) => {
+            this.notes = e.target.value;
+            this.saveData('notes', this.notes);
+            
+            // Update word count
+            const count = this.notes.trim() === "" ? 0 : this.notes.split(/\s+/).filter(Boolean).length;
+            wordCount.textContent = `${count} words`;
+
+            // Visual feedback
+            statusText.textContent = 'Saving...';
+            statusIcon.textContent = '●';
+            statusText.parentElement.style.color = 'var(--accent-green)';
+            
+            clearTimeout(this.saveTimeout);
+            this.saveTimeout = setTimeout(() => {
+                statusText.textContent = 'Saved locally';
+                statusIcon.textContent = '✓';
+                statusText.parentElement.style.color = 'var(--text-muted)';
+            }, 800);
+        });
+
+        // Smart cursor placement
+        setTimeout(() => {
+            notesArea.focus();
+            notesArea.setSelectionRange(notesArea.value.length, notesArea.value.length);
+        }, 100);
     }
 
     applyTemplate(template) {
@@ -1806,7 +1876,7 @@ class OrganizOApp {
             { id: 'ocean', name: 'Deep Ocean', icon: '🌊', color: '#0EA5E9' },
             { id: 'sandstone', name: 'Warm Sandstone', icon: '🏜️', color: '#D97706' },
             { id: 'sunset', name: 'Purple Sunset', icon: '🌆', color: '#A855F7' },
-            { id: 'midnight', name: 'Midnight Slate', icon: '🌑', color: '#38BDF8' }
+            { id: 'midnight', name: 'Minimal Dark', icon: '🌑', color: '#38BDF8' }
         ];
 
         modal.innerHTML = `

@@ -60,12 +60,12 @@ The full OrganizO experience is free. No account required, no credit card, no hi
 
 For users who want to go deeper. Pro features are in development and will be offered at an honest, fair price:
 
-- 🌙 Dark Mode — Sleek midnight look for late-night planning
 - 📓 Quiet Notes — A private daily scratchpad for quick braindumps
-- 🎨 Custom Palettes — Match your exact vibe (Purple Sunset, Sakura, Slate, Ocean, Sandstone)
+- 🎨 6 Calming Themes — From Sakura Pink to Minimal Dark (Midnight)
 - 🛡️ Streak Freeze — Protect your streak once a week
 - 📊 Advanced Reports — Deep dive into your productivity patterns
 - 📤 Data Export — Full secure JSON/CSV backups, you own your data
+- 📜 Early Access — Get every roadmap feature first
 
 ---
 

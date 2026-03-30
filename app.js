@@ -18,6 +18,7 @@ class OrganizOApp {
         this.streakData = this.loadData('streakData') || { currentStreak: 0, bestStreak: 0, lastActiveDate: null, history: [] };
         // OrganizO Pro
         this.isPro = this.loadData('isPro') || false;
+        this.theme = this.loadData('theme') || 'bamboo';
         this.timer = {
             minutes: 25,
             seconds: 0,
@@ -28,6 +29,7 @@ class OrganizOApp {
         this.calendarDate = new Date();
 
         this.renderDashboard();
+        this.applyTheme();
         this.updateUserUI();
         this.setupEventListeners();
         this.init();
@@ -1778,6 +1780,73 @@ class OrganizOApp {
             statusDiv.style.color = '#EF4444';
             statusDiv.textContent = '❌ Failed to connect to EmailJS. Have you replaced the API keys in app.js?';
         }
+    }
+
+    // ─── THEME SYSTEM ───────────────────────────────────────────
+    applyTheme() {
+        document.body.className = 'app-body'; // reset all
+        if (this.theme !== 'bamboo') {
+            document.body.classList.add(`theme-${this.theme}`);
+        }
+    }
+
+    setTheme(newTheme) {
+        this.theme = newTheme;
+        this.saveData('theme', this.theme);
+        this.applyTheme();
+    }
+
+    showProfileModal() {
+        const modal = document.createElement('div');
+        modal.className = 'modal-overlay';
+        
+        const themes = [
+            { id: 'bamboo', name: 'Bamboo Forest', icon: '🎋', color: '#10B981' },
+            { id: 'sakura', name: 'Sakura Blush', icon: '🌸', color: '#F43F5E' },
+            { id: 'ocean', name: 'Deep Ocean', icon: '🌊', color: '#0EA5E9' },
+            { id: 'sandstone', name: 'Warm Sandstone', icon: '🏜️', color: '#D97706' },
+            { id: 'sunset', name: 'Purple Sunset', icon: '🌆', color: '#A855F7' },
+            { id: 'midnight', name: 'Midnight Slate', icon: '🌑', color: '#38BDF8' }
+        ];
+
+        modal.innerHTML = `
+            <div class="modal-content" style="max-width: 450px; text-align: left; position: relative;">
+                <button class="close-modal-btn btn-focus" style="position: absolute; top: 15px; right: 15px; width: 32px; height: 32px; padding: 0; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.05); color: var(--text-dark); border-radius: 50%;">×</button>
+                <div style="font-size: 2.5rem; margin-bottom: 0.5rem; text-align: center;">🎨</div>
+                <h2 style="margin-bottom: 0.5rem; text-align: center;">Customize Your Space</h2>
+                <p style="color: var(--text-muted); text-align: center; margin-bottom: 1.5rem; font-size: 0.9rem;">Select a theme to match your current vibe</p>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; margin-bottom: 1.5rem;">
+                    ${themes.map(t => `
+                        <div class="theme-option" data-theme="${t.id}" style="padding: 12px; border-radius: 12px; border: 2px solid ${this.theme === t.id ? t.color : 'rgba(0,0,0,0.05)'}; background: rgba(0,0,0,0.02); cursor: pointer; display: flex; align-items: center; gap: 10px; transition: border 0.3s ease;">
+                            <div style="width: 24px; height: 24px; border-radius: 50%; background: ${t.color}; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; color: white; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">${t.icon}</div>
+                            <span style="font-size: 0.85rem; font-weight: 600; color: var(--text-dark);">${t.name}</span>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+
+        modal.querySelectorAll('.theme-option').forEach(opt => {
+            opt.addEventListener('click', (e) => {
+                const newTheme = e.currentTarget.dataset.theme;
+                this.setTheme(newTheme);
+                // Highlight active visually
+                modal.querySelectorAll('.theme-option').forEach(o => {
+                    o.style.borderColor = 'rgba(0,0,0,0.05)';
+                });
+                const tObj = themes.find(t => t.id === newTheme);
+                e.currentTarget.style.borderColor = tObj.color;
+                
+                // Keep modal open so they can see live background change behind it!
+            });
+        });
+
+        modal.querySelector('.close-modal-btn').addEventListener('click', () => modal.remove());
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) modal.remove();
+        });
     }
 
     updateUserUI() {

@@ -62,7 +62,7 @@ For users who want to go deeper. Pro features are in development and will be off
 
 - 🌙 Dark Mode — Sleek midnight look for late-night planning
 - 📓 Quiet Notes — A private daily scratchpad for quick braindumps
-- 🎨 Custom Palettes — Match your exact vibe (Matcha, Sakura, Slate, Ocean, Sandstone)
+- 🎨 Custom Palettes — Match your exact vibe (Purple Sunset, Sakura, Slate, Ocean, Sandstone)
 - 🛡️ Streak Freeze — Protect your streak once a week
 - 📊 Advanced Reports — Deep dive into your productivity patterns
 - 📤 Data Export — Full secure JSON/CSV backups, you own your data

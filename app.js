@@ -505,7 +505,7 @@ class OrganizOApp {
                     ${[
                         ['🌙', 'Dark Mode', 'For late-night planning sessions'],
                         ['📓', 'Quiet Notes', 'Your private daily scratchpad'],
-                        ['🎨', 'Custom Palettes', 'Matcha, Sakura, Slate, Ocean & Sandstone'],
+                        ['🎨', 'Custom Palettes', 'Purple Sunset, Sakura, Slate, Ocean & Sandstone'],
                         ['🛡️', 'Streak Freeze', 'Protect your streak once a week'],
                         ['📊', 'Advanced Reports', 'Deep dive into your patterns'],
                         ['📤', 'Data Export', 'CSV & PDF export anytime'],

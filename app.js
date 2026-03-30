@@ -792,8 +792,11 @@ class OrganizOApp {
                 </div>
                 <div class="top-actions">
                     <button class="icon-btn" title="Weekly Report" onclick="window.organizoApp.showWeeklyReport()" style="font-size: 1rem;">📊</button>
-                    <button class="icon-btn" title="OrganizO Pro" onclick="window.organizoApp.showProModal()" style="font-size: 1rem;">⭐</button>
-                    <div class="user-avatar profile-edit-trigger" style="width: 32px; height: 32px; font-size: 0.8rem; cursor: pointer;" onclick="window.organizoApp.showProfileModal()">${this.sanitize(this.userData.initials)}</div>
+                    ${!this.isPro ? '<button class="icon-btn" title="OrganizO Pro" onclick="window.organizoApp.showProModal()" style="font-size: 1rem;">⭐</button>' : ''}
+                    <div class="user-avatar profile-edit-trigger" style="width: 32px; height: 32px; font-size: 0.8rem; cursor: pointer; position: relative;" onclick="window.organizoApp.showProfileModal()">
+                        ${this.sanitize(this.userData.initials)}
+                        ${this.isPro ? '<div style="position: absolute; bottom: -2px; right: -2px; font-size: 0.6rem; background: #10B981; color: white; border-radius: 4px; padding: 1px 3px; border: 1px solid white;">PRO</div>' : ''}
+                    </div>
                 </div>
             </nav>
 
@@ -1920,6 +1923,12 @@ class OrganizOApp {
     }
 
     updateUserUI() {
+        // Toggle Sidebar Pro link
+        const sidebarPro = document.getElementById('sidebar-pro-link');
+        if (sidebarPro) {
+            sidebarPro.style.display = this.isPro ? 'none' : 'block';
+        }
+
         // Update greeting
         const greeting = document.getElementById('greeting');
         if (greeting) {
@@ -1932,7 +1941,11 @@ class OrganizOApp {
 
         // Update all avatars
         document.querySelectorAll('.user-avatar').forEach(avatar => {
-            avatar.textContent = this.userData.initials;
+            avatar.innerHTML = `
+                ${this.sanitize(this.userData.initials)}
+                ${this.isPro ? '<div style="position: absolute; bottom: -2px; right: -2px; font-size: 0.6rem; background: #10B981; color: white; border-radius: 4px; padding: 1px 3px; border: 1px solid white;">PRO</div>' : ''}
+            `;
+            avatar.style.position = 'relative'; 
         });
 
         // Update Sidebar info

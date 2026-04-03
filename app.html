@@ -107,74 +107,70 @@
                 linear-gradient(rgba(11, 17, 32, 0.95), rgba(11, 17, 32, 0.95)),
                 url('./images/midnight-slate.png');
         }
-        /* Midnight Dark Mode Overrides */
-        body.theme-midnight .sidebar { border-right: 1px solid rgba(255,255,255,0.05); background: rgba(11, 17, 32, 0.6) !important; }
-        body.theme-midnight .card, body.theme-midnight .stat-card, body.theme-midnight .intention-card { 
+        /* UNIVERSAL DARK MODE OVERRIDES */
+        body.dark-mode {
+            --app-bg: #0F172A;
+            --text-dark: #F8FAFC;
+            --text-muted: #CBD5E1;
+            --glass-white: rgba(15, 23, 42, 0.7);
+            --card-bg: rgba(30, 41, 59, 0.6);
+            --intention-bg: rgba(15, 23, 42, 0.8);
+            --input-bg: rgba(0, 0, 0, 0.5);
+            --ring-bg: rgba(255, 255, 255, 0.05);
+            --border-color: rgba(255, 255, 255, 0.08);
+        }
+
+        body.dark-mode {
+            background-image: linear-gradient(rgba(15, 23, 42, 0.15), rgba(15, 23, 42, 0.15)), var(--theme-bg-img);
+            background-color: #0F172A;
+        }
+
+        body.dark-mode h1, body.dark-mode h2, body.dark-mode h3, body.dark-mode .sidebar-brand { color: #F8FAFC !important; text-shadow: 0 4px 10px rgba(0,0,0,0.5); }
+        body.dark-mode .card, body.dark-mode .stat-card, body.dark-mode .intention-card { backdrop-filter: blur(12px); }
+
+        body.dark-mode .sidebar { border-right: 1px solid rgba(255,255,255,0.05); background: rgba(15, 23, 42, 0.6) !important; }
+        body.dark-mode .card, body.dark-mode .stat-card, body.dark-mode .intention-card { 
             border: 1px solid rgba(255,255,255,0.08); 
             background: var(--card-bg); 
             box-shadow: 0 10px 40px rgba(0,0,0,0.5);
         }
-        body.theme-midnight .input-field, body.theme-midnight .search-box { 
-            background: var(--input-bg) !important; 
-            color: #F1F5F9 !important; 
-            border-color: rgba(255,255,255,0.1) !important; 
+        body.dark-mode .input-field, body.dark-mode .search-box { background: var(--input-bg) !important; color: #F1F5F9 !important; border-color: rgba(255,255,255,0.1) !important; }
+        body.dark-mode .modal-content { background: #1E293B; border: 1px solid rgba(255,255,255,0.1); color: #F1F5F9; box-shadow: 0 20px 60px rgba(0,0,0,0.6); }
+        body.dark-mode .user-name, body.dark-mode .sidebar-brand { color: white; }
+        body.dark-mode th, body.dark-mode .day-num { color: white !important; }
+        body.dark-mode #notes-area { color: #F1F5F9 !important; }
+        body.dark-mode .mobile-nav { background: rgba(15, 23, 42, 0.95) !important; border-color: rgba(255,255,255,0.08) !important; }
+
+        /* THEME BACKGROUNDS */
+        body { --theme-bg-img: url('./images/bamboo-bg.png'); }
+        body.theme-sakura { --theme-bg-img: url('./images/sakura.png'); }
+        body.theme-ocean { --theme-bg-img: url('./images/ocean.png'); }
+        body.theme-sandstone { --theme-bg-img: url('./images/sandstone.png'); }
+        body.theme-sunset { --theme-bg-img: url('./images/sunset.png'); }
+        body.theme-peaks { --theme-bg-img: url('./images/misty-peaks.png'); }
+
+        body.theme-peaks {
+            --accent-green: #64748B;
+            --accent-green-glow: rgba(100, 116, 139, 0.3);
+            --streak-bg: linear-gradient(135deg, #334155 0%, #64748B 100%);
+            --text-dark: #334155;
         }
-        body.theme-midnight .search-box input { background: transparent !important; color: #F1F5F9 !important; }
-        body.theme-midnight .modal-content { background: #1E293B; border: 1px solid rgba(255,255,255,0.1); color: #F1F5F9; box-shadow: 0 20px 60px rgba(0,0,0,0.6); }
-        body.theme-midnight .month-header, body.theme-midnight .day-header { color: #F8FAFC; }
-        body.theme-midnight .day-cell { border-color: rgba(255,255,255,0.05); }
-        body.theme-midnight .nav-item:hover, body.theme-midnight .day-cell:hover, body.theme-midnight .nav-link:hover, body.theme-midnight .nav-link.active { 
-            background: rgba(255,255,255,0.08); 
+
+        body.theme-peaks:not(.dark-mode) {
+            background-image: linear-gradient(rgba(240, 241, 243, 0.85), rgba(240, 241, 243, 0.85)), var(--theme-bg-img);
         }
-        body.theme-midnight .nav-item.active { background: rgba(255,255,255,0.1); color: white; }
-        body.theme-midnight .timer-mode-btn { background: rgba(255,255,255,0.05) !important; color: white !important; border-color: rgba(255,255,255,0.1) !important; }
-        body.theme-midnight .timer-mode-btn.active { background: var(--accent-green) !important; border-color: var(--accent-green) !important; color: #0B1120 !important; }
-        body.theme-midnight .sidebar-brand, body.theme-midnight .user-name { color: white; }
-        body.theme-midnight #greeting, body.theme-midnight .header-section h1 { color: #F8FAFC; }
-        body.theme-midnight .header-section p, body.theme-midnight .dashboard-header p { color: #94A3B8; }
-        body.theme-midnight .intention-text { color: white; }
-        body.theme-midnight .btn-secondary { background: rgba(255,255,255,0.08) !important; color: white !important; border-color: rgba(255,255,255,0.1) !important; }
-        body.theme-midnight .add-btn { color: var(--accent-green); }
-        body.theme-midnight .task-item { border-bottom: 1px solid rgba(255,255,255,0.05); }
-        body.theme-midnight .task-name { color: #E2E8F0; }
-        body.theme-midnight .btn-focus { background: var(--accent-green); color: #0B1120; font-weight: 700; }
-        body.theme-midnight .btn-focus[style*="background: white"], body.theme-midnight .cancel-modal-btn { 
-            background: rgba(255,255,255,0.06) !important; 
-            color: white !important; 
-            border-color: rgba(255,255,255,0.1) !important; 
+
+        body.theme-peaks.dark-mode {
+            --accent-green: #CBD5E1;
+            --accent-green-glow: rgba(203, 213, 225, 0.15);
+            --text-dark: #F8FAFC;
+            background-image: linear-gradient(rgba(15, 23, 42, 0.15), rgba(15, 23, 42, 0.15)), var(--theme-bg-img);
         }
-        body.theme-midnight #notes-area { color: #F1F5F9 !important; }
-        body.theme-midnight .mobile-nav { background: rgba(11, 17, 32, 0.95) !important; border-color: rgba(255,255,255,0.08) !important; }
-        body.theme-midnight .mobile-nav-link.active { color: #2DD4BF !important; }
-        
+
         /* Themed info boxes */
         .info-box { background: rgba(16, 185, 129, 0.05); border-radius: 16px; padding: 1.5rem; text-align: center; }
-        body.theme-midnight .info-box { background: rgba(255, 255, 255, 0.05); color: white; }
-        body.theme-midnight .info-box div { color: #E2E8F0; }
-
-        body.theme-midnight {
-            --streak-bg: rgba(56, 189, 248, 0.15);
-            --streak-text: #38BDF8;
-            --streak-pill: rgba(255, 255, 255, 0.05);
-            --text-dark: #FFFFFF;
-            --text-muted: #CBD5E1;
-            --card-bg: rgba(255, 255, 255, 0.05);
-            --border-color: rgba(255, 255, 255, 0.1);
-            --input-bg: rgba(255, 255, 255, 0.05);
-        }
-        body.theme-midnight .calendar-day-card { background: var(--card-bg) !important; border-color: var(--border-color) !important; color: white; }
-        body.theme-midnight .calendar-day-card .day-num { color: white !important; }
-        body.theme-midnight .calendar-day-card:hover { background: rgba(255,255,255,0.1) !important; }
-        body.theme-midnight .calendar-day-card.today { border-color: var(--accent-green) !important; }
-        body.theme-midnight .empty-day { background: rgba(0,0,0,0.2) !important; border-color: rgba(255,255,255,0.05) !important; }
-        body.theme-midnight .calendar-header h1 { color: white !important; }
-        body.theme-midnight .calendar-grid div[style*="text-align: center"] { color: #94A3B8 !important; }
-        body.theme-midnight .holiday-banner { background: rgba(239, 68, 68, 0.1) !important; color: #FCA5A5 !important; border: 1px solid rgba(239, 68, 68, 0.2) !important; }
-        
-        body.theme-midnight .streak-card {
-            border: 1px solid rgba(56, 189, 248, 0.2);
-            box-shadow: 0 10px 30px rgba(56, 189, 248, 0.1);
-        }
+        body.dark-mode .info-box { background: rgba(255, 255, 255, 0.05); color: white; }
+        body.dark-mode .info-box div { color: #E2E8F0; }
 
         .app-container {
             display: flex;
@@ -192,6 +188,81 @@
             display: flex;
             flex-direction: column;
             padding: 2rem 1.5rem;
+            transition: width 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+                        padding 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+
+        /* Collapsed sidebar */
+        .sidebar.collapsed {
+            width: 64px;
+            padding: 2rem 0.75rem;
+        }
+
+        /* Toggle button inside sidebar header */
+        .sidebar-toggle {
+            margin-left: auto;
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--text-muted);
+            opacity: 0.5;
+            padding: 4px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            transition: opacity 0.2s, transform 0.35s;
+            flex-shrink: 0;
+        }
+        .sidebar-toggle:hover { opacity: 1; }
+        .sidebar.collapsed .sidebar-toggle { transform: rotate(180deg); }
+
+        /* Hide text labels when collapsed */
+        .sidebar.collapsed .sidebar-brand,
+        .sidebar.collapsed .nav-link-label,
+        .sidebar.collapsed .sidebar-feedback,
+        .sidebar.collapsed .user-info,
+        .sidebar.collapsed .sidebar-cog { display: none !important; }
+
+        /* Center icons when collapsed */
+        .sidebar.collapsed .sidebar-logo { justify-content: center; gap: 0; }
+        .sidebar.collapsed .nav-link { justify-content: center; padding: 10px; }
+        .sidebar.collapsed .sidebar-user { justify-content: center; gap: 0; }
+
+        /* Background transparency when collapsed — less gradient, more image */
+        body.sidebar-collapsed {
+            background-image:
+                linear-gradient(rgba(248, 250, 249, 0.35), rgba(248, 250, 249, 0.35)),
+                url('./images/bamboo-bg.png');
+        }
+        body.sidebar-collapsed.theme-sakura {
+            background-image:
+                linear-gradient(rgba(248, 250, 249, 0.3), rgba(248, 250, 249, 0.3)),
+                url('./images/sakura.png');
+        }
+        body.sidebar-collapsed.theme-ocean {
+            background-image:
+                linear-gradient(rgba(240, 249, 255, 0.35), rgba(240, 249, 255, 0.35)),
+                url('./images/ocean.png');
+        }
+        body.sidebar-collapsed.theme-sandstone {
+            background-image:
+                linear-gradient(rgba(255, 251, 245, 0.3), rgba(255, 251, 245, 0.3)),
+                url('./images/sandstone.png');
+        }
+        body.sidebar-collapsed.theme-sunset {
+            background-image:
+                linear-gradient(rgba(250, 245, 255, 0.35), rgba(250, 245, 255, 0.35)),
+                url('./images/sunset.png');
+        }
+        body.sidebar-collapsed.theme-midnight {
+            background-image:
+                linear-gradient(rgba(11, 17, 32, 0.55), rgba(11, 17, 32, 0.55)),
+                url('./images/midnight-slate.png');
+        }
+        body.sidebar-collapsed.dark-mode {
+            background-image: linear-gradient(rgba(15, 23, 42, 0.3), rgba(15, 23, 42, 0.3)), var(--theme-bg-img);
         }
 
         .sidebar-logo {
@@ -310,6 +381,8 @@
         }
 
         .search-box input {
+            background: transparent;
+            color: inherit;
             border: none;
             outline: none;
             width: 100%;
@@ -411,22 +484,22 @@
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s;
-            box-shadow: 8px 8px 16px rgba(16, 185, 129, 0.2),
+            box-shadow: 8px 8px 16px var(--accent-green-glow),
                 inset 4px 4px 8px rgba(255, 255, 255, 0.3),
                 inset -4px -4px 8px rgba(0, 0, 0, 0.1);
         }
 
         .btn-focus:hover {
             transform: scale(1.05);
-            box-shadow: 12px 12px 20px rgba(16, 185, 129, 0.3),
+            box-shadow: 12px 12px 20px var(--accent-green-glow),
                 inset 6px 6px 12px rgba(255, 255, 255, 0.4),
                 inset -6px -6px 12px rgba(0, 0, 0, 0.15);
         }
 
         .btn-secondary {
-            background: white;
+            background: var(--card-bg);
             color: var(--text-dark);
-            border: 1px solid #E2E8F0;
+            border: 1px solid var(--border-color);
             box-shadow: none;
         }
 
@@ -685,7 +758,7 @@
 <body class="app-body">
     <div class="app-container">
         <!-- Sidebar -->
-        <aside class="sidebar">
+        <aside class="sidebar" id="app-sidebar">
             <div class="sidebar-logo">
                 <svg class="logo-icon" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
                     <path d="M50 90 Q40 60 55 10" fill="none" stroke="currentColor" stroke-width="4"
@@ -695,26 +768,23 @@
                     <path d="M55 30 Q75 20 80 40 Q65 45 55 30 Z" fill="currentColor" opacity="0.9" />
                 </svg>
                 <span class="sidebar-brand">OrganizO</span>
+                <button class="sidebar-toggle" id="sidebar-toggle-btn" title="Toggle sidebar">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="15 18 9 12 15 6"></polyline>
+                    </svg>
+                </button>
             </div>
 
             <nav class="nav-list">
                 <ul>
-                    <li class="nav-item"><a href="#" class="nav-link active" data-view="dashboard"><span
-                                class="nav-icon">📊</span>
-                            Dashboard</a></li>
-                    <li class="nav-item"><a href="#" class="nav-link" data-view="calendar"><span
-                                class="nav-icon">📅</span> Calendar</a></li>
-                    <li class="nav-item"><a href="#" class="nav-link" data-view="tasks"><span class="nav-icon">✅</span>
-                            Tasks</a></li>
-                    <li class="nav-item"><a href="#" class="nav-link" data-view="timer"><span class="nav-icon">⏱️</span>
-                            Focus Timer</a>
-                    </li>
-                    <li class="nav-item"><a href="#" class="nav-link" data-view="insights"><span
-                                class="nav-icon">💡</span> Insights</a></li>
-                    <li class="nav-item"><a href="#" class="nav-link" data-view="notes"><span
-                                class="nav-icon">📓</span> Quiet Notes</a></li>
-                    <li class="nav-item"><a href="#" class="nav-link" data-view="templates"><span class="nav-icon">🎯</span> Templates</a></li>
-                    <li class="nav-item" id="sidebar-pro-link"><a href="#" class="nav-link" onclick="event.preventDefault(); window.organizoApp && window.organizoApp.showProModal()"><span class="nav-icon">⭐</span> <span style="color: #10B981; font-weight: 700;">Pro</span></a></li>
+                    <li class="nav-item"><a href="#" class="nav-link active" data-view="dashboard"><span class="nav-icon">📊</span><span class="nav-link-label"> Dashboard</span></a></li>
+                    <li class="nav-item"><a href="#" class="nav-link" data-view="calendar"><span class="nav-icon">📅</span><span class="nav-link-label"> Calendar</span></a></li>
+                    <li class="nav-item"><a href="#" class="nav-link" data-view="tasks"><span class="nav-icon">✅</span><span class="nav-link-label"> Tasks</span></a></li>
+                    <li class="nav-item"><a href="#" class="nav-link" data-view="timer"><span class="nav-icon">⏱️</span><span class="nav-link-label"> Focus Timer</span></a></li>
+                    <li class="nav-item"><a href="#" class="nav-link" data-view="insights"><span class="nav-icon">💡</span><span class="nav-link-label"> Insights</span></a></li>
+                    <li class="nav-item"><a href="#" class="nav-link" data-view="notes"><span class="nav-icon">📓</span><span class="nav-link-label"> Quiet Notes</span></a></li>
+                    <li class="nav-item"><a href="#" class="nav-link" data-view="templates"><span class="nav-icon">🎯</span><span class="nav-link-label"> Templates</span></a></li>
+                    <li class="nav-item" id="sidebar-pro-link"><a href="#" class="nav-link" onclick="event.preventDefault(); window.organizoApp && window.organizoApp.showProModal()"><span class="nav-icon">⭐</span><span class="nav-link-label" style="color: #10B981; font-weight: 700;"> Pro</span></a></li>
                 </ul>
             </nav>
 
@@ -732,7 +802,7 @@
                 <div class="user-info">
                     <span class="user-name">Zen Seeker</span>
                 </div>
-                <svg style="margin-left: auto; width: 18px; height: 18px; opacity: 0.4;" viewBox="0 0 24 24" fill="none"
+                <svg class="sidebar-cog" style="margin-left: auto; width: 18px; height: 18px; opacity: 0.4;" viewBox="0 0 24 24" fill="none"
                     stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <circle cx="12" cy="12" r="3"></circle>
                     <path
@@ -843,6 +913,26 @@
                 .then(reg => console.log('[OrganizO] SW registered:', reg.scope))
                 .catch(err => console.warn('[OrganizO] SW failed:', err));
         }
+
+        // ── Sidebar collapse toggle ──────────────────────────────
+        (function() {
+            const sidebar = document.getElementById('app-sidebar');
+            const btn     = document.getElementById('sidebar-toggle-btn');
+            const body    = document.body;
+
+            // Restore state from localStorage
+            if (localStorage.getItem('sidebarCollapsed') === 'true') {
+                sidebar.classList.add('collapsed');
+                body.classList.add('sidebar-collapsed');
+            }
+
+            btn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                const isCollapsed = sidebar.classList.toggle('collapsed');
+                body.classList.toggle('sidebar-collapsed', isCollapsed);
+                localStorage.setItem('sidebarCollapsed', isCollapsed);
+            });
+        })();
     </script>
 </body>
 

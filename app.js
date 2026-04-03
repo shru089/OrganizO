@@ -19,6 +19,7 @@ class OrganizOApp {
         // OrganizO Pro
         this.isPro = this.loadData('isPro') || false;
         this.theme = this.loadData('theme') || 'bamboo';
+        this.isDarkMode = this.loadData('isDarkMode') || false;
         this.notes = this.loadData('notes') || '';
         this.timer = {
             minutes: 25,
@@ -400,7 +401,7 @@ class OrganizOApp {
         const color = pct >= 80 ? 'var(--accent-green)' : pct >= 50 ? '#F59E0B' : '#94A3B8';
         return `
             <svg width="72" height="72" style="transform: rotate(-90deg);">
-                <circle class="ring-bg" cx="36" cy="36" r="${r}" fill="none" stroke="#E2E8F0" stroke-width="5"/>
+                <circle class="ring-bg" cx="36" cy="36" r="${r}" fill="none" stroke="var(--border-color)" stroke-width="5" style="opacity: 0.2;"/>
                 <circle cx="36" cy="36" r="${r}" fill="none" class="completion-circle" stroke="${color}" stroke-width="5"
                     stroke-dasharray="0 ${c}" stroke-linecap="round"
                     data-target="${filled} ${c - filled}"
@@ -482,7 +483,7 @@ class OrganizOApp {
                     </div>
                 </div>
 
-                <div style="background: var(--accent-green); border-radius: 12px; padding: 1rem; color: white; text-align: center; margin-bottom: 1.5rem;">
+                <div style="background: var(--accent-green); border-radius: 12px; padding: 1rem; color: white; text-align: center; margin-bottom: 1.5rem; box-shadow: 0 4px 15px var(--accent-green-glow);">
                     <div style="font-size: 0.85rem; opacity: 0.9; margin-bottom: 4px;">✨ Zen Insight</div>
                     <div style="font-style: italic; font-size: 0.95rem;">${this.getWeeklyInsight(completedThisWeek.length, focusMins, this.streakData.currentStreak)}</div>
                 </div>
@@ -509,8 +510,8 @@ class OrganizOApp {
         modal.className = 'modal-overlay';
         modal.innerHTML = `
             <div class="modal-content" style="max-width: 480px; text-align: center;">
-                <div style="background: linear-gradient(135deg, #065F46, #10B981); border-radius: 16px; padding: 2rem; margin-bottom: 1.5rem; color: white;">
-                    <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">🌿</div>
+                <div style="background: linear-gradient(135deg, var(--accent-green), var(--accent-green-glow)); border-radius: 16px; padding: 2rem; margin-bottom: 1.5rem; color: white;">
+                    <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">👑</div>
                     <h2 style="margin: 0; font-size: 1.5rem;">OrganizO Pro</h2>
                     <p style="margin: 8px 0 0; opacity: 0.85; font-size: 0.9rem;">Everything you need to grow — gently.</p>
                     <div style="font-size: 2rem; font-weight: 800; margin-top: 1rem;">₹19<span style="font-size: 1rem; font-weight: 400; opacity: 0.8;">/month</span></div>
@@ -519,20 +520,20 @@ class OrganizOApp {
 
                 <div style="text-align: left; margin-bottom: 1.5rem;">
                     ${[
-                        ['📓', 'Quiet Notes', 'Your private daily scratchpad'],
-                        ['🎨', '6 Calming Themes', 'Including the new Minimal Dark mode'],
-                        ['🛡️', 'Streak Freeze', 'Protect your streak once a week'],
-                        ['📊', 'Advanced Reports', 'Deep dive into your patterns'],
-                        ['📤', 'Data Export', 'CSV & PDF export anytime'],
-                        ['📜', 'Early Access', 'To all upcoming roadmap features'],
+                        ['🔔', 'Zen Wake-Up', 'Nature-vibe audio alarms for tasks'],
+                        ['🔄', 'Power Routines', 'Automate daily/weekly recurring habits'],
+                        ['🔒', 'The Vault', 'Encrypted local backups & privacy lock'],
+                        ['🎨', '6 Calming Themes', 'Including the signature Misty Peaks'],
+                        ['📊', 'Advanced Reports', 'Visual insights & focus time trends'],
+                        ['📜', 'Early Access', 'To all upcoming experimental features'],
                     ].map(([icon, title, desc]) => `
-                        <div style="display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid #F1F5F9;">
+                        <div style="display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--border-color);">
                             <span style="font-size: 1.3rem; width: 30px;">${icon}</span>
                             <div>
-                                <div style="font-weight: 600; font-size: 0.9rem;">${title}</div>
+                                <div style="font-weight: 600; font-size: 0.9rem; color: var(--text-dark);">${title}</div>
                                 <div style="color: var(--text-muted); font-size: 0.8rem;">${desc}</div>
                             </div>
-                            <span style="margin-left: auto; color: #10B981; font-weight: 700;">✓</span>
+                            <span style="margin-left: auto; color: var(--accent-green); font-weight: 700;">✓</span>
                         </div>
                     `).join('')}
                 </div>
@@ -857,15 +858,15 @@ class OrganizOApp {
         mainContent.innerHTML = `
             <nav class="top-nav">
                 <div class="search-box">
-                    <span>🔍</span>
+                    <span style="opacity: 0.6;">🔍</span>
                     <input type="text" placeholder="Search your tasks..." id="search-input">
                 </div>
                 <div class="top-actions">
-                    <button class="icon-btn" title="Weekly Report" onclick="window.organizoApp.showWeeklyReport()" style="font-size: 1rem;">📊</button>
-                    ${!this.isPro ? '<button class="icon-btn" title="OrganizO Pro" onclick="window.organizoApp.showProModal()" style="font-size: 1rem;">⭐</button>' : ''}
-                    <div class="user-avatar profile-edit-trigger" style="width: 32px; height: 32px; font-size: 0.8rem; cursor: pointer; position: relative;" onclick="window.organizoApp.showProfileModal()">
+                    <button class="icon-btn" title="Weekly Report" onclick="window.organizoApp.showWeeklyReport()" style="font-size: 1rem; background: var(--card-bg); border-color: var(--border-color);">📊</button>
+                    ${!this.isPro ? '<button class="icon-btn" title="OrganizO Pro" onclick="window.organizoApp.showProModal()" style="font-size: 1rem; background: var(--accent-green); color: white; border: none;">⭐</button>' : ''}
+                    <div class="user-avatar profile-edit-trigger" style="width: 32px; height: 32px; font-size: 0.8rem; cursor: pointer; position: relative; background: var(--accent-green); color: white;" onclick="window.organizoApp.showProfileModal()">
                         ${this.sanitize(this.userData.initials)}
-                        ${this.isPro ? '<div style="position: absolute; bottom: -2px; right: -2px; font-size: 0.6rem; background: #10B981; color: white; border-radius: 4px; padding: 1px 3px; border: 1px solid white;">PRO</div>' : ''}
+                        ${this.isPro ? '<div style="position: absolute; bottom: -2px; right: -2px; font-size: 0.6rem; background: var(--accent-green); color: white; border-radius: 4px; padding: 1px 3px; border: 1px solid white;">PRO</div>' : ''}
                     </div>
                 </div>
             </nav>
@@ -900,13 +901,13 @@ class OrganizOApp {
                             ${this.renderTaskList()}
                         </div>
                         <!-- Daily Completion % -->
-                        <div style="margin-top: 1.5rem; display: flex; align-items: center; gap: 1rem; padding: 1rem; background: rgba(0,0,0,0.03); border-radius: 12px; border: 1px solid rgba(0,0,0,0.02);">
+                        <div style="margin-top: 1.5rem; display: flex; align-items: center; gap: 1rem; padding: 1rem; background: var(--input-bg); border-radius: 12px; border: 1px solid var(--border-color);">
                             <div style="position: relative; flex-shrink: 0;">
                                 ${this.renderCompletionRing(completion.pct)}
                                 <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 0.75rem; font-weight: 800; color: var(--text-dark);">${completion.pct}%</div>
                             </div>
                             <div>
-                                <div style="font-weight: 700; font-size: 0.9rem;">Daily Completion</div>
+                                <div style="font-weight: 700; font-size: 0.9rem; color: var(--text-dark);">Daily Completion</div>
                                 <div style="font-size: 0.8rem; color: var(--text-muted);">${completion.done} of ${completion.total} tasks today</div>
                                 ${completion.pct === 100 ? '<div style="font-size: 0.8rem; color: var(--accent-green); font-weight: 600; margin-top: 2px;">🎉 Perfect day!</div>' : ''}
                             </div>
@@ -956,14 +957,14 @@ class OrganizOApp {
         }
 
         return this.tasks.map(task => `
-            <div class="task-item" data-task-id="${task.id}">
-                <div class="checkbox ${task.completed ? 'checked' : ''}">${task.completed ? '✓' : ''}</div>
+            <div class="task-item" data-task-id="${task.id}" style="border-bottom-color: var(--border-color);">
+                <div class="checkbox ${task.completed ? 'checked' : ''}" style="border-color: var(--border-color); background: ${task.completed ? 'var(--accent-green)' : 'transparent'};">${task.completed ? '✓' : ''}</div>
                 <div class="task-info">
-                    <span class="task-name" style="${task.completed ? 'text-decoration: line-through; color: var(--text-muted);' : ''}">${this.sanitize(task.name)}</span>
-                    <div class="task-meta">${task.category || 'General'} ${task.priority ? '• ' + task.priority : ''}</div>
+                    <span class="task-name" style="${task.completed ? 'text-decoration: line-through; color: var(--text-muted);' : 'color: var(--text-dark);'}">${this.sanitize(task.name)}</span>
+                    <div class="task-meta" style="color: var(--text-muted);">${task.category || 'General'} ${task.priority ? '• ' + task.priority : ''}</div>
                 </div>
                 <span class="tag-priority ${task.priority === 'High' ? 'high' : ''}">${task.priority || 'Normal'}</span>
-                <button class="delete-task" style="background: none; border: none; color: #EF4444; cursor: pointer; margin-left: 8px;">×</button>
+                <button class="delete-task" style="background: none; border: none; color: #EF4444; cursor: pointer; margin-left: 8px; opacity: 0.6;">×</button>
             </div>
         `).join('');
     }
@@ -1080,7 +1081,21 @@ class OrganizOApp {
         mainContent.innerHTML = `
             <div style="max-width: 600px; margin: 0 auto; text-align: center; padding-top: 4rem;">
                 <h1 style="font-size: 2.5rem; margin-bottom: 1rem;">Focus Timer</h1>
-                <p style="color: var(--text-muted); margin-bottom: 3rem;">Deep work session</p>
+                <p style="color: var(--text-muted); margin-bottom: 2rem;">Deep work session</p>
+
+                <div style="display: flex; gap: 1rem; justify-content: center; margin-bottom: 3rem; flex-wrap: wrap;">
+                    <div style="display: flex; align-items: center; gap: 4px; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 20px; padding-right: 12px;">
+                        <button class="btn-focus" onclick="window.organizoApp.isPro ? window.organizoApp.toggleAudio() : window.organizoApp.showProModal()" style="display: flex; align-items: center; gap: 8px; background: transparent; border: none; color: var(--text-dark); padding: 8px 12px; border-radius: 20px;">
+                            <span class="pro-badge-mini" style="font-size: 1.1rem;">🎧</span>
+                            <span id="soundscape-status">${this.audioPlaying ? 'Pause Audio' : 'Soundscape'}</span>
+                        </button>
+                        ${this.isPro ? `<input type="range" id="soundscape-volume" min="0" max="1" step="0.05" value="${this.audioPlayer ? this.audioPlayer.volume : 0.5}" style="width: 70px; cursor: pointer; accent-color: var(--accent-green);" oninput="window.organizoApp.updateVolume(this.value)">` : ''}
+                    </div>
+                    <button class="btn-focus" onclick="window.organizoApp.isPro ? window.organizoApp.toggleZenMode() : window.organizoApp.showProModal()" style="display: flex; align-items: center; gap: 8px; background: var(--card-bg); border: 1px solid var(--border-color); color: var(--text-dark); padding: 8px 16px; border-radius: 20px;">
+                        <span class="pro-badge-mini" style="font-size: 1.1rem;">🧘‍♂️</span>
+                        <span>Focus Lock</span>
+                    </button>
+                </div>
                 
                 <div class="timer-display" style="font-size: 6rem; font-weight: 700; color: var(--accent-green); margin-bottom: 3rem;">
                     ${String(this.timer.minutes).padStart(2, '0')}:${String(this.timer.seconds).padStart(2, '0')}
@@ -1090,19 +1105,19 @@ class OrganizOApp {
                     <button class="btn-focus start-timer-btn" style="padding: 1rem 2rem;">
                         ${this.timer.isRunning ? 'Pause' : 'Start'}
                     </button>
-                    <button class="btn-focus reset-timer-btn" style="background: white; color: var(--text-dark); border: 1px solid #E2E8F0; padding: 1rem 2rem;">
+                    <button class="btn-focus reset-timer-btn" style="background: var(--card-bg); color: var(--text-dark); border: 1px solid var(--border-color); padding: 1rem 2rem;">
                         Reset
                     </button>
                 </div>
 
                 <div style="display: flex; gap: 1rem; justify-content: center;">
-                    <button class="timer-mode-btn ${this.timer.mode === 'focus' ? 'active' : ''}" data-mode="focus" style="padding: 8px 16px; border-radius: 8px; border: 1px solid #E2E8F0; background: ${this.timer.mode === 'focus' ? 'var(--accent-green)' : 'white'}; color: ${this.timer.mode === 'focus' ? 'white' : 'var(--text-dark)'}; cursor: pointer;">
+                    <button class="timer-mode-btn ${this.timer.mode === 'focus' ? 'active' : ''}" data-mode="focus" style="padding: 8px 16px; border-radius: 8px; border: 1px solid var(--border-color); background: ${this.timer.mode === 'focus' ? 'var(--accent-green)' : 'var(--card-bg)'}; color: ${this.timer.mode === 'focus' ? 'white' : 'var(--text-dark)'}; cursor: pointer;">
                         Focus (25min)
                     </button>
-                    <button class="timer-mode-btn ${this.timer.mode === 'shortBreak' ? 'active' : ''}" data-mode="shortBreak" style="padding: 8px 16px; border-radius: 8px; border: 1px solid #E2E8F0; background: ${this.timer.mode === 'shortBreak' ? 'var(--accent-green)' : 'white'}; color: ${this.timer.mode === 'shortBreak' ? 'white' : 'var(--text-dark)'}; cursor: pointer;">
+                    <button class="timer-mode-btn ${this.timer.mode === 'shortBreak' ? 'active' : ''}" data-mode="shortBreak" style="padding: 8px 16px; border-radius: 8px; border: 1px solid var(--border-color); background: ${this.timer.mode === 'shortBreak' ? 'var(--accent-green)' : 'var(--card-bg)'}; color: ${this.timer.mode === 'shortBreak' ? 'white' : 'var(--text-dark)'}; cursor: pointer;">
                         Short Break (5min)
                     </button>
-                    <button class="timer-mode-btn ${this.timer.mode === 'longBreak' ? 'active' : ''}" data-mode="longBreak" style="padding: 8px 16px; border-radius: 8px; border: 1px solid #E2E8F0; background: ${this.timer.mode === 'longBreak' ? 'var(--accent-green)' : 'white'}; color: ${this.timer.mode === 'longBreak' ? 'white' : 'var(--text-dark)'}; cursor: pointer;">
+                    <button class="timer-mode-btn ${this.timer.mode === 'longBreak' ? 'active' : ''}" data-mode="longBreak" style="padding: 8px 16px; border-radius: 8px; border: 1px solid var(--border-color); background: ${this.timer.mode === 'longBreak' ? 'var(--accent-green)' : 'var(--card-bg)'}; color: ${this.timer.mode === 'longBreak' ? 'white' : 'var(--text-dark)'}; cursor: pointer;">
                         Long Break (15min)
                     </button>
                 </div>
@@ -1217,7 +1232,7 @@ class OrganizOApp {
         mainContent.innerHTML = `
             <nav class="top-nav">
                 <div class="search-box">
-                    <span>🔍</span>
+                    <span style="opacity: 0.6;">🔍</span>
                     <input type="text" placeholder="Search your tasks..." id="search-input">
                 </div>
             </nav>
@@ -1246,7 +1261,10 @@ class OrganizOApp {
                 <div class="checkbox ${task.completed ? 'checked' : ''}">${task.completed ? '✓' : ''}</div>
                 <div class="task-info">
                     <span class="task-name" style="${task.completed ? 'text-decoration: line-through; color: var(--text-muted);' : ''}">${this.sanitize(task.name)}</span>
-                    <div class="task-meta">${task.category || 'General'} ${task.priority ? '• ' + task.priority : ''}</div>
+                    <div class="task-meta">
+                        ${task.category || 'General'} ${task.priority ? '• ' + task.priority : ''}
+                        <span class="pro-badge-mini" title="Pro Feature: Alarms" onclick="window.organizoApp.showProModal(); event.stopPropagation();">🔔</span>
+                    </div>
                 </div>
                 <span class="tag-priority ${task.priority === 'High' ? 'high' : ''}">${task.priority || 'Normal'}</span>
                 <button class="delete-task" style="background: none; border: none; color: #EF4444; cursor: pointer; margin-left: 8px; font-size: 1.5rem;">×</button>
@@ -1281,7 +1299,7 @@ class OrganizOApp {
         mainContent.innerHTML = `
             <nav class="top-nav">
                 <div class="search-box">
-                    <span>🔍</span>
+                    <span style="opacity: 0.6;">🔍</span>
                     <input type="text" placeholder="Search events & holidays..." id="search-input">
                 </div>
             </nav>
@@ -1312,10 +1330,10 @@ class OrganizOApp {
 
             return `
                         <div class="calendar-day-card ${isToday ? 'today' : ''}" 
-                             data-date="${dateStr}">
+                             data-date="${dateStr}" style="background: var(--card-bg); border-color: var(--border-color);">
                             
                             <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-                                <div class="day-num" style="font-size: 1.1rem; font-weight: 700; color: ${isToday ? 'var(--accent-green)' : 'var(--text-dark)'};">${day.getDate()}</div>
+                                <div class="day-num" style="font-size: 1.1rem; font-weight: 700; color: ${isToday ? 'var(--accent-green)' : 'var(--text-dark)'}; opacity: ${isToday ? '1' : '0.8'};">${day.getDate()}</div>
                                 ${holiday ? `<span title="${holiday}" style="font-size: 1rem;">🎁</span>` : ''}
                             </div>
                             
@@ -1411,15 +1429,15 @@ class OrganizOApp {
                 ` : ''}
 
                 <div style="font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); margin-bottom: 1rem;">Add Milestone / Goal</div>
-                <input type="text" id="event-name" placeholder="Milestone or Deadline title" class="input-field" style="width: 100%; padding: 12px; border: 1px solid #E2E8F0; border-radius: 8px; margin-bottom: 1rem;">
-                <select id="event-type" class="input-field" style="width: 100%; padding: 12px; border: 1px solid #E2E8F0; border-radius: 8px; margin-bottom: 1.5rem;">
+                <input type="text" id="event-name" placeholder="Milestone or Deadline title" class="input-field" style="width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: 8px; margin-bottom: 1rem; background: var(--input-bg); color: var(--text-dark);">
+                <select id="event-type" class="input-field" style="width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: 8px; margin-bottom: 1.5rem; background: var(--input-bg); color: var(--text-dark);">
                     <option value="Event">✨ Simple Event</option>
                     <option value="Deadline">🚨 Important Deadline</option>
                     <option value="Meeting">🤝 Meeting</option>
                 </select>
                 <div style="display: flex; gap: 1rem;">
                     <button class="btn-focus" id="save-event-btn" style="flex: 1;">Save to Schedule</button>
-                    <button class="btn-focus cancel-modal-btn" style="flex: 1; background: white; color: var(--text-dark); border: 1px solid #E2E8F0;">Cancel</button>
+                    <button class="btn-focus cancel-modal-btn" style="flex: 1; background: var(--card-bg); color: var(--text-dark); border: 1px solid var(--border-color);">Cancel</button>
                 </div>
             </div>
         `;
@@ -1454,7 +1472,7 @@ class OrganizOApp {
         mainContent.innerHTML = `
             <nav class="top-nav">
                 <div class="search-box">
-                    <span>🔍</span>
+                    <span style="opacity: 0.6;">🔍</span>
                     <input type="text" placeholder="Search activity..." id="search-input">
                 </div>
             </nav>
@@ -1969,6 +1987,9 @@ class OrganizOApp {
         if (this.theme !== 'bamboo') {
             document.body.classList.add(`theme-${this.theme}`);
         }
+        if (this.isDarkMode) {
+            document.body.classList.add('dark-mode');
+        }
     }
 
     setTheme(newTheme) {
@@ -1987,7 +2008,7 @@ class OrganizOApp {
             { id: 'ocean', name: 'Deep Ocean', icon: '🌊', color: '#0EA5E9' },
             { id: 'sandstone', name: 'Warm Sandstone', icon: '🏜️', color: '#D97706' },
             { id: 'sunset', name: 'Purple Sunset', icon: '🌆', color: '#A855F7' },
-            { id: 'midnight', name: 'Minimal Dark', icon: '🌑', color: '#38BDF8' }
+            { id: 'peaks', name: 'Misty Peaks', icon: '⛰️', color: '#64748B' }
         ];
 
         modal.innerHTML = `
@@ -2005,6 +2026,28 @@ class OrganizOApp {
                         </div>
                     `).join('')}
                 </div>
+
+                <div style="background: var(--streak-pill); border-radius: 16px; padding: 1.25rem; display: flex; align-items: center; justify-content: space-between;">
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <span style="font-size: 1.5rem;">🌙</span>
+                        <div>
+                            <div style="font-weight: 700; color: var(--text-dark); font-size: 0.9rem;">Universal Night Mode</div>
+                            <div style="font-size: 0.75rem; color: var(--text-muted);">Dark background for all themes</div>
+                        </div>
+                    </div>
+                    <label class="switch" style="position: relative; display: inline-block; width: 50px; height: 26px;">
+                        <input type="checkbox" id="dark-mode-toggle" ${this.isDarkMode ? 'checked' : ''} style="opacity: 0; width: 0; height: 0;">
+                        <span style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: ${this.isDarkMode ? 'var(--accent-green)' : '#ccc'}; transition: .4s; border-radius: 34px;">
+                            <span style="position: absolute; content: ''; height: 18px; width: 18px; left: ${this.isDarkMode ? '28px' : '4px'}; bottom: 4px; background-color: white; transition: .4s; border-radius: 50%;"></span>
+                        </span>
+                    </label>
+                </div>
+
+                <div style="margin-top: 1.5rem; border-top: 1px solid var(--border-color); padding-top: 1.5rem;">
+                    <button class="btn-focus" onclick="window.organizoApp.isPro ? window.organizoApp.exportData() : window.organizoApp.showProModal()" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 10px; background: ${this.isPro ? 'var(--accent-green)' : 'var(--card-bg)'}; color: ${this.isPro ? 'white' : 'var(--text-dark)'}; border: ${this.isPro ? 'none' : '1px solid var(--border-color)'};">
+                        <span>🔒</span> ${this.isPro ? 'Backup to Secure Vault' : 'Unlock The Vault (Backup)'}
+                    </button>
+                </div>
             </div>
         `;
         document.body.appendChild(modal);
@@ -2013,15 +2056,22 @@ class OrganizOApp {
             opt.addEventListener('click', (e) => {
                 const newTheme = e.currentTarget.dataset.theme;
                 this.setTheme(newTheme);
-                // Highlight active visually
                 modal.querySelectorAll('.theme-option').forEach(o => {
-                    o.style.borderColor = 'rgba(0,0,0,0.05)';
+                    o.style.borderColor = 'var(--border-color)';
                 });
                 const tObj = themes.find(t => t.id === newTheme);
                 e.currentTarget.style.borderColor = tObj.color;
-                
-                // Keep modal open so they can see live background change behind it!
             });
+        });
+
+        // Dark Mode Toggle
+        modal.querySelector('#dark-mode-toggle').addEventListener('change', (e) => {
+            this.isDarkMode = e.target.checked;
+            this.saveData('isDarkMode', this.isDarkMode);
+            this.applyTheme();
+            // Refresh modal to update switch color
+            modal.remove();
+            this.showProfileModal();
         });
 
         modal.querySelector('.close-modal-btn').addEventListener('click', () => modal.remove());
@@ -2042,6 +2092,48 @@ class OrganizOApp {
                 this.showProfileModal(); // reopen to see changes
             }
         });
+    }
+
+    toggleAudio() {
+        if (!this.audioPlayer) {
+            this.audioPlayer = new Audio('lofi.mp3');
+            this.audioPlayer.loop = true;
+            
+            // Try to extract existing volume if slider is present
+            const slider = document.getElementById('soundscape-volume');
+            this.audioPlayer.volume = slider ? parseFloat(slider.value) : 0.5;
+        }
+        
+        const statusSpan = document.getElementById('soundscape-status');
+
+        if (this.audioPlaying) {
+            this.audioPlayer.pause();
+            this.audioPlaying = false;
+            if (statusSpan) statusSpan.textContent = 'Soundscape';
+        } else {
+            this.audioPlayer.play().then(() => {
+                this.audioPlaying = true;
+                if (statusSpan) statusSpan.textContent = 'Pause Audio';
+            }).catch(e => {
+                alert("Browser prevented audio from playing. Interact with the document first.");
+            });
+        }
+    }
+
+    updateVolume(val) {
+        if (this.audioPlayer) {
+            this.audioPlayer.volume = parseFloat(val);
+        }
+    }
+
+    toggleZenMode() {
+        if (!document.fullscreenElement) {
+            document.documentElement.requestFullscreen().catch(err => {
+                alert("Fullscreen Zen Mode not supported by your browser.");
+            });
+        } else {
+            document.exitFullscreen();
+        }
     }
 
     updateUserUI() {

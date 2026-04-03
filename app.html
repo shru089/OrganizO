@@ -741,16 +741,41 @@
         @media (max-width: 768px) {
             .app-container { flex-direction: column; }
             .sidebar { display: none !important; }
-            .mobile-nav { display: flex; }
-            .main-content { padding: 1.5rem 1rem 5rem 1rem !important; }
-            .search-box { width: 100% !important; margin-bottom: 1rem; }
-            .top-nav { flex-direction: column; gap: 1rem; align-items: flex-start; }
-            .header-section h1, .dashboard-header h1 { font-size: 1.75rem !important; }
-            .dashboard-grid { grid-template-columns: 1fr !important; }
+            .mobile-nav { display: flex; padding-bottom: max(10px, env(safe-area-inset-bottom)); box-shadow: 0 -10px 40px rgba(0,0,0,0.1); }
+            .main-content { padding: 1.5rem 1.25rem 6.5rem 1.25rem !important; height: 100vh; overflow-y: auto; }
+            
+            /* Typography Fixes */
+            .header-section { margin-bottom: 1.5rem !important; }
+            .header-section h1, .dashboard-header h1 { font-size: 1.6rem !important; line-height: 1.25; margin-bottom: 0.25rem; }
+            .header-section p { font-size: 0.95rem; opacity: 0.9; }
+            
+            /* Components */
+            .search-box { 
+                width: 100% !important; 
+                margin-bottom: 0.5rem; 
+                background: rgba(255,255,255,0.7); 
+                backdrop-filter: blur(10px);
+            }
+            body.dark-mode .search-box { background: rgba(0,0,0,0.4) !important; }
+            
+            .top-nav { flex-direction: column; gap: 0.5rem; align-items: stretch; margin-bottom: 1.5rem; }
+            
+            .intention-card { padding: 1.5rem 1.25rem !important; margin-bottom: 1.5rem !important; }
+            .intention-text { font-size: 1.3rem !important; margin-bottom: 1.25rem !important; }
+            
+            .dashboard-grid { grid-template-columns: 1fr !important; gap: 1rem !important; }
+            
+            /* Buttons */
+            .btn-focus { width: 100%; text-align: center; justify-content: center; padding: 12px !important; }
+            .intention-card > div { flex-direction: column; gap: 0.75rem !important; width: 100%; }
+            
+            /* Calendar */
             .calendar-grid { gap: 5px !important; }
             .calendar-day-card { min-height: 50px !important; padding: 4px !important; }
             .day-num { font-size: 0.8rem !important; }
-            .intention-text { font-size: 1.25rem !important; }
+            
+            /* Cards */
+            .card { padding: 1.25rem !important; }
         }
     </style>
 </head>

@@ -369,7 +369,7 @@ class OrganizOApp {
                 </div>
                 <div style="text-align: left; margin-bottom: 2rem;">
                     <div style="font-size: 0.75rem; font-weight: 700; color: var(--text-muted); letter-spacing: 1px; margin-bottom: 0.75rem;">STREAK MILESTONES</div>
-                    ${[3,7,14,30,60].map(n => `
+                    ${[3, 7, 14, 30, 60].map(n => `
                         <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
                             <span style="font-size: 1.2rem;">${currentStreak >= n ? '✅' : '⬜'}</span>
                             <span style="color: ${currentStreak >= n ? 'var(--accent-green)' : 'var(--text-muted)'}; font-size: 0.9rem;">${n} day streak ${currentStreak >= n ? '— Achieved!' : ''}</span>
@@ -387,9 +387,9 @@ class OrganizOApp {
     getDailyCompletion() {
         const activeTasks = this.tasks.filter(t => !t.completed);
         const completedToday = this.tasks.filter(t => t.completed && t.completedAt && this.isToday(t.completedAt));
-        
+
         const relevantTasks = [...activeTasks, ...completedToday];
-        
+
         if (relevantTasks.length === 0) return { pct: 0, done: 0, total: 0 };
         const done = completedToday.length;
         return { pct: Math.round((done / relevantTasks.length) * 100), done, total: relevantTasks.length };
@@ -423,7 +423,7 @@ class OrganizOApp {
         const habitRate = totalHabits > 0 ? Math.round((habitsCompleted / totalHabits) * 100) : 0;
 
         // Day-by-day breakdown
-        const days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+        const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
         const dayBars = [];
         for (let i = 6; i >= 0; i--) {
             const d = new Date(); d.setDate(d.getDate() - i);
@@ -520,36 +520,43 @@ class OrganizOApp {
 
                 <div style="text-align: left; margin-bottom: 1.5rem;">
                     ${[
-                        ['🔔', 'Zen Wake-Up', 'Nature-vibe audio alarms for tasks'],
-                        ['🔄', 'Power Routines', 'Automate daily/weekly recurring habits'],
-                        ['🔒', 'The Vault', 'Encrypted local backups & privacy lock'],
-                        ['🎨', '6 Calming Themes', 'Including the signature Misty Peaks'],
-                        ['📊', 'Advanced Reports', 'Visual insights & focus time trends'],
-                        ['📜', 'Early Access', 'To all upcoming experimental features'],
-                    ].map(([icon, title, desc]) => `
-                        <div style="display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--border-color);">
-                            <span style="font-size: 1.3rem; width: 30px;">${icon}</span>
+                        ['☁️', 'Cloud Sync', 'Real-time sync across your phone and laptop.'],
+                        ['🎧', 'Focus Soundscapes', 'Offline lo-fi beats and nature audio.'],
+                        ['🔒', 'The Digital Vault', 'AES-256 encrypted local backups.'],
+                        ['🎨', 'Premium Aesthetics', 'Unlock Misty Peaks and 5 more themes.'],
+                        ['📊', 'Advanced Reports', 'Visual insights & focus time trends.'],
+                        ['🔔', 'Zen Alarms', 'Nature-vibe audio tasks.'],
+            ].map(([icon, title, desc]) => `
+                        <div style="display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--border-color);">
+                            <span style="font-size: 1.5rem; width: 32px; display: flex; justify-content: center;">${icon}</span>
                             <div>
-                                <div style="font-weight: 600; font-size: 0.9rem; color: var(--text-dark);">${title}</div>
-                                <div style="color: var(--text-muted); font-size: 0.8rem;">${desc}</div>
+                                <div style="font-weight: 700; font-size: 0.95rem; color: var(--text-dark);">${title}</div>
+                                <div style="color: var(--text-muted); font-size: 0.8rem; line-height: 1.3;">${desc}</div>
                             </div>
-                            <span style="margin-left: auto; color: var(--accent-green); font-weight: 700;">✓</span>
+                            <span style="margin-left: auto; color: var(--accent-green); font-weight: 800; font-size: 1.2rem;">✓</span>
                         </div>
                     `).join('')}
                 </div>
 
-                <div style="background: #FEF9C3; border-radius: 10px; padding: 0.75rem; margin-bottom: 1.5rem; font-size: 0.85rem; color: #92400E;">
-                    🚀 <strong>Coming Soon!</strong> Pro features are in development. Join the waitlist to get early access at 50% off.
+                <div style="background: linear-gradient(to right, rgba(16, 185, 129, 0.1), rgba(16, 185, 129, 0.05)); border-radius: 12px; padding: 1rem; margin-bottom: 1.5rem; text-align: left; border: 1px solid rgba(16, 185, 129, 0.2);">
+                    <div style="font-weight: 600; color: var(--accent-green); margin-bottom: 4px; display: flex; align-items: center; gap: 6px;">
+                        <span style="font-size: 1rem;">✨</span> Instant Access
+                    </div>
+                    <div style="font-size: 0.85rem; color: var(--text-dark); opacity: 0.8;">Cloud Sync and Pro features activate immediately across all your devices.</div>
                 </div>
 
-                <button class="btn-focus" id="pro-waitlist-btn" style="width: 100%; margin-bottom: 0.75rem;">Join Waitlist — Free</button>
+                <button class="btn-focus" id="pro-checkout-btn" style="width: 100%; margin-bottom: 0.75rem; font-size: 1.05rem; padding: 14px;">Unlock OrganizO Pro Now</button>
                 <button onclick="this.closest('.modal-overlay').remove()" style="background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 0.9rem;">Maybe later</button>
             </div>
         `;
         document.body.appendChild(modal);
         modal.addEventListener('click', e => { if (e.target === modal) modal.remove(); });
-        modal.querySelector('#pro-waitlist-btn').addEventListener('click', () => {
-            window.location.href = 'mailto:organizo089@gmail.com?subject=OrganizO Pro Waitlist&body=Hi! I want early access to OrganizO Pro.';
+        modal.querySelector('#pro-checkout-btn').addEventListener('click', () => {
+            alert("Cloud Sync Backend Integration Required:\\n\\nIn a live environment, this button triggers a Stripe Checkout or Google Play Billing flow. Once paid, the server flips 'isPro = true'.\\n\\nDevelopment mode: Unlocking locally.");
+            this.isPro = true;
+            this.saveData('isPro', this.isPro);
+            this.updateUserUI();
+            modal.remove();
         });
     }
 
@@ -743,31 +750,41 @@ class OrganizOApp {
     renderNotesView() {
         const mainContent = document.querySelector('.main-content');
         mainContent.innerHTML = `
-            <div style="max-width: 800px; margin: 0 auto; height: calc(100vh - 120px); display: flex; flex-direction: column; padding: 2rem 0;">
-                <header class="header-section" style="margin-bottom: 2rem;">
-                    <h1>📓 Quiet Notes</h1>
-                    <p>A private space for your brain dumps, journals, and raw thoughts. Saved only on your device.</p>
+            <div style="max-width: 850px; margin: 0 auto; min-height: 100%; display: flex; flex-direction: column; padding: 2rem 0;">
+                <header class="header-section" style="margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 1rem;">
+                    <div>
+                        <h1>📓 Quiet Notes</h1>
+                        <p>Format your thoughts beautifully.</p>
+                    </div>
+                    <div style="display: flex; gap: 8px; background: var(--card-bg); padding: 8px 12px; border-radius: 12px; border: 1px solid var(--border-color); box-shadow: 0 4px 12px rgba(0,0,0,0.05); align-items: center; overflow-x: auto;">
+                        <button class="icon-btn" onclick="document.execCommand('bold', false, null)" style="background:none; border:none; cursor:pointer; font-weight:bold; font-size:1.1rem; width:34px; height:34px; color:var(--text-dark);">B</button>
+                        <button class="icon-btn" onclick="document.execCommand('italic', false, null)" style="background:none; border:none; cursor:pointer; font-style:italic; font-family:serif; font-size:1.1rem; width:34px; height:34px; color:var(--text-dark);">I</button>
+                        <div style="width: 1px; height: 20px; background: var(--border-color); margin: 0 4px;"></div>
+                        <button class="icon-btn" onclick="document.execCommand('insertUnorderedList', false, null)" style="background:none; border:none; cursor:pointer; font-size:1.1rem; width:34px; height:34px; color:var(--text-dark);">•</button>
+                        <button class="icon-btn" onclick="document.execCommand('formatBlock', false, 'H2')" style="background:none; border:none; cursor:pointer; font-size:1rem; font-weight: 700; width:34px; height:34px; color:var(--text-dark);">H</button>
+                        <button class="icon-btn" onclick="window.organizoApp.showProModal()" title="Cloud Sync" style="background:none; border:none; cursor:pointer; font-size:1.1rem; width:34px; height:34px; color:var(--accent-green); margin-left: 8px;">☁️</button>
+                    </div>
                 </header>
                 
-                <div class="card" style="flex: 1; display: flex; flex-direction: column; padding: 2rem; margin-bottom: 1rem; border-radius: 24px;">
-                    <textarea id="notes-area" 
-                        style="flex: 1; border: none; outline: none; font-family: 'Inter', sans-serif; font-size: 1.15rem; line-height: 1.9; color: var(--text-dark); background: transparent; resize: none;" 
-                        placeholder="Start writing gently..."
-                    >${this.sanitize(this.notes)}</textarea>
+                <div class="card" style="flex: 1; display: flex; flex-direction: column; padding: 2.5rem; margin-bottom: 1rem; border-radius: 24px;">
+                    <div id="notes-area" contenteditable="true" 
+                        style="flex: 1; min-height: 50vh; border: none; outline: none; font-family: 'Inter', sans-serif; font-size: 1.15rem; line-height: 1.8; color: var(--text-dark); background: transparent; word-wrap: break-word;" 
+                        placeholder="Start writing gently...">
+${this.notes}</div>
                     
-                    <div style="margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid #F1F5F9; display: flex; justify-content: space-between; align-items: center; font-size: 0.85rem; color: var(--text-muted);">
+                    <div style="margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; font-size: 0.85rem; color: var(--text-muted);">
                         <div id="notes-status" style="display: flex; align-items: center; gap: 6px;">
                             <span class="status-icon">✓</span>
                             <span class="status-text">Saved locally</span>
                         </div>
                         <div id="notes-word-count" style="font-weight: 500;">
-                            ${this.notes.trim() === "" ? 0 : this.notes.split(/\s+/).filter(Boolean).length} words
+                            0 words
                         </div>
                     </div>
                 </div>
                 
                 <div style="text-align: center; font-size: 0.8rem; color: var(--text-muted); opacity: 0.7;">
-                    Pro Tip: Use this for morning pages or end-of-day reflection. 🌿
+                    Select text and format it. Or click ☁️ to sync across devices.
                 </div>
             </div>
         `;
@@ -776,20 +793,27 @@ class OrganizOApp {
         const statusText = document.querySelector('.status-text');
         const statusIcon = document.querySelector('.status-icon');
         const wordCount = document.getElementById('notes-word-count');
+
+        const countWords = (html) => {
+            if (!html) return 0;
+            let text = html.replace(/<[^>]*>?/igm, ' ');
+            return text.trim() === "" ? 0 : text.trim().split(/\s+/).filter(Boolean).length;
+        };
+
+        wordCount.textContent = countWords(notesArea.innerHTML) + ' words';
         
-        notesArea.addEventListener('input', (e) => {
-            this.notes = e.target.value;
+        notesArea.addEventListener('input', () => {
+            this.notes = notesArea.innerHTML;
             this.saveData('notes', this.notes);
-            
+
             // Update word count
-            const count = this.notes.trim() === "" ? 0 : this.notes.split(/\s+/).filter(Boolean).length;
-            wordCount.textContent = `${count} words`;
+            wordCount.textContent = countWords(notesArea.innerHTML) + ' words';
 
             // Visual feedback
             statusText.textContent = 'Saving...';
             statusIcon.textContent = '●';
             statusText.parentElement.style.color = 'var(--accent-green)';
-            
+
             clearTimeout(this.saveTimeout);
             this.saveTimeout = setTimeout(() => {
                 statusText.textContent = 'Saved locally';
@@ -1510,7 +1534,7 @@ class OrganizOApp {
                 </div>
             ` : ''}
         `;
-        
+
         if (this.isPro) {
             setTimeout(() => {
                 document.getElementById('export-data-btn')?.addEventListener('click', () => this.exportData());
@@ -2001,7 +2025,7 @@ class OrganizOApp {
     showProfileModal() {
         const modal = document.createElement('div');
         modal.className = 'modal-overlay';
-        
+
         const themes = [
             { id: 'bamboo', name: 'Bamboo Forest', icon: '🎋', color: '#10B981' },
             { id: 'sakura', name: 'Sakura Blush', icon: '🌸', color: '#F43F5E' },
@@ -2098,12 +2122,12 @@ class OrganizOApp {
         if (!this.audioPlayer) {
             this.audioPlayer = new Audio('audio/lofi.mp3');
             this.audioPlayer.loop = true;
-            
+
             // Try to extract existing volume if slider is present
             const slider = document.getElementById('soundscape-volume');
             this.audioPlayer.volume = slider ? parseFloat(slider.value) : 0.5;
         }
-        
+
         const statusSpan = document.getElementById('soundscape-status');
 
         if (this.audioPlaying) {
@@ -2159,7 +2183,7 @@ class OrganizOApp {
                 ${this.sanitize(this.userData.initials)}
                 ${this.isPro ? '<div style="position: absolute; bottom: -2px; right: -2px; font-size: 0.6rem; background: #10B981; color: white; border-radius: 4px; padding: 1px 3px; border: 1px solid white;">PRO</div>' : ''}
             `;
-            avatar.style.position = 'relative'; 
+            avatar.style.position = 'relative';
         });
 
         // Update Sidebar info

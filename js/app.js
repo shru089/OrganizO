@@ -436,9 +436,6 @@ class OrganizOApp {
             dayBars.push({ day: days[d.getDay()], count });
         }
         const maxCount = Math.max(...dayBars.map(d => d.count), 1);
-
-        const modal = document.createElement('div');
-        modal.className = 'modal-overlay';
         modal.innerHTML = `
             <div class="modal-content" style="max-width: 520px;">
                 <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem;">
@@ -782,10 +779,10 @@ class OrganizOApp {
                     #notes-area li { margin-bottom: 0.2rem; }
                     
                     /* Custom Editor UI */
-                    .editor-select { background: transparent; border: none; color: var(--text-dark); font-size: 0.9rem; font-weight: 600; outline: none; cursor: pointer; padding: 4px; }
-                    .editor-select option { background: var(--bg-color); color: var(--text-dark); }
-                    .glass-btn { background: none; border: none; cursor: pointer; color: var(--text-dark); border-radius: 6px; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
-                    .glass-btn:hover { background: rgba(255,255,255,0.2); }
+                    .editor-select { background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.25); border-radius: 8px; color: var(--text-dark); font-size: 0.9rem; font-weight: 600; outline: none; cursor: pointer; padding: 4px 8px; }
+                    .editor-select option { background: #1E293B !important; color: #F8FAFC !important; padding: 8px; }
+                    .glass-btn { background: none; border: none; cursor: pointer; color: var(--text-dark); border-radius: 6px; display: flex; align-items: center; justify-content: center; transition: all 0.2s; font-weight: 600; }
+                    .glass-btn:hover { background: rgba(255,255,255,0.25); transform: scale(1.05); }
                 </style>
                 
                 <div style="flex: 1; display: flex; flex-direction: column; padding: 3rem 8% 5rem 8%; transition: all 0.3s ease; overflow-y: auto; ${cardBgStyle}">
@@ -985,7 +982,7 @@ ${this.notes}</div>
 
                 <div style="display: flex; justify-content: center; gap: 1rem;">
                     <button class="btn-focus start-timer-btn">${this.timer.isRunning ? 'Pause Timer' : 'Start Focus Session'}</button>
-                    <button class="btn-focus edit-intention-btn btn-secondary">Edit Intention</button>
+                    <button class="btn-focus edit-intention-btn" style="background: rgba(255,255,255,1); color: #1E293B; border: 1px solid rgba(0,0,0,0.1); box-shadow: 0 4px 15px rgba(0,0,0,0.15); font-weight: 700;">Edit Intention</button>
                 </div>
             </section>
 
@@ -1524,31 +1521,47 @@ ${this.notes}</div>
         });
 
         const holiday = this.holidays[dateStr];
-
-        const modal = document.createElement('div');
-        modal.className = 'modal-overlay';
+        const eventsForDay = this.events.filter(e => e.date === dateStr);
         modal.innerHTML = `
-            <div class="modal-content" style="max-width: 450px; padding: 2.5rem;">
+            <div class="modal-content" style="max-width: 450px; padding: 2.5rem; max-height: 85vh; overflow-y: auto;">
                 <h3 style="margin-bottom: 0.5rem; font-family: 'Playfair Display', serif;">Plan for ${dateStr}</h3>
                 
-                ${holiday ? `<div class="holiday-banner" style="background: #FEF2F2; color: #EF4444; border-radius: 8px; padding: 12px; margin-bottom: 1.5rem; font-weight: 600; font-size: 0.9rem; display: flex; align-items: center; gap: 10px;"><span>🎁</span> ${holiday}</div>` : ''}
+                ${holiday ? `<div style="background: #FEF2F2; color: #EF4444; border-radius: 8px; padding: 12px; margin-bottom: 1.5rem; font-weight: 600; font-size: 0.9rem; display: flex; align-items: center; gap: 10px;"><span style="font-size:1.2rem">🎁</span> ${holiday}</div>` : ''}
+
+                ${eventsForDay.length > 0 ? `
+                <div style="margin-bottom: 1.5rem;">
+                    <div style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); margin-bottom: 0.75rem; font-weight: 700;">Scheduled Events</div>
+                    <div style="display: flex; flex-direction: column; gap: 8px;">
+                        ${eventsForDay.map(ev => `
+                            <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px; background: rgba(0,0,0,0.03); border: 1px solid var(--border-color); border-radius: 10px; padding: 10px 14px;">
+                                <span style="font-size: 0.9rem; font-weight: 600; color: var(--text-dark); flex: 1;">
+                                    ${ev.type === 'Deadline' ? '🚨' : ev.type === 'Meeting' ? '🤝' : '✨'} ${this.sanitize(ev.name)}
+                                </span>
+                                <button class="modal-delete-event-btn" data-event-id="${ev.id}" style="background: #FEF2F2; color: #EF4444; border: 1px solid #FECACA; border-radius: 8px; padding: 4px 12px; font-size: 0.8rem; font-weight: 700; cursor: pointer; flex-shrink: 0;">Delete</button>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+                <hr style="border: none; border-top: 1px solid var(--border-color); margin-bottom: 1.5rem;">
+                ` : ''}
 
                 ${tasksForDay.length > 0 ? `
-                <div style="margin-bottom: 2rem; border-top: 1px solid #f1f5f9; padding-top: 1.5rem;">
-                    <div style="font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); margin-bottom: 1rem;">Daily Flow Tasks</div>
+                <div style="margin-bottom: 1.5rem;">
+                    <div style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); margin-bottom: 1rem; font-weight: 700;">Daily Flow Tasks</div>
                     <div style="display: flex; flex-direction: column; gap: 8px;">
                         ${tasksForDay.map(t => `
-                            <div style="display: flex; align-items: center; gap: 10px; font-size: 0.95rem; color: ${t.completed ? 'var(--accent-green)' : 'var(--text-dark)'};">
+                            <div style="display: flex; align-items: center; gap: 10px; font-size: 0.9rem; color: ${t.completed ? 'var(--accent-green)' : 'var(--text-dark)'};">
                                 <span>${t.completed ? '🟢' : '⚪'}</span>
                                 <span style="${t.completed ? 'text-decoration: line-through; opacity: 0.6;' : ''}">${this.sanitize(t.name)}</span>
                             </div>
                         `).join('')}
                     </div>
                 </div>
+                <hr style="border: none; border-top: 1px solid var(--border-color); margin-bottom: 1.5rem;">
                 ` : ''}
 
-                <div style="font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); margin-bottom: 1rem;">Add Milestone / Goal</div>
-                <input type="text" id="event-name" placeholder="Milestone or Deadline title" class="input-field" style="width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: 8px; margin-bottom: 1rem; background: var(--input-bg); color: var(--text-dark);">
+                <div style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); margin-bottom: 1rem; font-weight: 700;">Add New Event</div>
+                <input type="text" id="event-name" placeholder="Milestone or Deadline title" class="input-field" style="width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: 8px; margin-bottom: 1rem; background: var(--input-bg); color: var(--text-dark); box-sizing: border-box;">
                 <select id="event-type" class="input-field" style="width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: 8px; margin-bottom: 1.5rem; background: var(--input-bg); color: var(--text-dark);">
                     <option value="Event">✨ Simple Event</option>
                     <option value="Deadline">🚨 Important Deadline</option>
@@ -1561,6 +1574,16 @@ ${this.notes}</div>
             </div>
         `;
         document.body.appendChild(modal);
+
+        // Delete buttons inside the modal
+        modal.querySelectorAll('.modal-delete-event-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const id = parseInt(btn.dataset.eventId);
+                this.deleteEvent(id);
+                modal.remove();
+                this.showAddEventModal(dateStr); // Re-open refreshed
+            });
+        });
 
         modal.querySelector('.cancel-modal-btn').addEventListener('click', () => modal.remove());
         modal.querySelector('#save-event-btn').addEventListener('click', () => {

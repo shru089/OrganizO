@@ -750,41 +750,34 @@ class OrganizOApp {
     renderNotesView() {
         const mainContent = document.querySelector('.main-content');
         mainContent.innerHTML = `
-            <div style="max-width: 850px; margin: 0 auto; min-height: 100%; display: flex; flex-direction: column; padding: 2rem 0;">
-                <header class="header-section" style="margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 1rem;">
-                    <div>
-                        <h1>📓 Quiet Notes</h1>
-                        <p>Format your thoughts beautifully.</p>
-                    </div>
-                    <div style="display: flex; gap: 8px; background: var(--card-bg); padding: 8px 12px; border-radius: 12px; border: 1px solid var(--border-color); box-shadow: 0 4px 12px rgba(0,0,0,0.05); align-items: center; overflow-x: auto;">
-                        <button class="icon-btn" onclick="document.execCommand('bold', false, null)" style="background:none; border:none; cursor:pointer; font-weight:bold; font-size:1.1rem; width:34px; height:34px; color:var(--text-dark);">B</button>
-                        <button class="icon-btn" onclick="document.execCommand('italic', false, null)" style="background:none; border:none; cursor:pointer; font-style:italic; font-family:serif; font-size:1.1rem; width:34px; height:34px; color:var(--text-dark);">I</button>
-                        <div style="width: 1px; height: 20px; background: var(--border-color); margin: 0 4px;"></div>
-                        <button class="icon-btn" onclick="document.execCommand('insertUnorderedList', false, null)" style="background:none; border:none; cursor:pointer; font-size:1.1rem; width:34px; height:34px; color:var(--text-dark);">•</button>
-                        <button class="icon-btn" onclick="document.execCommand('formatBlock', false, 'H2')" style="background:none; border:none; cursor:pointer; font-size:1rem; font-weight: 700; width:34px; height:34px; color:var(--text-dark);">H</button>
-                        <button class="icon-btn" onclick="window.organizoApp.showProModal()" title="Cloud Sync" style="background:none; border:none; cursor:pointer; font-size:1.1rem; width:34px; height:34px; color:var(--accent-green); margin-left: 8px;">☁️</button>
-                    </div>
-                </header>
+            <div style="max-width: 760px; margin: 0 auto; min-height: 100vh; display: flex; flex-direction: column; padding: 3rem 1rem;">
                 
-                <div class="card" style="flex: 1; display: flex; flex-direction: column; padding: 2.5rem; margin-bottom: 1rem; border-radius: 24px;">
-                    <div id="notes-area" contenteditable="true" 
-                        style="flex: 1; min-height: 50vh; border: none; outline: none; font-family: 'Inter', sans-serif; font-size: 1.15rem; line-height: 1.8; color: var(--text-dark); background: transparent; word-wrap: break-word;" 
-                        placeholder="Start writing gently...">
-${this.notes}</div>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                    <div style="display: flex; gap: 8px; background: transparent; align-items: center; opacity: 0.5; transition: opacity 0.3s;" onmouseenter="this.style.opacity=1" onmouseleave="this.style.opacity=0.5">
+                        <button class="icon-btn" onclick="document.execCommand('bold', false, null)" style="background:none; border:none; cursor:pointer; font-weight:bold; font-size:1.1rem; width:34px; height:34px; color:var(--text-dark); border-radius: 6px;">B</button>
+                        <button class="icon-btn" onclick="document.execCommand('italic', false, null)" style="background:none; border:none; cursor:pointer; font-style:italic; font-family:serif; font-size:1.1rem; width:34px; height:34px; color:var(--text-dark); border-radius: 6px;">I</button>
+                        <button class="icon-btn" onclick="document.execCommand('insertUnorderedList', false, null)" style="background:none; border:none; cursor:pointer; font-size:1.1rem; width:34px; height:34px; color:var(--text-dark); border-radius: 6px;">•</button>
+                        <button class="icon-btn" onclick="document.execCommand('formatBlock', false, 'H2')" style="background:none; border:none; cursor:pointer; font-size:1rem; font-weight: 700; width:34px; height:34px; color:var(--text-dark); border-radius: 6px;">H2</button>
+                        <button class="icon-btn" onclick="document.execCommand('formatBlock', false, 'H3')" style="background:none; border:none; cursor:pointer; font-size:1rem; font-weight: 600; width:34px; height:34px; color:var(--text-dark); border-radius: 6px;">H3</button>
+                        <div style="width: 1px; height: 16px; background: var(--border-color); margin: 0 4px;"></div>
+                        <button class="icon-btn" onclick="window.organizoApp.exportData()" title="Backup Notes" style="background:none; border:none; cursor:pointer; font-size:1.1rem; width:34px; height:34px; color:var(--text-dark); border-radius: 6px;">☁️</button>
+                    </div>
                     
-                    <div style="margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; font-size: 0.85rem; color: var(--text-muted);">
-                        <div id="notes-status" style="display: flex; align-items: center; gap: 6px;">
-                            <span class="status-icon">✓</span>
-                            <span class="status-text">Saved locally</span>
+                    <div style="display: flex; align-items: center; gap: 12px; font-size: 0.8rem; color: var(--text-muted);">
+                        <div id="notes-status" style="display: flex; align-items: center; gap: 6px; transition: color 0.3s;">
+                            <span class="status-icon" style="font-size: 0.7rem;">✓</span>
+                            <span class="status-text">Saved</span>
                         </div>
-                        <div id="notes-word-count" style="font-weight: 500;">
-                            0 words
-                        </div>
+                        <div style="width: 4px; height: 4px; background: var(--border-color); border-radius: 50%;"></div>
+                        <div id="notes-word-count">0 words</div>
                     </div>
                 </div>
-                
-                <div style="text-align: center; font-size: 0.8rem; color: var(--text-muted); opacity: 0.7;">
-                    Select text and format it. Or click ☁️ to sync across devices.
+
+                <div style="flex: 1; display: flex; flex-direction: column;">
+                    <div id="notes-area" contenteditable="true" 
+                        style="flex: 1; min-height: 70vh; border: none; outline: none; font-family: 'Inter', -apple-system, sans-serif; font-size: 1.1rem; line-height: 1.7; color: var(--text-dark); background: transparent; word-wrap: break-word; padding-bottom: 50px;" 
+                        placeholder="Type '/' for commands or start writing...">
+${this.notes}</div>
                 </div>
             </div>
         `;
@@ -822,10 +815,30 @@ ${this.notes}</div>
             }, 800);
         });
 
+        // Handle placeholder block natively like Notion
+        if (!this.notes || this.notes.trim() === '') {
+            notesArea.innerHTML = '<h1 style="font-size: 2.5rem; margin-bottom: 1rem; font-weight: 800; opacity: 0.3;" class="default-title">Untitled</h1><p></p>';
+        }
+
+        // Notion-style slash commands listener
+        notesArea.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                document.execCommand('insertLineBreak');
+                e.preventDefault();
+            }
+        });
+
         // Smart cursor placement
         setTimeout(() => {
             notesArea.focus();
-            notesArea.setSelectionRange(notesArea.value.length, notesArea.value.length);
+            if (notesArea.innerHTML.includes('default-title')) {
+                // Select the text inside the title
+                const sel = window.getSelection();
+                const range = document.createRange();
+                range.selectNodeContents(notesArea.firstChild);
+                sel.removeAllRanges();
+                sel.addRange(range);
+            }
         }, 100);
     }
 

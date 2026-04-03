@@ -232,6 +232,19 @@ class OrganizOApp {
                 const eventId = parseInt(e.target.closest('.delete-event').dataset.eventId);
                 this.deleteEvent(eventId);
             }
+            if (e.target.closest('.today-btn')) {
+                this.calendarDate = new Date();
+                this.renderCalendarView();
+            }
+            if (e.target.closest('.modal-task-toggle')) {
+                const taskId = parseInt(e.target.closest('.modal-task-toggle').dataset.taskId);
+                this.toggleTask(taskId);
+                // Refresh modal to show completion
+                const modal = e.target.closest('.modal-overlay');
+                const dateStr = modal.querySelector('h3').textContent.replace('Plan for ', '');
+                modal.remove();
+                this.showAddEventModal(dateStr);
+            }
         });
     }
 
@@ -1416,18 +1429,22 @@ ${this.notes}</div>
             <nav class="top-nav">
                 <div class="search-box">
                     <span style="opacity: 0.6;">🔍</span>
-                    <input type="text" placeholder="Search events & holidays..." id="search-input">
+                    <input type="text" placeholder="Search events..." id="search-input">
+                </div>
+                <div style="display: flex; align-items: center; gap: 1rem;">
+                    <button class="btn-focus today-btn" style="padding: 6px 14px; font-size: 0.8rem; background: var(--card-bg); color: #1E293B; border: 1.5px solid var(--border-color); border-radius: 8px; cursor: pointer; font-weight: 700;">Today</button>
+                    <div style="width: 36px; height: 36px; border-radius: 50%; background: var(--accent-green); color: white; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.85rem;">${this.userData.initials}</div>
                 </div>
             </nav>
 
-            <header class="header-section" style="display: flex; justify-content: space-between; align-items: center;">
+            <header class="header-section" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
                 <div>
-                    <h1>Monthly Sanctuary</h1>
-                    <p>Tracking focus and milestones for ${monthName} ${year}</p>
+                    <h1 style="font-family: 'Playfair Display', serif; font-size: 2.2rem; color: var(--text-dark);">${monthName} ${year}</h1>
+                    <p style="color: var(--text-muted); font-size: 0.95rem;">Structure your schedule with intention.</p>
                 </div>
-                <div style="display: flex; gap: 10px;">
-                    <button class="btn-focus prev-month" style="background: white; color: var(--text-dark); border: 1px solid #E2E8F0;">←</button>
-                    <button class="btn-focus next-month" style="background: white; color: var(--text-dark); border: 1px solid #E2E8F0;">→</button>
+                <div style="display: flex; gap: 0.6rem;">
+                    <button class="btn-focus prev-month" style="background: white; color: var(--text-dark); border: 1.5px solid #E2E8F0; width: 42px; height: 42px; padding: 0; display: flex; align-items: center; justify-content: center; border-radius: 10px; font-size: 1.2rem;">←</button>
+                    <button class="btn-focus next-month" style="background: white; color: var(--text-dark); border: 1.5px solid #E2E8F0; width: 42px; height: 42px; padding: 0; display: flex; align-items: center; justify-content: center; border-radius: 10px; font-size: 1.2rem;">→</button>
                 </div>
             </header>
 
@@ -1453,7 +1470,7 @@ ${this.notes}</div>
                                 ${holiday ? `<span title="${holiday}" style="font-size: 1rem;">🎁</span>` : ''}
                             </div>
                             
-                            <div style="display: flex; flex-direction: column; gap: px; margin-top: 5px; flex-grow: 1;">
+                            <div style="display: flex; flex-direction: column; gap: 3px; margin-top: 5px; flex-grow: 1;">
                                 ${this.renderCalendarTasks(day)}
                                 ${dailyEvents.map(ev => `
                                     <div class="${ev.type === 'Deadline' ? 'badge-deadline' : 'badge-event'}">
@@ -1550,7 +1567,7 @@ ${this.notes}</div>
                     <div style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); margin-bottom: 1rem; font-weight: 700;">Daily Flow Tasks</div>
                     <div style="display: flex; flex-direction: column; gap: 8px;">
                         ${tasksForDay.map(t => `
-                            <div style="display: flex; align-items: center; gap: 10px; font-size: 0.9rem; color: ${t.completed ? 'var(--accent-green)' : 'var(--text-dark)'};">
+                            <div class="modal-task-toggle" data-task-id="${t.id}" style="display: flex; align-items: center; gap: 10px; font-size: 0.9rem; color: ${t.completed ? 'var(--accent-green)' : 'var(--text-dark)'}; cursor: pointer; background: rgba(0,0,0,0.02); padding: 8px; border-radius: 8px;">
                                 <span>${t.completed ? '🟢' : '⚪'}</span>
                                 <span style="${t.completed ? 'text-decoration: line-through; opacity: 0.6;' : ''}">${this.sanitize(t.name)}</span>
                             </div>

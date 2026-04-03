@@ -10,6 +10,21 @@
   "orientation": "portrait-primary",
   "lang": "en",
   "categories": ["productivity", "lifestyle"],
+  "id": "/OrganizO/",
+  "screenshots": [
+    {
+      "src": "/OrganizO/images/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "form_factor": "wide"
+    },
+    {
+      "src": "/OrganizO/images/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "form_factor": "narrow"
+    }
+  ],
   "icons": [
     {
       "src": "/OrganizO/images/icon-192.png",

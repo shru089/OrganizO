@@ -17,7 +17,7 @@ class OrganizOApp {
         // Streak system
         this.streakData = this.loadData('streakData') || { currentStreak: 0, bestStreak: 0, lastActiveDate: null, history: [] };
         // OrganizO Pro
-        this.isPro = this.loadData('isPro') || false;
+        this.isPro = true; // Path 2 Growth Strategy: Pro is free for early adopters
         this.theme = this.loadData('theme') || 'bamboo';
         this.isDarkMode = this.loadData('isDarkMode') || false;
         this.notes = this.loadData('notes') || '';

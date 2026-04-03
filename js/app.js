@@ -1179,6 +1179,11 @@ ${this.notes}</div>
     startTimer() {
         if (this.timer.isRunning) return; // Prevent double intervals
 
+        // Request notification permission for Zen Alarms
+        if ("Notification" in window && Notification.permission !== "granted") {
+            Notification.requestPermission();
+        }
+
         this.timer.isRunning = true;
         this.timer.interval = setInterval(() => {
             if (this.timer.seconds === 0) {
@@ -1221,12 +1226,27 @@ ${this.notes}</div>
             this.saveData('focusTime', this.focusTime);
         }
 
-        // Show completion notification
+        const msg = this.timer.mode === 'focus' ? '🎉 Focus session complete!' : '✨ Break time over!';
+
+        // Native System Notification
+        if ("Notification" in window && Notification.permission === "granted") {
+            new Notification('OrganizO Zen Alarm', {
+                body: msg,
+                icon: './images/icon-192.png',
+                badge: './images/icon-192.png'
+            });
+        }
+
+        // Show in-app completion notification
         const notification = document.createElement('div');
-        notification.style.cssText = 'position: fixed; top: 2rem; right: 2rem; background: var(--accent-green); color: white; padding: 1rem 2rem; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); z-index: 1000;';
-        notification.textContent = this.timer.mode === 'focus' ? '🎉 Focus session complete!' : '✨ Break time over!';
+        notification.style.cssText = 'position: fixed; top: 2rem; right: 2rem; background: var(--accent-green); color: white; padding: 1rem 2rem; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); z-index: 1000; animation: slideUp 0.3s ease;';
+        notification.textContent = msg;
         document.body.appendChild(notification);
-        setTimeout(() => notification.remove(), 3000);
+        setTimeout(() => {
+            notification.style.opacity = '0';
+            notification.style.transition = 'opacity 0.5s';
+            setTimeout(() => notification.remove(), 500);
+        }, 4000);
 
         this.resetTimer();
     }
@@ -2008,11 +2028,32 @@ ${this.notes}</div>
     // ─── THEME SYSTEM ───────────────────────────────────────────
     applyTheme() {
         document.body.className = 'app-body'; // reset all
+        
+        let hexColor = '#10B981'; // bamboo default
+
         if (this.theme !== 'bamboo') {
             document.body.classList.add(`theme-${this.theme}`);
+            if (this.theme === 'sakura') hexColor = '#F43F5E';
+            if (this.theme === 'ocean') hexColor = '#0EA5E9';
+            if (this.theme === 'sandstone') hexColor = '#D97706';
+            if (this.theme === 'sunset') hexColor = '#A855F7';
+            if (this.theme === 'peaks') hexColor = '#64748B';
         }
+        
         if (this.isDarkMode) {
             document.body.classList.add('dark-mode');
+            hexColor = '#0F172A'; // Midnight background base
+        }
+
+        // Sync Browser Address Bar/Status Bar Color
+        let metaTheme = document.querySelector('meta[name="theme-color"]');
+        if (metaTheme) {
+            metaTheme.setAttribute('content', hexColor);
+        } else {
+            const meta = document.createElement('meta');
+            meta.name = "theme-color";
+            meta.content = hexColor;
+            document.head.appendChild(meta);
         }
     }
 

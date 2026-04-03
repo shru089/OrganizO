@@ -2096,7 +2096,7 @@ class OrganizOApp {
 
     toggleAudio() {
         if (!this.audioPlayer) {
-            this.audioPlayer = new Audio('lofi.mp3');
+            this.audioPlayer = new Audio('audio/lofi.mp3');
             this.audioPlayer.loop = true;
             
             // Try to extract existing volume if slider is present

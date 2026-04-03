@@ -7,17 +7,18 @@ const DYNAMIC_CACHE = `${CACHE_VERSION}-dynamic`;
 
 // Core app shell — cached on install
 const CORE_ASSETS = [
-    '/index.html',
-    '/app.html',
-    '/js/app.js',
-    '/js/script.js',
-    '/css/styles.css',
-    '/css/app-styles.css',
-    '/css/responsive.css',
-    '/audio/lofi.mp3',
-    '/manifest.json',
-    '/images/icon-192.png',
-    '/images/icon-512.png',
+    './',
+    './index.html',
+    './app.html',
+    './js/app.js',
+    './js/script.js',
+    './css/styles.css',
+    './css/app-styles.css',
+    './css/responsive.css',
+    './audio/lofi.mp3',
+    './manifest.json',
+    './images/icon-192.png',
+    './images/icon-512.png',
 ];
 
 // These patterns use network-first so users ALWAYS get the latest version
@@ -84,7 +85,7 @@ self.addEventListener('fetch', event => {
                     return response;
                 })
                 .catch(() => {
-                    return caches.match(event.request).then(cached => cached || caches.match('/app.html'));
+                    return caches.match(event.request).then(cached => cached || caches.match('./app.html'));
                 })
         );
         return;
@@ -100,7 +101,7 @@ self.addEventListener('fetch', event => {
                     caches.open(DYNAMIC_CACHE).then(cache => cache.put(event.request, clone));
                 }
                 return response;
-            }).catch(() => caches.match('/app.html'));
+            }).catch(() => caches.match('./app.html'));
         })
     );
 });

@@ -21,6 +21,10 @@ class OrganizOApp {
         this.theme = this.loadData('theme') || 'bamboo';
         this.isDarkMode = this.loadData('isDarkMode') || false;
         this.notes = this.loadData('notes') || '';
+        this.notesFont = this.loadData('notesFont') || 'Playfair Display'; // Default serif for aesthetic
+        const rawCardMode = this.loadData('notesCardMode');
+        this.notesCardMode = rawCardMode !== null ? rawCardMode : true;
+        
         this.timer = {
             minutes: 25,
             seconds: 0,
@@ -749,50 +753,110 @@ class OrganizOApp {
     // ─── QUIET NOTES ──────────────────────────────────────────────
     renderNotesView() {
         const mainContent = document.querySelector('.main-content');
-            <div style="max-width: 800px; margin: 0 auto; height: calc(100vh - 60px); display: flex; flex-direction: column; padding: 1rem 1rem 0 1rem;">
+        
+        // Determine container style based on Card Mode toggle
+        const cardBgStyle = this.notesCardMode 
+            ? 'background: var(--card-bg); border-radius: 20px 20px 0 0; box-shadow: 0 -10px 40px rgba(0,0,0,0.4); border: 1px solid var(--border-color); border-bottom: none;' 
+            : 'background: transparent; border: none; box-shadow: none;';
+
+        const glassToolbar = `
+            background: rgba(255, 255, 255, 0.1); 
+            backdrop-filter: blur(12px); 
+            -webkit-backdrop-filter: blur(12px); 
+            border: 1px solid rgba(255,255,255,0.2); 
+            border-radius: 12px; 
+            padding: 6px 12px; 
+            box-shadow: 0 4px 16px rgba(0,0,0,0.05);
+        `;
+
+        mainContent.innerHTML = `
+            <div style="max-width: 800px; margin: 0 auto; min-height: 100vh; display: flex; flex-direction: column; padding: 1rem 1rem 0 1rem; position: relative;">
                 <style>
-                    #notes-area h1 { font-family: 'Inter', sans-serif !important; font-weight: 800; font-size: 2.5rem; margin-bottom: 1rem; color: var(--text-dark); letter-spacing: -0.02em; }
-                    #notes-area h2 { font-family: 'Inter', sans-serif !important; font-weight: 700; font-size: 1.5rem; margin-top: 1.5rem; margin-bottom: 0.5rem; color: var(--text-dark); }
-                    #notes-area h3 { font-family: 'Inter', sans-serif !important; font-weight: 600; font-size: 1.25rem; margin-top: 1.2rem; margin-bottom: 0.5rem; color: var(--text-dark); }
-                    #notes-area p { margin-bottom: 0.8rem; line-height: 1.7; }
+                    /* Scoped Typography */
+                    #notes-area { font-family: '${this.notesFont}', sans-serif !important; }
+                    #notes-area h1 { font-family: '${this.notesFont}', sans-serif !important; font-weight: 800; font-size: 2.5rem; margin-bottom: 1rem; color: var(--text-dark); letter-spacing: -0.02em; }
+                    #notes-area h2 { font-family: '${this.notesFont}', sans-serif !important; font-weight: 700; font-size: 1.5rem; margin-top: 1.5rem; margin-bottom: 0.5rem; color: var(--text-dark); }
+                    #notes-area h3 { font-family: '${this.notesFont}', sans-serif !important; font-weight: 600; font-size: 1.25rem; margin-top: 1.2rem; margin-bottom: 0.5rem; color: var(--text-dark); }
+                    #notes-area p, #notes-area div { margin-bottom: 0.8rem; line-height: 1.7; font-size: 1.1rem; }
                     #notes-area ul { margin-bottom: 1rem; padding-left: 1.5rem; }
                     #notes-area li { margin-bottom: 0.2rem; }
-                </style>
-                <div style="background: var(--card-bg); border-radius: 20px 20px 0 0; flex: 1; display: flex; flex-direction: column; padding: 3rem 10% 5rem 10%; box-shadow: 0 -10px 40px rgba(0,0,0,0.08); border: 1px solid var(--border-color); border-bottom: none; overflow-y: auto;">
                     
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 3rem; position: sticky; top: 0; background: var(--card-bg); z-index: 10; padding: 10px 0;">
-                        <div style="display: flex; gap: 8px; align-items: center; opacity: 0.4; transition: opacity 0.3s;" onmouseenter="this.style.opacity=1" onmouseleave="this.style.opacity=0.4">
-                            <button class="icon-btn" onclick="document.execCommand('bold', false, null)" style="background:none; border:none; cursor:pointer; font-weight:bold; font-size:1.1rem; width:34px; height:34px; color:var(--text-dark); border-radius: 6px; font-family: 'Inter', sans-serif;">B</button>
-                            <button class="icon-btn" onclick="document.execCommand('italic', false, null)" style="background:none; border:none; cursor:pointer; font-style:italic; font-family:serif; font-size:1.1rem; width:34px; height:34px; color:var(--text-dark); border-radius: 6px;">I</button>
-                            <button class="icon-btn" onclick="document.execCommand('insertUnorderedList', false, null)" style="background:none; border:none; cursor:pointer; font-size:1.1rem; width:34px; height:34px; color:var(--text-dark); border-radius: 6px;">•</button>
+                    /* Custom Editor UI */
+                    .editor-select { background: transparent; border: none; color: var(--text-dark); font-size: 0.9rem; font-weight: 600; outline: none; cursor: pointer; padding: 4px; }
+                    .editor-select option { background: var(--bg-color); color: var(--text-dark); }
+                    .glass-btn { background: none; border: none; cursor: pointer; color: var(--text-dark); border-radius: 6px; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
+                    .glass-btn:hover { background: rgba(255,255,255,0.2); }
+                </style>
+                
+                <div style="flex: 1; display: flex; flex-direction: column; padding: 3rem 8% 5rem 8%; transition: all 0.3s ease; overflow-y: auto; ${cardBgStyle}">
+                    
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 3rem; position: sticky; top: 0; z-index: 20; padding: 10px 0;">
+                        <!-- Glassmorphic Toolbar -->
+                        <div style="display: flex; gap: 8px; align-items: center; ${glassToolbar}">
+                            <select id="notes-font-select" class="editor-select" title="Change Font">
+                                <option value="Inter" ${this.notesFont === 'Inter' ? 'selected' : ''}>Inter</option>
+                                <option value="Playfair Display" ${this.notesFont === 'Playfair Display' ? 'selected' : ''}>Playfair</option>
+                                <option value="Outfit" ${this.notesFont === 'Outfit' ? 'selected' : ''}>Outfit</option>
+                                <option value="Lora" ${this.notesFont === 'Lora' ? 'selected' : ''}>Lora (Serif)</option>
+                                <option value="Courier New" ${this.notesFont === 'Courier New' ? 'selected' : ''}>Typewriter</option>
+                            </select>
+                            
                             <div style="width: 1px; height: 16px; background: var(--border-color); margin: 0 4px;"></div>
-                            <button class="icon-btn" onclick="document.execCommand('formatBlock', false, 'H1')" style="background:none; border:none; cursor:pointer; font-size:1rem; font-weight: 800; width:34px; height:34px; color:var(--text-dark); border-radius: 6px; font-family: 'Inter', sans-serif;">H1</button>
-                            <button class="icon-btn" onclick="document.execCommand('formatBlock', false, 'H2')" style="background:none; border:none; cursor:pointer; font-size:1rem; font-weight: 700; width:34px; height:34px; color:var(--text-dark); border-radius: 6px; font-family: 'Inter', sans-serif;">H2</button>
-                            <button class="icon-btn" onclick="window.organizoApp.exportData()" title="Backup Notes" style="background:none; border:none; cursor:pointer; font-size:1.1rem; width:34px; height:34px; color:var(--text-dark); border-radius: 6px; margin-left: 8px;">☁️</button>
+                            
+                            <button class="glass-btn" onclick="document.execCommand('bold', false, null)" style="font-weight:bold; width:30px; height:30px;" title="Bold">B</button>
+                            <button class="glass-btn" onclick="document.execCommand('italic', false, null)" style="font-style:italic; font-family:serif; width:30px; height:30px;" title="Italic">I</button>
+                            <button class="glass-btn" onclick="document.execCommand('insertUnorderedList', false, null)" style="width:30px; height:30px;" title="Bullet List">•</button>
+                            
+                            <div style="width: 1px; height: 16px; background: var(--border-color); margin: 0 4px;"></div>
+                            
+                            <button class="glass-btn" onclick="document.execCommand('formatBlock', false, 'H1')" style="font-weight: 800; width:30px; height:30px; font-size: 0.8rem;" title="Title size">H1</button>
+                            <button class="glass-btn" onclick="document.execCommand('formatBlock', false, 'H2')" style="font-weight: 700; width:30px; height:30px; font-size: 0.8rem;" title="Header size">H2</button>
+                            
+                            <div style="width: 1px; height: 16px; background: var(--border-color); margin: 0 4px;"></div>
+                            
+                            <button id="toggle-card-btn" class="glass-btn" style="width:30px; height:30px;" title="Toggle Paper Mode">
+                                ${this.notesCardMode ? '📄' : '✨'}
+                            </button>
+                            <button class="glass-btn" onclick="window.organizoApp.exportData()" title="Backup Notes" style="width:30px; height:30px; margin-left:8px;">☁️</button>
                         </div>
                         
-                        <div style="display: flex; align-items: center; gap: 12px; font-size: 0.8rem; color: var(--text-muted); font-family: 'Inter', sans-serif;">
-                            <div id="notes-status" style="display: flex; align-items: center; gap: 6px; transition: color 0.3s;">
-                                <span class="status-icon" style="font-size: 0.7rem;">✓</span>
+                        <!-- Status indicator (also glassmorphic) -->
+                        <div style="display: flex; align-items: center; gap: 12px; font-size: 0.8rem; color: var(--text-dark); font-weight: 500; ${glassToolbar}">
+                            <div id="notes-status" style="display: flex; align-items: center; gap: 6px;">
+                                <span class="status-icon" style="font-size: 0.7rem; color: var(--accent-green);">✓</span>
                                 <span class="status-text">Saved</span>
                             </div>
-                            <div style="width: 4px; height: 4px; background: var(--border-color); border-radius: 50%;"></div>
+                            <div style="width: 4px; height: 4px; background: var(--text-dark); opacity: 0.3; border-radius: 50%;"></div>
                             <div id="notes-word-count">0 words</div>
                         </div>
                     </div>
 
                     <div id="notes-area" contenteditable="true" 
-                        style="flex: 1; border: none; outline: none; font-family: 'Inter', -apple-system, sans-serif; font-size: 1.1rem; color: var(--text-dark); background: transparent; word-wrap: break-word;" 
+                        style="flex: 1; border: none; outline: none; color: var(--text-dark); background: transparent; word-wrap: break-word;" 
                         placeholder="Type '/' for commands or start writing...">
 ${this.notes}</div>
                 </div>
             </div>
-        `;
+        \`;
 
         const notesArea = document.getElementById('notes-area');
         const statusText = document.querySelector('.status-text');
         const statusIcon = document.querySelector('.status-icon');
         const wordCount = document.getElementById('notes-word-count');
+        
+        // Font Selector Logic
+        document.getElementById('notes-font-select').addEventListener('change', (e) => {
+            this.notesFont = e.target.value;
+            this.saveData('notesFont', this.notesFont);
+            this.renderNotesView(); // Re-render to apply strictly
+        });
+        
+        // Card Toggle Logic
+        document.getElementById('toggle-card-btn').addEventListener('click', () => {
+            this.notesCardMode = !this.notesCardMode;
+            this.saveData('notesCardMode', this.notesCardMode);
+            this.renderNotesView();
+        });
 
         const countWords = (html) => {
             if (!html) return 0;
@@ -812,34 +876,25 @@ ${this.notes}</div>
             // Visual feedback
             statusText.textContent = 'Saving...';
             statusIcon.textContent = '●';
-            statusText.parentElement.style.color = 'var(--accent-green)';
+            statusIcon.style.color = 'var(--text-muted)';
 
             clearTimeout(this.saveTimeout);
             this.saveTimeout = setTimeout(() => {
-                statusText.textContent = 'Saved locally';
+                statusText.textContent = 'Saved';
                 statusIcon.textContent = '✓';
-                statusText.parentElement.style.color = 'var(--text-muted)';
+                statusIcon.style.color = 'var(--accent-green)';
             }, 800);
         });
 
-        // Handle placeholder block natively like Notion
+        // Handle placeholder block natively
         if (!this.notes || this.notes.trim() === '') {
-            notesArea.innerHTML = '<h1 style="font-size: 2.5rem; margin-bottom: 1rem; font-weight: 800; opacity: 0.3;" class="default-title">Untitled</h1><p></p>';
+            notesArea.innerHTML = '<h1>Untitled</h1><br>';
         }
-
-        // Notion-style slash commands listener
-        notesArea.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') {
-                document.execCommand('insertLineBreak');
-                e.preventDefault();
-            }
-        });
 
         // Smart cursor placement
         setTimeout(() => {
             notesArea.focus();
-            if (notesArea.innerHTML.includes('default-title')) {
-                // Select the text inside the title
+            if (notesArea.innerHTML.includes('Untitled')) {
                 const sel = window.getSelection();
                 const range = document.createRange();
                 range.selectNodeContents(notesArea.firstChild);

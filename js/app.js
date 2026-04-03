@@ -2043,12 +2043,15 @@ ${this.notes}</div>
                 <p style="color: var(--text-muted); text-align: center; margin-bottom: 1.5rem; font-size: 0.9rem;">Select a theme to match your current vibe</p>
                 
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; margin-bottom: 1.5rem;">
-                    ${themes.map(t => `
-                        <div class="theme-option" data-theme="${t.id}" style="padding: 12px; border-radius: 12px; border: 2px solid ${this.theme === t.id ? t.color : 'var(--border-color)'}; background: var(--streak-pill); cursor: pointer; display: flex; align-items: center; gap: 10px; transition: border 0.3s ease;">
+                    ${themes.map(t => {
+                        const isLocked = t.id !== 'bamboo' && !this.isPro;
+                        return `
+                        <div class="theme-option" data-theme="${t.id}" data-locked="${isLocked}" style="padding: 12px; border-radius: 12px; border: 2px solid ${this.theme === t.id ? t.color : 'var(--border-color)'}; background: var(--streak-pill); cursor: ${isLocked ? 'pointer' : 'pointer'}; display: flex; align-items: center; gap: 10px; transition: border 0.3s ease; opacity: ${isLocked && this.theme !== t.id ? '0.7' : '1'}; position: relative;">
                             <div style="width: 24px; height: 24px; border-radius: 50%; background: ${t.color}; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; color: white; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">${t.icon}</div>
                             <span style="font-size: 0.85rem; font-weight: 600; color: var(--text-dark);">${t.name}</span>
+                            ${isLocked ? '<span style="position: absolute; right: 10px; font-size: 0.9rem;" title="Pro Feature">🔒</span>' : ''}
                         </div>
-                    `).join('')}
+                    `}).join('')}
                 </div>
 
                 <div style="background: var(--streak-pill); border-radius: 16px; padding: 1.25rem; display: flex; align-items: center; justify-content: space-between;">
@@ -2069,7 +2072,7 @@ ${this.notes}</div>
 
                 <div style="margin-top: 1.5rem; border-top: 1px solid var(--border-color); padding-top: 1.5rem;">
                     <button class="btn-focus" onclick="window.organizoApp.isPro ? window.organizoApp.exportData() : window.organizoApp.showProModal()" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 10px; background: ${this.isPro ? 'var(--accent-green)' : 'var(--card-bg)'}; color: ${this.isPro ? 'white' : 'var(--text-dark)'}; border: ${this.isPro ? 'none' : '1px solid var(--border-color)'};">
-                        <span>🔒</span> ${this.isPro ? 'Backup to Secure Vault' : 'Unlock The Vault (Backup)'}
+                        <span>☁️</span> ${this.isPro ? 'Manual Cloud Sync (Backup)' : 'Unlock Cloud Sync'}
                     </button>
                 </div>
             </div>
@@ -2078,6 +2081,11 @@ ${this.notes}</div>
 
         modal.querySelectorAll('.theme-option').forEach(opt => {
             opt.addEventListener('click', (e) => {
+                if (e.currentTarget.dataset.locked === 'true') {
+                    modal.remove();
+                    this.showProModal();
+                    return;
+                }
                 const newTheme = e.currentTarget.dataset.theme;
                 this.setTheme(newTheme);
                 modal.querySelectorAll('.theme-option').forEach(o => {
@@ -2090,6 +2098,12 @@ ${this.notes}</div>
 
         // Dark Mode Toggle
         modal.querySelector('#dark-mode-toggle').addEventListener('change', (e) => {
+            if (!this.isPro) {
+                e.target.checked = false;
+                modal.remove();
+                this.showProModal();
+                return;
+            }
             this.isDarkMode = e.target.checked;
             this.saveData('isDarkMode', this.isDarkMode);
             this.applyTheme();

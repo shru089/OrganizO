@@ -1429,27 +1429,27 @@ ${this.notes}</div>
             <nav class="top-nav">
                 <div class="search-box">
                     <span style="opacity: 0.6;">🔍</span>
-                    <input type="text" placeholder="Search events..." id="search-input">
+                    <input type="text" placeholder="Search events..." id="search-input" style="color: var(--text-dark); background: transparent; border: none; width: 100%; outline: none;">
                 </div>
                 <div style="display: flex; align-items: center; gap: 1rem;">
-                    <button class="btn-focus today-btn" style="padding: 6px 14px; font-size: 0.8rem; background: var(--card-bg); color: #1E293B; border: 1.5px solid var(--border-color); border-radius: 8px; cursor: pointer; font-weight: 700;">Today</button>
-                    <div style="width: 36px; height: 36px; border-radius: 50%; background: var(--accent-green); color: white; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.85rem;">${this.userData.initials}</div>
+                    <button class="btn-focus today-btn" style="padding: 8px 18px; font-size: 0.85rem; background: #FFFFFF; color: #1E293B; border: 1px solid rgba(0,0,0,0.1); border-radius: 10px; cursor: pointer; font-weight: 700; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">Today</button>
+                    <div style="width: 40px; height: 40px; border-radius: 50%; background: var(--accent-green); color: white; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.95rem; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);">${this.userData.initials}</div>
                 </div>
             </nav>
 
-            <header class="header-section" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+            <header class="header-section" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2.5rem; padding-top: 1rem;">
                 <div>
-                    <h1 style="font-family: 'Playfair Display', serif; font-size: 2.2rem; color: var(--text-dark);">${monthName} ${year}</h1>
-                    <p style="color: var(--text-muted); font-size: 0.95rem;">Structure your schedule with intention.</p>
+                    <h1 style="font-family: 'Playfair Display', serif; font-size: 2.8rem; color: #FFFFFF; margin-bottom: 0.5rem; text-shadow: 0 4px 12px rgba(0,0,0,0.2);">${monthName} ${year}</h1>
+                    <p style="color: rgba(255,255,255,0.7); font-size: 1.1rem; font-weight: 500;">Structure your schedule with intention.</p>
                 </div>
-                <div style="display: flex; gap: 0.6rem;">
-                    <button class="btn-focus prev-month" style="background: white; color: var(--text-dark); border: 1.5px solid #E2E8F0; width: 42px; height: 42px; padding: 0; display: flex; align-items: center; justify-content: center; border-radius: 10px; font-size: 1.2rem;">←</button>
-                    <button class="btn-focus next-month" style="background: white; color: var(--text-dark); border: 1.5px solid #E2E8F0; width: 42px; height: 42px; padding: 0; display: flex; align-items: center; justify-content: center; border-radius: 10px; font-size: 1.2rem;">→</button>
+                <div style="display: flex; gap: 0.8rem;">
+                    <button class="btn-focus prev-month" style="background: #FFFFFF; color: #1E293B; border: none; width: 48px; height: 48px; padding: 0; display: flex; align-items: center; justify-content: center; border-radius: 12px; font-size: 1.4rem; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.2);">←</button>
+                    <button class="btn-focus next-month" style="background: #FFFFFF; color: #1E293B; border: none; width: 48px; height: 48px; padding: 0; display: flex; align-items: center; justify-content: center; border-radius: 12px; font-size: 1.4rem; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.2);">→</button>
                 </div>
             </header>
 
-            <div style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px; text-align: center; margin-bottom: 15px; font-weight: 600; font-size: 0.8rem; color: var(--text-muted);">
-                <div>SUN</div><div>MON</div><div>TUE</div><div>WED</div><div>THU</div><div>FRI</div><div>SAT</div>
+            <div class="calendar-grid-header" style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 1rem; margin-bottom: 1.5rem; text-align: center; color: #FFFFFF; font-size: 0.85rem; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; opacity: 0.9;">
+                <div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div>
             </div>
 
             <div class="calendar-grid" style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px;">

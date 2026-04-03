@@ -2,8 +2,8 @@
   "name": "OrganizO: Calm Productivity",
   "short_name": "OrganizO",
   "description": "Structure your life, gently. Tasks, habits & focus timer in one zen space.",
-  "start_url": "./app.html",
-  "scope": "./",
+  "start_url": "/OrganizO/app.html",
+  "scope": "/OrganizO/",
   "display": "standalone",
   "background_color": "#F8FAF9",
   "theme_color": "#10B981",
@@ -12,13 +12,13 @@
   "categories": ["productivity", "lifestyle"],
   "icons": [
     {
-      "src": "./images/icon-192.png",
+      "src": "/OrganizO/images/icon-192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "./images/icon-512.png",
+      "src": "/OrganizO/images/icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
@@ -29,15 +29,15 @@
       "name": "Open Dashboard",
       "short_name": "Dashboard",
       "description": "Go to your zen dashboard",
-      "url": "./app.html#dashboard",
-      "icons": [{ "src": "./images/icon-192.png", "sizes": "192x192" }]
+      "url": "/OrganizO/app.html#dashboard",
+      "icons": [{ "src": "/OrganizO/images/icon-192.png", "sizes": "192x192" }]
     },
     {
       "name": "Focus Timer",
       "short_name": "Timer",
       "description": "Start a focus session",
-      "url": "./app.html#timer",
-      "icons": [{ "src": "./images/icon-192.png", "sizes": "192x192" }]
+      "url": "/OrganizO/app.html#timer",
+      "icons": [{ "src": "/OrganizO/images/icon-192.png", "sizes": "192x192" }]
     }
   ]
 }

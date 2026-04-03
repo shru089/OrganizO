@@ -837,7 +837,7 @@ class OrganizOApp {
 ${this.notes}</div>
                 </div>
             </div>
-        \`;
+        `;
 
         const notesArea = document.getElementById('notes-area');
         const statusText = document.querySelector('.status-text');

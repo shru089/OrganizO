@@ -749,33 +749,40 @@ class OrganizOApp {
     // ─── QUIET NOTES ──────────────────────────────────────────────
     renderNotesView() {
         const mainContent = document.querySelector('.main-content');
-        mainContent.innerHTML = `
-            <div style="max-width: 760px; margin: 0 auto; min-height: 100vh; display: flex; flex-direction: column; padding: 3rem 1rem;">
-                
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
-                    <div style="display: flex; gap: 8px; background: transparent; align-items: center; opacity: 0.5; transition: opacity 0.3s;" onmouseenter="this.style.opacity=1" onmouseleave="this.style.opacity=0.5">
-                        <button class="icon-btn" onclick="document.execCommand('bold', false, null)" style="background:none; border:none; cursor:pointer; font-weight:bold; font-size:1.1rem; width:34px; height:34px; color:var(--text-dark); border-radius: 6px;">B</button>
-                        <button class="icon-btn" onclick="document.execCommand('italic', false, null)" style="background:none; border:none; cursor:pointer; font-style:italic; font-family:serif; font-size:1.1rem; width:34px; height:34px; color:var(--text-dark); border-radius: 6px;">I</button>
-                        <button class="icon-btn" onclick="document.execCommand('insertUnorderedList', false, null)" style="background:none; border:none; cursor:pointer; font-size:1.1rem; width:34px; height:34px; color:var(--text-dark); border-radius: 6px;">•</button>
-                        <button class="icon-btn" onclick="document.execCommand('formatBlock', false, 'H2')" style="background:none; border:none; cursor:pointer; font-size:1rem; font-weight: 700; width:34px; height:34px; color:var(--text-dark); border-radius: 6px;">H2</button>
-                        <button class="icon-btn" onclick="document.execCommand('formatBlock', false, 'H3')" style="background:none; border:none; cursor:pointer; font-size:1rem; font-weight: 600; width:34px; height:34px; color:var(--text-dark); border-radius: 6px;">H3</button>
-                        <div style="width: 1px; height: 16px; background: var(--border-color); margin: 0 4px;"></div>
-                        <button class="icon-btn" onclick="window.organizoApp.exportData()" title="Backup Notes" style="background:none; border:none; cursor:pointer; font-size:1.1rem; width:34px; height:34px; color:var(--text-dark); border-radius: 6px;">☁️</button>
-                    </div>
+            <div style="max-width: 800px; margin: 0 auto; height: calc(100vh - 60px); display: flex; flex-direction: column; padding: 1rem 1rem 0 1rem;">
+                <style>
+                    #notes-area h1 { font-family: 'Inter', sans-serif !important; font-weight: 800; font-size: 2.5rem; margin-bottom: 1rem; color: var(--text-dark); letter-spacing: -0.02em; }
+                    #notes-area h2 { font-family: 'Inter', sans-serif !important; font-weight: 700; font-size: 1.5rem; margin-top: 1.5rem; margin-bottom: 0.5rem; color: var(--text-dark); }
+                    #notes-area h3 { font-family: 'Inter', sans-serif !important; font-weight: 600; font-size: 1.25rem; margin-top: 1.2rem; margin-bottom: 0.5rem; color: var(--text-dark); }
+                    #notes-area p { margin-bottom: 0.8rem; line-height: 1.7; }
+                    #notes-area ul { margin-bottom: 1rem; padding-left: 1.5rem; }
+                    #notes-area li { margin-bottom: 0.2rem; }
+                </style>
+                <div style="background: var(--card-bg); border-radius: 20px 20px 0 0; flex: 1; display: flex; flex-direction: column; padding: 3rem 10% 5rem 10%; box-shadow: 0 -10px 40px rgba(0,0,0,0.08); border: 1px solid var(--border-color); border-bottom: none; overflow-y: auto;">
                     
-                    <div style="display: flex; align-items: center; gap: 12px; font-size: 0.8rem; color: var(--text-muted);">
-                        <div id="notes-status" style="display: flex; align-items: center; gap: 6px; transition: color 0.3s;">
-                            <span class="status-icon" style="font-size: 0.7rem;">✓</span>
-                            <span class="status-text">Saved</span>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 3rem; position: sticky; top: 0; background: var(--card-bg); z-index: 10; padding: 10px 0;">
+                        <div style="display: flex; gap: 8px; align-items: center; opacity: 0.4; transition: opacity 0.3s;" onmouseenter="this.style.opacity=1" onmouseleave="this.style.opacity=0.4">
+                            <button class="icon-btn" onclick="document.execCommand('bold', false, null)" style="background:none; border:none; cursor:pointer; font-weight:bold; font-size:1.1rem; width:34px; height:34px; color:var(--text-dark); border-radius: 6px; font-family: 'Inter', sans-serif;">B</button>
+                            <button class="icon-btn" onclick="document.execCommand('italic', false, null)" style="background:none; border:none; cursor:pointer; font-style:italic; font-family:serif; font-size:1.1rem; width:34px; height:34px; color:var(--text-dark); border-radius: 6px;">I</button>
+                            <button class="icon-btn" onclick="document.execCommand('insertUnorderedList', false, null)" style="background:none; border:none; cursor:pointer; font-size:1.1rem; width:34px; height:34px; color:var(--text-dark); border-radius: 6px;">•</button>
+                            <div style="width: 1px; height: 16px; background: var(--border-color); margin: 0 4px;"></div>
+                            <button class="icon-btn" onclick="document.execCommand('formatBlock', false, 'H1')" style="background:none; border:none; cursor:pointer; font-size:1rem; font-weight: 800; width:34px; height:34px; color:var(--text-dark); border-radius: 6px; font-family: 'Inter', sans-serif;">H1</button>
+                            <button class="icon-btn" onclick="document.execCommand('formatBlock', false, 'H2')" style="background:none; border:none; cursor:pointer; font-size:1rem; font-weight: 700; width:34px; height:34px; color:var(--text-dark); border-radius: 6px; font-family: 'Inter', sans-serif;">H2</button>
+                            <button class="icon-btn" onclick="window.organizoApp.exportData()" title="Backup Notes" style="background:none; border:none; cursor:pointer; font-size:1.1rem; width:34px; height:34px; color:var(--text-dark); border-radius: 6px; margin-left: 8px;">☁️</button>
                         </div>
-                        <div style="width: 4px; height: 4px; background: var(--border-color); border-radius: 50%;"></div>
-                        <div id="notes-word-count">0 words</div>
+                        
+                        <div style="display: flex; align-items: center; gap: 12px; font-size: 0.8rem; color: var(--text-muted); font-family: 'Inter', sans-serif;">
+                            <div id="notes-status" style="display: flex; align-items: center; gap: 6px; transition: color 0.3s;">
+                                <span class="status-icon" style="font-size: 0.7rem;">✓</span>
+                                <span class="status-text">Saved</span>
+                            </div>
+                            <div style="width: 4px; height: 4px; background: var(--border-color); border-radius: 50%;"></div>
+                            <div id="notes-word-count">0 words</div>
+                        </div>
                     </div>
-                </div>
 
-                <div style="flex: 1; display: flex; flex-direction: column;">
                     <div id="notes-area" contenteditable="true" 
-                        style="flex: 1; min-height: 70vh; border: none; outline: none; font-family: 'Inter', -apple-system, sans-serif; font-size: 1.1rem; line-height: 1.7; color: var(--text-dark); background: transparent; word-wrap: break-word; padding-bottom: 50px;" 
+                        style="flex: 1; border: none; outline: none; font-family: 'Inter', -apple-system, sans-serif; font-size: 1.1rem; color: var(--text-dark); background: transparent; word-wrap: break-word;" 
                         placeholder="Type '/' for commands or start writing...">
 ${this.notes}</div>
                 </div>

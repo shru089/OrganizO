@@ -13,7 +13,7 @@ class OrganizOApp {
         this.holidays = this.getHolidays();
         this.focusTime = this.loadData('focusTime') || { total: 0, sessions: [] };
         this.dailyIntention = this.loadData('dailyIntention') || '';
-        this.userData = this.loadData('userData') || { name: 'Zen Seeker', initials: 'JS' };
+        this.userData = this.loadData('userData') || { name: '', initials: '', email: '' };
         // Streak system
         this.streakData = this.loadData('streakData') || { currentStreak: 0, bestStreak: 0, lastActiveDate: null, history: [] };
         // OrganizO Pro
@@ -24,7 +24,7 @@ class OrganizOApp {
         this.notesFont = this.loadData('notesFont') || 'Playfair Display'; // Default serif for aesthetic
         const rawCardMode = this.loadData('notesCardMode');
         this.notesCardMode = rawCardMode !== null ? rawCardMode : true;
-        
+
         this.timer = {
             minutes: 25,
             seconds: 0,
@@ -32,6 +32,8 @@ class OrganizOApp {
             interval: null,
             mode: 'focus'
         };
+        this.selectedSound = 'lofi'; // default sound
+        this.focusTaskId = null; // target task for focus session
         this.calendarDate = new Date();
 
         this.renderDashboard();
@@ -47,60 +49,106 @@ class OrganizOApp {
         this.checkOnboarding();
         this.setupHotkeys();
         this.updateDailyStreak(); // Track daily login streak
+        this.setupEndOfDayReminder(); // Remind about remaining tasks
+        this.setupOnlineOfflineBanner(); // Offline/online notification
+        this.setupFAB(); // Floating action button
+        // Re-schedule any deadline notifications for existing tasks
+        if ('Notification' in window && Notification.permission === 'granted') {
+            this.tasks.filter(t => !t.completed && t.dueDate).forEach(t => this.scheduleDeadlineNotification(t));
+        }
+    }
+
+    setupFAB() {
+        const fab = document.getElementById('fab-add-task');
+        if (!fab) return;
+        // Show FAB only on mobile (< 768px)
+        const updateFab = () => {
+            fab.style.display = window.innerWidth < 768 ? 'flex' : 'none';
+        };
+        updateFab();
+        window.addEventListener('resize', updateFab);
     }
 
     checkOnboarding() {
         const hasSeenOnboarding = localStorage.getItem('organizo_onboarding_seen');
-        if (!hasSeenOnboarding) {
-            // Slight delay so it feels natural
-            setTimeout(() => this.showOnboardingModal(), 500);
+        // Show onboarding if never seen OR if user still has no name
+        if (!hasSeenOnboarding || !this.userData.name) {
+            setTimeout(() => this.showOnboardingModal(), 400);
         }
     }
 
     showOnboardingModal() {
         const modal = document.createElement('div');
         modal.className = 'modal-overlay';
+        modal.style.cssText = 'background: rgba(0,0,0,0.7); backdrop-filter: blur(8px);';
         modal.innerHTML = `
-            <div class="modal-content" style="max-width: 480px; text-align: center;">
-                <div style="font-size: 3rem; margin-bottom: 1rem;">🌿</div>
-                <h2 style="margin-bottom: 0.5rem; color: var(--text-dark);">Welcome to your sanctuary</h2>
-                <p style="color: var(--text-muted); margin-bottom: 2rem; line-height: 1.6;">
-                    OrganizO is your calm space for productivity. No pressure, no overwhelming lists. Just gentle focus and structure.
+            <div class="modal-content" style="max-width: 480px; text-align: center; padding: 2.5rem; border-radius: 28px; animation: slideUp 0.4s cubic-bezier(0.34,1.56,0.64,1);">
+                <div style="font-size: 3.5rem; margin-bottom: 1rem; animation: pulse 2s infinite;">🌿</div>
+                <h2 style="margin-bottom: 0.25rem; color: var(--text-dark); font-family: 'Playfair Display', serif;">Welcome to OrganizO</h2>
+                <p style="color: var(--text-muted); margin-bottom: 2rem; line-height: 1.7; font-size: 0.95rem;">
+                    Your calm digital sanctuary for gentle, focused productivity. Let's personalize your space.
                 </p>
-                
-                <div style="display: flex; flex-direction: column; gap: 1rem; margin-bottom: 2rem;">
-                    <button class="btn-focus" id="onboarding-intention-btn" style="background: var(--surface); color: var(--accent-green); border: 2px solid var(--accent-green);">
-                        ✨ Set today's intention
-                    </button>
-                    <button class="btn-focus" id="onboarding-task-btn" style="background: var(--accent-green); color: white;">
-                        📝 Create your first task
-                    </button>
+
+                <div style="text-align: left; margin-bottom: 1.25rem;">
+                    <label style="font-size: 0.8rem; font-weight: 700; color: var(--text-muted); letter-spacing: 1px; text-transform: uppercase; display: block; margin-bottom: 6px;">Your Name *</label>
+                    <input type="text" id="onboarding-name" placeholder="e.g. Shrishti" class="input-field" autocomplete="name"
+                        style="width: 100%; padding: 14px 16px; border: 2px solid var(--accent-green); border-radius: 12px; font-size: 1rem; background: var(--input-bg); color: var(--text-dark); box-sizing: border-box; outline: none; transition: box-shadow 0.3s;"
+                        onfocus="this.style.boxShadow='0 0 0 4px rgba(16,185,129,0.15)'" onblur="this.style.boxShadow='none'">
                 </div>
-                
-                <button class="icon-btn" id="onboarding-close-btn" style="font-size: 0.9rem; width: auto; padding: 0.5rem 1rem; border: none; background: transparent; color: var(--text-muted);">
-                    I'll explore on my own
+
+                <div style="text-align: left; margin-bottom: 2rem;">
+                    <label style="font-size: 0.8rem; font-weight: 700; color: var(--text-muted); letter-spacing: 1px; text-transform: uppercase; display: block; margin-bottom: 6px;">Gmail Address (optional)</label>
+                    <input type="email" id="onboarding-email" placeholder="e.g. you@gmail.com" class="input-field" autocomplete="email"
+                        style="width: 100%; padding: 14px 16px; border: 1.5px solid var(--border-color); border-radius: 12px; font-size: 1rem; background: var(--input-bg); color: var(--text-dark); box-sizing: border-box; outline: none; transition: all 0.3s;"
+                        onfocus="this.style.borderColor='var(--accent-green)'; this.style.boxShadow='0 0 0 4px rgba(16,185,129,0.1)'" onblur="this.style.borderColor='var(--border-color)'; this.style.boxShadow='none'">
+                    <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 6px; line-height: 1.5;">🔒 Stored only on your device. Never shared.</p>
+                </div>
+
+                <button class="btn-focus" id="onboarding-start-btn" style="width: 100%; padding: 15px; font-size: 1rem; border-radius: 14px; margin-bottom: 1rem;">
+                    Begin My Sanctuary 🌿
+                </button>
+                <button id="onboarding-skip-btn" style="background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 0.85rem;">
+                    Skip for now
                 </button>
             </div>
         `;
         document.body.appendChild(modal);
 
-        const closeAndMarkSeen = () => {
+        const nameInput = modal.querySelector('#onboarding-name');
+        setTimeout(() => nameInput.focus(), 300);
+
+        const saveAndClose = () => {
+            const name = nameInput.value.trim();
+            const email = modal.querySelector('#onboarding-email').value.trim();
+            if (!name) {
+                nameInput.style.borderColor = '#EF4444';
+                nameInput.style.boxShadow = '0 0 0 4px rgba(239,68,68,0.15)';
+                nameInput.placeholder = 'Please enter your name...';
+                nameInput.focus();
+                return;
+            }
+            const initials = name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+            this.userData = { name, initials, email };
+            this.saveData('userData', this.userData);
+            localStorage.setItem('organizo_onboarding_seen', 'true');
+            this.updateUserUI();
+            this.renderDashboard();
+            modal.style.opacity = '0';
+            modal.style.transition = 'opacity 0.3s';
+            setTimeout(() => modal.remove(), 300);
+            this.showToast(`Welcome aboard, ${name}! 🌿`);
+        };
+
+        const skipAndClose = () => {
             localStorage.setItem('organizo_onboarding_seen', 'true');
             modal.style.opacity = '0';
+            modal.style.transition = 'opacity 0.3s';
             setTimeout(() => modal.remove(), 300);
         };
 
-        modal.querySelector('#onboarding-close-btn').addEventListener('click', closeAndMarkSeen);
-
-        modal.querySelector('#onboarding-intention-btn').addEventListener('click', () => {
-            closeAndMarkSeen();
-            this.editIntention();
-        });
-
-        modal.querySelector('#onboarding-task-btn').addEventListener('click', () => {
-            closeAndMarkSeen();
-            this.showAddTaskModal();
-        });
+        modal.querySelector('#onboarding-start-btn').addEventListener('click', saveAndClose);
+        modal.querySelector('#onboarding-skip-btn').addEventListener('click', skipAndClose);
+        nameInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') saveAndClose(); });
     }
 
     // Security: Sanitize user input to prevent XSS
@@ -261,6 +309,19 @@ class OrganizOApp {
         });
 
         const mainContent = document.querySelector('.main-content');
+        
+        // Reset dynamic background if not in timer
+        if (view !== 'timer' && mainContent) {
+            mainContent.style.backgroundImage = '';
+            mainContent.style.backgroundSize = '';
+            mainContent.style.backgroundPosition = '';
+        }
+        
+        // Handle FAB visibility - only show on TASKS view (mobile only handled by setupFAB)
+        const fab = document.getElementById('fab-add-task');
+        if (fab) {
+            fab.style.display = (view === 'tasks' && window.innerWidth < 768) ? 'flex' : 'none';
+        }
 
         switch (view) {
             case 'dashboard':
@@ -534,12 +595,12 @@ class OrganizOApp {
 
                 <div style="text-align: left; margin-bottom: 1.5rem;">
                     ${[
-                        ['☁️', 'Cloud Sync', 'Real-time sync across your phone and laptop.'],
-                        ['🎧', 'Focus Soundscapes', 'Offline lo-fi beats and nature audio.'],
-                        ['🔒', 'The Digital Vault', 'AES-256 encrypted local backups.'],
-                        ['🎨', 'Premium Aesthetics', 'Unlock Misty Peaks and 5 more themes.'],
-                        ['📊', 'Advanced Reports', 'Visual insights & focus time trends.'],
-                        ['🔔', 'Zen Alarms', 'Nature-vibe audio tasks.'],
+                ['☁️', 'Cloud Sync', 'Real-time sync across your phone and laptop.'],
+                ['🎧', 'Focus Soundscapes', 'Offline lo-fi beats and nature audio.'],
+                ['🔒', 'The Digital Vault', 'AES-256 encrypted local backups.'],
+                ['🎨', 'Premium Aesthetics', 'Unlock Misty Peaks and 5 more themes.'],
+                ['📊', 'Advanced Reports', 'Visual insights & focus time trends.'],
+                ['🔔', 'Zen Alarms', 'Nature-vibe audio tasks.'],
             ].map(([icon, title, desc]) => `
                         <div style="display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--border-color);">
                             <span style="font-size: 1.5rem; width: 32px; display: flex; justify-content: center;">${icon}</span>
@@ -763,10 +824,10 @@ class OrganizOApp {
     // ─── QUIET NOTES ──────────────────────────────────────────────
     renderNotesView() {
         const mainContent = document.querySelector('.main-content');
-        
+
         // Determine container style based on Card Mode toggle
-        const cardBgStyle = this.notesCardMode 
-            ? 'background: var(--card-bg); border-radius: 20px 20px 0 0; box-shadow: 0 -10px 40px rgba(0,0,0,0.4); border: 1px solid var(--border-color); border-bottom: none;' 
+        const cardBgStyle = this.notesCardMode
+            ? 'background: var(--card-bg); border-radius: 20px 20px 0 0; box-shadow: 0 -10px 40px rgba(0,0,0,0.4); border: 1px solid var(--border-color); border-bottom: none;'
             : 'background: transparent; border: none; box-shadow: none;';
 
         const glassToolbar = `
@@ -853,14 +914,14 @@ ${this.notes}</div>
         const statusText = document.querySelector('.status-text');
         const statusIcon = document.querySelector('.status-icon');
         const wordCount = document.getElementById('notes-word-count');
-        
+
         // Font Selector Logic
         document.getElementById('notes-font-select').addEventListener('change', (e) => {
             this.notesFont = e.target.value;
             this.saveData('notesFont', this.notesFont);
             this.renderNotesView(); // Re-render to apply strictly
         });
-        
+
         // Card Toggle Logic
         document.getElementById('toggle-card-btn').addEventListener('click', () => {
             this.notesCardMode = !this.notesCardMode;
@@ -875,7 +936,7 @@ ${this.notes}</div>
         };
 
         wordCount.textContent = countWords(notesArea.innerHTML) + ' words';
-        
+
         notesArea.addEventListener('input', () => {
             this.notes = notesArea.innerHTML;
             this.saveData('notes', this.notes);
@@ -985,17 +1046,44 @@ ${this.notes}</div>
                 <p style="margin: 5px 0 0 0; color: var(--text-muted);">Take a deep breath. It's ${new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' })}.</p>
             </div>
 
-            <section class="intention-card">
-                <span class="intention-label">Today's Single Intention</span>
-                <h2 class="intention-text" id="intention-display" style="margin-bottom: 0.5rem;">${this.sanitize(this.dailyIntention) || 'Click to set your daily intention...'}</h2>
-                
-                <div id="dashboard-timer" style="font-size: 3.5rem; font-weight: 700; color: var(--accent-green); margin-bottom: 1.5rem; font-family: 'Outfit', sans-serif; display: ${this.timer.isRunning ? 'block' : 'none'};">
-                    ${String(this.timer.minutes).padStart(2, '0')}:${String(this.timer.seconds).padStart(2, '0')}
-                </div>
+            <section class="intention-card" style="position: relative; overflow: visible; cursor: default;">
+                <div style="display: flex; flex-direction: column; align-items: center;">
+                    <span class="intention-label">Today's Single Intention</span>
+                    
+                    <h2 class="intention-text" id="intention-display" 
+                        style="margin-bottom: 1rem; cursor: text; transition: color 0.3s;"
+                        title="Click to edit your intention"
+                        onclick="window.organizoApp.editIntention()">
+                        ${this.dailyIntention
+                ? '&ldquo;' + this.sanitize(this.dailyIntention) + '&rdquo;'
+                : '<span style="opacity:0.4; font-size:1.2rem;">✨ Click here to set your intention for today...</span>'}
+                    </h2>
 
-                <div style="display: flex; justify-content: center; gap: 1rem;">
-                    <button class="btn-focus start-timer-btn">${this.timer.isRunning ? 'Pause Timer' : 'Start Focus Session'}</button>
-                    <button class="btn-focus edit-intention-btn" style="background: rgba(255,255,255,1); color: #1E293B; border: 1px solid rgba(0,0,0,0.1); box-shadow: 0 4px 15px rgba(0,0,0,0.15); font-weight: 700;">Edit Intention</button>
+                    ${this.dailyIntention ? `
+                    <div style="display: flex; gap: 8px; margin-bottom: 1.25rem; flex-wrap: wrap; justify-content: center;">
+                        ${['🌿 Calm', '🔥 Focused', '💡 Creative', '⚡ Energised'].map(mood => `
+                            <span style="font-size:0.75rem; padding: 4px 12px; border-radius: 20px; background: rgba(16,185,129,0.08); border: 1px solid rgba(16,185,129,0.2); color: var(--accent-green); cursor: pointer; font-weight: 600; transition: all 0.2s;"
+                                onclick="window.organizoApp.showToast('${mood} — great mindset for today!')">${mood}</span>
+                        `).join('')}
+                    </div>` : ''}
+
+                    <div id="dashboard-timer" style="font-size: 3.5rem; font-weight: 700; color: var(--accent-green); margin-bottom: 1.5rem; font-family: 'Outfit', sans-serif; text-shadow: 0 0 15px rgba(16, 185, 129, 0.3); display: ${this.timer.isRunning ? 'block' : 'none'};"
+                        title="Focus timer running">
+                        ${String(this.timer.minutes).padStart(2, '0')}:${String(this.timer.seconds).padStart(2, '0')}
+                    </div>
+
+                    <div style="display: flex; justify-content: center; gap: 0.75rem; flex-wrap: wrap;">
+                        <button class="btn-focus start-timer-btn" style="display: flex; align-items: center; gap: 8px; padding: 11px 24px;">
+                            <span>${this.timer.isRunning ? '⏸️' : '▶️'}</span>
+                            ${this.timer.isRunning ? 'Pause Timer' : 'Start Focus Session'}
+                        </button>
+                        <button class="btn-focus edit-intention-btn" style="background: rgba(255,255,255,0.9); color: #1E293B; border: 1px solid rgba(0,0,0,0.1); box-shadow: 0 4px 12px rgba(0,0,0,0.1); font-weight: 700; display: flex; align-items: center; gap: 8px; padding: 11px 20px;">
+                            <span>✏️</span> ${this.dailyIntention ? 'Edit Intention' : 'Set Intention'}
+                        </button>
+                        <button class="btn-focus random-affirmation-btn" title="Random Zen intention" style="background: rgba(255,255,255,0.8); color: var(--accent-green); border: 1px solid rgba(16,185,129,0.3); padding: 11px 16px; font-size: 1.1rem;" onclick="window.organizoApp.editIntention(); setTimeout(()=>window.organizoApp.generateAffirmation(),100)">
+                            ✨
+                        </button>
+                    </div>
                 </div>
             </section>
 
@@ -1047,6 +1135,7 @@ ${this.notes}</div>
                     </div>
                 </div>
             </div>
+            <button class="fab" onclick="window.organizoApp.switchView('tasks')">+</button>
         `;
 
         this.updateGreeting();
@@ -1062,21 +1151,42 @@ ${this.notes}</div>
 
     renderTaskList() {
         if (this.tasks.length === 0) {
-            return '<div style="text-align: center; padding: 2.5rem 1rem; color: var(--text-muted);"><div style="font-size: 2rem; margin-bottom: 0.5rem;">🌱</div>No tasks yet. Add one to begin cultivating focus.</div>';
+            return '<div style="text-align: center; padding: 2.5rem 1rem; color: var(--text-muted);"><div style="font-size: 2.5rem; margin-bottom: 0.75rem;">🌱</div><div style="font-weight: 600; margin-bottom: 0.25rem;">No tasks yet</div><div style="font-size: 0.85rem;">Add one to begin cultivating focus</div></div>';
         }
 
-        return this.tasks.map(task => `
-            <div class="task-item" data-task-id="${task.id}" style="border-bottom-color: var(--border-color);">
-                <div class="checkbox ${task.completed ? 'checked' : ''}" style="border-color: var(--border-color); background: ${task.completed ? 'var(--accent-green)' : 'transparent'};">${task.completed ? '✓' : ''}</div>
-                <div class="task-info">
+        const today = new Date(); today.setHours(0, 0, 0, 0);
+
+        return this.tasks.map(task => {
+            let deadlineBadge = '';
+            if (task.dueDate && !task.completed) {
+                const due = new Date(task.dueDate + 'T00:00:00');
+                const diffDays = Math.ceil((due - today) / 86400000);
+                if (diffDays < 0) {
+                    deadlineBadge = `<span class="deadline-badge" style="font-size:0.65rem; padding: 2px 8px; border-radius: 20px; background: #FEE2E2; color: #DC2626; font-weight: 700; white-space: nowrap;">⚠️ Overdue</span>`;
+                } else if (diffDays === 0) {
+                    deadlineBadge = `<span class="due-soon-badge" style="font-size:0.65rem; padding: 2px 8px; border-radius: 20px; background: #FEF3C7; color: #D97706; font-weight: 700; white-space: nowrap;">🔥 Due today</span>`;
+                } else if (diffDays === 1) {
+                    deadlineBadge = `<span class="due-soon-badge" style="font-size:0.65rem; padding: 2px 8px; border-radius: 20px; background: #FEF3C7; color: #D97706; font-weight: 700; white-space: nowrap;">📅 Tomorrow</span>`;
+                } else if (diffDays <= 3) {
+                    deadlineBadge = `<span class="due-soon-badge" style="font-size:0.65rem; padding: 2px 8px; border-radius: 20px; background: #ECFDF5; color: #059669; font-weight: 700; white-space: nowrap;">🗓️ In ${diffDays}d</span>`;
+                }
+            }
+            return `
+            <div class="task-item" data-task-id="${task.id}" style="border-bottom-color: var(--border-color); animation: fadeInTask 0.3s ease;">
+                <div class="checkbox ${task.completed ? 'checked' : ''}" style="border-color: var(--border-color); background: ${task.completed ? 'var(--accent-green)' : 'transparent'}; flex-shrink: 0;">${task.completed ? '✓' : ''}</div>
+                <div class="task-info" style="flex: 1; min-width: 0;">
                     <span class="task-name" style="${task.completed ? 'text-decoration: line-through; color: var(--text-muted);' : 'color: var(--text-dark);'}">${this.sanitize(task.name)}</span>
-                    <div class="task-meta" style="color: var(--text-muted);">${task.category || 'General'} ${task.priority ? '• ' + task.priority : ''}</div>
+                    <div class="task-meta" style="color: var(--text-muted); display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin-top: 2px;">
+                        <span style="font-size: 0.75rem;">${task.category || 'General'}</span>
+                        ${deadlineBadge}
+                    </div>
                 </div>
-                <span class="tag-priority ${task.priority === 'High' ? 'high' : ''}">${task.priority || 'Normal'}</span>
-                <button class="delete-task" style="background: none; border: none; color: #EF4444; cursor: pointer; margin-left: 8px; opacity: 0.6;">×</button>
+                <span class="tag-priority ${task.priority === 'High' ? 'high' : (task.priority === 'Low' ? 'low' : '')}" style="flex-shrink: 0;">${task.priority || 'Normal'}</span>
+                <button class="delete-task" style="background: none; border: none; color: #EF4444; cursor: pointer; margin-left: 6px; opacity: 0.5; font-size: 1.1rem; flex-shrink: 0;">×</button>
             </div>
-        `).join('');
+        `}).join('');
     }
+
 
     renderHabits() {
         return this.habits.map(habit => `
@@ -1110,24 +1220,51 @@ ${this.notes}</div>
     showAddTaskModal() {
         const modal = document.createElement('div');
         modal.className = 'modal-overlay';
+        const today = new Date().toISOString().split('T')[0];
         modal.innerHTML = `
-            <div class="modal-content" style="max-width: 500px;">
-                <h3 style="margin-bottom: 1.5rem;">Add New Task</h3>
-                <input type="text" id="task-name" placeholder="Task name" class="input-field" style="width: 100%; padding: 12px; border: 1px solid #E2E8F0; border-radius: 8px; margin-bottom: 1rem;">
-                <select id="task-category" class="input-field" style="width: 100%; padding: 12px; border: 1px solid #E2E8F0; border-radius: 8px; margin-bottom: 1rem;">
-                    <option value="Work">Work</option>
-                    <option value="Personal">Personal</option>
-                    <option value="Creativity">Creativity</option>
-                    <option value="Health">Health</option>
-                </select>
-                <select id="task-priority" class="input-field" style="width: 100%; padding: 12px; border: 1px solid #E2E8F0; border-radius: 8px; margin-bottom: 1.5rem;">
-                    <option value="Normal">Normal Priority</option>
-                    <option value="High">High Priority</option>
-                    <option value="Low">Low Priority</option>
-                </select>
-                <div style="display: flex; gap: 1rem;">
-                    <button class="btn-focus" id="save-task-btn" style="flex: 1;">Add Task</button>
-                    <button class="btn-focus cancel-modal-btn" style="flex: 1; background: white; color: var(--text-dark); border: 1px solid #E2E8F0;">Cancel</button>
+            <div class="modal-content" style="max-width: 500px; padding: 2rem; border-radius: 24px;">
+                <h3 style="margin-bottom: 1.5rem; font-family: 'Playfair Display', serif;">🌱 Add New Task</h3>
+
+                <div style="margin-bottom: 1rem;">
+                    <label style="font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); margin-bottom: 6px; display: block;">Task Name *</label>
+                    <input type="text" id="task-name" placeholder="What needs your focus?" class="input-field"
+                        style="width: 100%; padding: 12px 16px; border: 1.5px solid var(--border-color); border-radius: 12px; font-size: 1rem; color: var(--text-dark); background: var(--input-bg, white); box-sizing: border-box; outline: none;"
+                        onfocus="this.style.borderColor='var(--accent-green)'" onblur="this.style.borderColor='var(--border-color)'">
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 1rem;">
+                    <div>
+                        <label style="font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); margin-bottom: 6px; display: block;">Category</label>
+                        <select id="task-category" class="input-field"
+                            style="width: 100%; padding: 10px 14px; border: 1.5px solid var(--border-color); border-radius: 12px; font-size: 0.9rem; color: var(--text-dark); background: var(--input-bg, white);">
+                            <option value="Work">💼 Work</option>
+                            <option value="Personal">🙋 Personal</option>
+                            <option value="Creativity">🎨 Creativity</option>
+                            <option value="Health">🏃 Health</option>
+                            <option value="Learning">📚 Learning</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label style="font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); margin-bottom: 6px; display: block;">Priority</label>
+                        <select id="task-priority" class="input-field"
+                            style="width: 100%; padding: 10px 14px; border: 1.5px solid var(--border-color); border-radius: 12px; font-size: 0.9rem; color: var(--text-dark); background: var(--input-bg, white);">
+                            <option value="Normal">⚪ Normal</option>
+                            <option value="High">🔴 High</option>
+                            <option value="Low">🟢 Low</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div style="margin-bottom: 1.5rem;">
+                    <label style="font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); margin-bottom: 6px; display: block;">📅 Due Date (optional)</label>
+                    <input type="date" id="task-due-date" min="${today}" class="input-field"
+                        style="width: 100%; padding: 10px 14px; border: 1.5px solid var(--border-color); border-radius: 12px; font-size: 0.9rem; color: var(--text-dark); background: var(--input-bg, white); box-sizing: border-box;">
+                    <p style="font-size: 0.72rem; color: var(--text-muted); margin-top: 5px;">🔔 You'll get a reminder 1 hour before the deadline</p>
+                </div>
+
+                <div style="display: flex; gap: 0.75rem;">
+                    <button class="btn-focus" id="save-task-btn" style="flex: 1; padding: 13px; border-radius: 14px; font-size: 1rem;">Add Task</button>
+                    <button class="btn-focus cancel-modal-btn" style="flex: 1; padding: 13px; border-radius: 14px; background: var(--card-bg, white); color: var(--text-dark); border: 1.5px solid var(--border-color); font-size: 1rem;">Cancel</button>
                 </div>
             </div>
         `;
@@ -1142,28 +1279,87 @@ ${this.notes}</div>
             const name = document.getElementById('task-name').value.trim();
             const category = document.getElementById('task-category').value;
             const priority = document.getElementById('task-priority').value;
-
+            const dueDate = document.getElementById('task-due-date').value;
             if (name) {
-                this.addTask(name, category, priority);
+                this.addTask(name, category, priority, dueDate);
                 modal.remove();
+            } else {
+                document.getElementById('task-name').style.borderColor = '#EF4444';
+                document.getElementById('task-name').focus();
             }
         });
 
         setTimeout(() => document.getElementById('task-name').focus(), 100);
     }
 
-    addTask(name, category, priority) {
+    addTask(name, category, priority, dueDate = null) {
         const task = {
             id: Date.now(),
             name,
             category,
             priority,
+            dueDate: dueDate || null,
             completed: false,
             createdAt: new Date().toISOString()
         };
         this.tasks.unshift(task);
         this.saveData('tasks', this.tasks);
+
+        // Schedule deadline notification if due date is set
+        if (dueDate) {
+            this.scheduleDeadlineNotification(task);
+        }
+
+        // Show task-added toast
+        const dueTxt = dueDate ? ` (due ${new Date(dueDate + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' })})` : '';
+        this.showToast(`✅ Task added${dueTxt}`);
+
         this.renderDashboard();
+    }
+
+    scheduleDeadlineNotification(task) {
+        if (!task.dueDate) return;
+        // Fire notification 1hr before end of due date
+        const dueDateTime = new Date(task.dueDate + 'T23:00:00').getTime();
+        const now = Date.now();
+        const delay = dueDateTime - now;
+        if (delay <= 0) return; // Already past
+
+        // Cap at max setTimeout (~24 days); for longer deadlines revisit on next page-load
+        const MAX_DELAY = 2 * 24 * 60 * 60 * 1000;
+        if (delay > MAX_DELAY) {
+            // Store for next session
+            return;
+        }
+
+        setTimeout(() => {
+            if (!task.completed) {
+                const msg = `⏰ Task due today: "${task.name}" — don't forget!`;
+                if ('Notification' in window && Notification.permission === 'granted') {
+                    new Notification('OrganizO 🗓️ Deadline Reminder', {
+                        body: msg,
+                        icon: './images/icon-192.png'
+                    });
+                }
+                this.showToast(`🗓️ ${msg}`);
+            }
+        }, delay);
+    }
+
+    requestNotificationPermission() {
+        if (!('Notification' in window)) {
+            this.showToast('Notifications not supported in this browser.');
+            return;
+        }
+        Notification.requestPermission().then(perm => {
+            if (perm === 'granted') {
+                this.showToast('🔔 Notifications enabled! You will get task alerts.');
+                // Re-schedule all outstanding deadlines
+                this.tasks.filter(t => !t.completed && t.dueDate).forEach(t => this.scheduleDeadlineNotification(t));
+            } else {
+                this.showToast('❌ Notifications blocked. Please allow in browser settings.');
+            }
+        });
     }
 
     toggleTask(taskId) {
@@ -1187,36 +1383,107 @@ ${this.notes}</div>
     // Timer Functions
     renderTimerView() {
         const mainContent = document.querySelector('.main-content');
-        mainContent.innerHTML = `
-            <div style="max-width: 600px; margin: 0 auto; text-align: center; padding-top: 4rem;">
-                <h1 style="font-size: 2.5rem; margin-bottom: 1rem;">Focus Timer</h1>
-                <p style="color: var(--text-muted); margin-bottom: 2rem;">Deep work session</p>
+        
+        // Dynamic Background Logic for Timer
+        const bgMap = {
+            'lofi': 'images/misty-peaks.png',
+            'rain': 'images/rain-bg.jpg',
+            'forest': 'images/forest-bg.jpg',
+            'waves': 'images/ocean.png',
+            'guitar': 'images/guitar-bg.jpg',
+            'piano': 'images/piano-bg.jpg',
+            'genshin': 'images/genshin-bg.jpg'
+        };
+        
+        const activeBg = bgMap[this.selectedSound] || 'images/misty-peaks.png';
+        
+        // Apply background style to main content for immersive feel
+        mainContent.style.backgroundImage = `linear-gradient(rgba(255,255,255,0.7), rgba(255,255,255,0.7)), url('${activeBg}')`;
+        if (this.isDarkMode) {
+            mainContent.style.backgroundImage = `linear-gradient(rgba(15, 23, 42, 0.8), rgba(15, 23, 42, 0.8)), url('${activeBg}')`;
+        }
+        mainContent.style.backgroundSize = 'cover';
+        mainContent.style.backgroundPosition = 'center';
 
-                <div style="display: flex; gap: 1rem; justify-content: center; margin-bottom: 3rem; flex-wrap: wrap;">
-                    <div style="display: flex; align-items: center; gap: 4px; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 20px; padding-right: 12px;">
-                        <button class="btn-focus" onclick="window.organizoApp.isPro ? window.organizoApp.toggleAudio() : window.organizoApp.showProModal()" style="display: flex; align-items: center; gap: 8px; background: transparent; border: none; color: var(--text-dark); padding: 8px 12px; border-radius: 20px;">
-                            <span class="pro-badge-mini" style="font-size: 1.1rem;">🎧</span>
-                            <span id="soundscape-status">${this.audioPlaying ? 'Pause Audio' : 'Soundscape'}</span>
-                        </button>
-                        ${this.isPro ? `<input type="range" id="soundscape-volume" min="0" max="1" step="0.05" value="${this.audioPlayer ? this.audioPlayer.volume : 0.5}" style="width: 70px; cursor: pointer; accent-color: var(--accent-green);" oninput="window.organizoApp.updateVolume(this.value)">` : ''}
-                    </div>
-                    <button class="btn-focus" onclick="window.organizoApp.isPro ? window.organizoApp.toggleZenMode() : window.organizoApp.showProModal()" style="display: flex; align-items: center; gap: 8px; background: var(--card-bg); border: 1px solid var(--border-color); color: var(--text-dark); padding: 8px 16px; border-radius: 20px;">
-                        <span class="pro-badge-mini" style="font-size: 1.1rem;">🧘‍♂️</span>
-                        <span>Focus Lock</span>
-                    </button>
+        const openTasks = this.tasks.filter(t => !t.completed);
+        const currentFocusTask = this.tasks.find(t => t.id === this.focusTaskId);
+
+        mainContent.innerHTML = `
+            <div style="max-width: 600px; margin: 0 auto; text-align: center; padding-top: 3rem; min-height: 80vh;">
+                <h1 style="font-size: 2.5rem; margin-bottom: 0.5rem; font-family: 'Playfair Display', serif;">Focus Sanctuary</h1>
+                <p style="color: var(--text-muted); margin-bottom: 2rem; font-size: 0.95rem;">Release all distractions. Be here now.</p>
+
+                <!-- Task Selector -->
+                <div style="margin-bottom: 2.5rem; background: var(--card-bg); border-radius: 20px; padding: 1rem; border: 1px solid var(--border-color); backdrop-filter: blur(10px);">
+                    <p style="font-size: 0.75rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 10px; letter-spacing: 1px;">Currently Focusing On</p>
+                    ${openTasks.length === 0 ? 
+                        `<p style="font-size: 0.9rem; color: var(--text-dark);">No active tasks. Just enjoy the silence. ✨</p>` :
+                        `<select id="focus-task-select" onchange="window.organizoApp.setFocusTask(this.value)" 
+                            style="width: 100%; max-width: 350px; padding: 12px; border-radius: 12px; border: 1.5px solid var(--border-color); background: var(--input-bg); color: var(--text-dark); font-family: 'Inter', sans-serif; outline: none; cursor: pointer;">
+                            <option value="">-- Choose a goal for this session --</option>
+                            ${openTasks.map(t => `<option value="${t.id}" ${this.focusTaskId === t.id ? 'selected' : ''}>${this.sanitize(t.text)}</option>`).join('')}
+                        </select>`
+                    }
+                    ${currentFocusTask ? 
+                        `<div style="margin-top: 12px; font-weight: 700; color: var(--accent-green); animation: fadeIn 0.5s;">🎯 Goal: ${this.sanitize(currentFocusTask.text)}</div>` : ''
+                    }
                 </div>
-                
-                <div class="timer-display" style="font-size: 6rem; font-weight: 700; color: var(--accent-green); margin-bottom: 3rem;">
+
+                <div class="timer-display" style="font-size: 7rem; font-weight: 700; color: var(--accent-green); margin-bottom: 1.5rem; font-family: 'Outfit', sans-serif; text-shadow: 0 0 30px rgba(16, 185, 129, 0.4);">
                     ${String(this.timer.minutes).padStart(2, '0')}:${String(this.timer.seconds).padStart(2, '0')}
                 </div>
 
-                <div class="timer-controls" style="display: flex; gap: 1rem; justify-content: center; margin-bottom: 2rem;">
-                    <button class="btn-focus start-timer-btn" style="padding: 1rem 2rem;">
-                        ${this.timer.isRunning ? 'Pause' : 'Start'}
+                <div class="timer-controls" style="display: flex; gap: 1rem; justify-content: center; margin-bottom: 2.5rem;">
+                    <button class="btn-focus start-timer-btn" style="padding: 1.2rem 2.5rem; font-size: 1.1rem; border-radius: 20px;">
+                        ${this.timer.isRunning ? 'Pause Session' : 'Start Session'}
                     </button>
-                    <button class="btn-focus reset-timer-btn" style="background: var(--card-bg); color: var(--text-dark); border: 1px solid var(--border-color); padding: 1rem 2rem;">
+                    <button class="btn-focus reset-timer-btn" style="background: var(--card-bg); color: var(--text-dark); border: 1.5px solid var(--border-color); padding: 1.2rem 2rem; border-radius: 20px;">
                         Reset
                     </button>
+                </div>
+
+                <!-- Zen Soundscapes Card -->
+                <div style="background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 24px; padding: 1.5rem; max-width: 450px; margin: 0 auto 3rem auto; box-shadow: 0 10px 30px rgba(0,0,0,0.05);">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+                        <div style="text-align: left;">
+                            <h3 style="margin: 0; font-size: 1rem;">🍃 Zen Soundscapes</h3>
+                            <p style="margin: 2px 0 0 0; font-size: 0.75rem; color: var(--text-muted);">Gentle background focus</p>
+                        </div>
+                        <button class="btn-focus" onclick="window.organizoApp.isPro ? window.organizoApp.toggleAudio() : window.organizoApp.showProModal()" 
+                            style="padding: 8px 16px; border-radius: 12px; font-size: 0.85rem; background: ${this.audioPlaying ? 'var(--accent-green)' : 'var(--card-bg)'}; color: ${this.audioPlaying ? 'white' : 'var(--text-dark)'}; border: 1px solid var(--border-color);">
+                            ${this.audioPlaying ? 'Stop' : 'Play'}
+                        </button>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 1.25rem;">
+                        ${[
+                            {id: 'lofi', icon: '🎧', name: 'Lofi Trio'},
+                            {id: 'rain', icon: '🌧️', name: 'Soft Rain'},
+                            {id: 'forest', icon: '🌲', name: 'Zen Forest'},
+                            {id: 'waves', icon: '🌊', name: 'Waves'},
+                            {id: 'guitar', icon: '🎸', name: 'Acoustic'},
+                            {id: 'piano', icon: '🎹', name: 'Soft Piano'},
+                            {id: 'genshin', icon: '✨', name: 'Genshin'}
+                        ].map(s => {
+                            const isActive = this.selectedSound === s.id;
+                            return `
+                            <div class="sound-chip" onclick="window.organizoApp.selectZenSound('${s.id}')" 
+                                style="padding: 10px; border-radius: 14px; background: ${isActive ? 'rgba(16,185,129,0.1)' : 'rgba(0,0,0,0.03)'}; border: 1.5px solid ${isActive ? 'var(--accent-green)' : 'var(--border-color)'}; cursor: pointer; text-align: center; transition: all 0.2s; position: relative;">
+                                <div style="font-size: 1.2rem; margin-bottom: 4px;">${s.icon}</div>
+                                <div style="font-size: 0.65rem; font-weight: 700; color: ${isActive ? 'var(--accent-green)' : 'var(--text-dark)'};">${s.name}</div>
+                                ${isActive ? '<div style="position: absolute; top: 4px; right: 4px; width: 6px; height: 6px; background: var(--accent-green); border-radius: 50%;"></div>' : ''}
+                            </div>
+                            `;
+                        }).join('')}
+                    </div>
+
+                    <div style="display: flex; align-items: center; gap: 12px; padding: 0 5px;">
+                        <span style="font-size: 0.9rem; opacity: 0.5;">🔈</span>
+                        <input type="range" id="soundscape-volume" min="0" max="1" step="0.05" value="${this.audioPlayer ? this.audioPlayer.volume : 0.5}" 
+                            style="flex: 1; cursor: pointer; accent-color: var(--accent-green);" 
+                            oninput="window.organizoApp.updateVolume(this.value)">
+                        <span style="font-size: 0.9rem; opacity: 0.5;">🔊</span>
+                    </div>
                 </div>
 
                 <div style="display: flex; gap: 1rem; justify-content: center;">
@@ -1311,29 +1578,68 @@ ${this.notes}</div>
             this.saveData('focusTime', this.focusTime);
         }
 
-        const msg = this.timer.mode === 'focus' ? '🎉 Focus session complete!' : '✨ Break time over!';
+        const msg = this.timer.mode === 'focus' ? '🎉 Focus session complete! Time for a well-earned break.' : '✨ Break over — ready to focus again?';
+
+        // 🔔 Play bell sound
+        this.playBellSound();
 
         // Native System Notification
         if ("Notification" in window && Notification.permission === "granted") {
-            new Notification('OrganizO Zen Alarm', {
+            new Notification('OrganizO ⏱️', {
                 body: msg,
                 icon: './images/icon-192.png',
                 badge: './images/icon-192.png'
             });
         }
 
-        // Show in-app completion notification
-        const notification = document.createElement('div');
-        notification.style.cssText = 'position: fixed; top: 2rem; right: 2rem; background: var(--accent-green); color: white; padding: 1rem 2rem; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); z-index: 1000; animation: slideUp 0.3s ease;';
-        notification.textContent = msg;
-        document.body.appendChild(notification);
+        // Show in-app completion banner
+        const banner = document.createElement('div');
+        banner.style.cssText = `
+            position: fixed; top: 1.5rem; left: 50%; transform: translateX(-50%);
+            background: linear-gradient(135deg, var(--accent-green), #059669);
+            color: white; padding: 1.1rem 2rem; border-radius: 16px;
+            box-shadow: 0 8px 30px rgba(16,185,129,0.35); z-index: 9999;
+            font-size: 1rem; font-weight: 600;
+            display: flex; align-items: center; gap: 10px;
+            animation: slideDown 0.4s cubic-bezier(0.34,1.56,0.64,1);
+            min-width: 260px; justify-content: center;
+        `;
+        banner.innerHTML = `<span style="font-size:1.4rem;">🔔</span> ${msg}`;
+        document.body.appendChild(banner);
         setTimeout(() => {
-            notification.style.opacity = '0';
-            notification.style.transition = 'opacity 0.5s';
-            setTimeout(() => notification.remove(), 500);
-        }, 4000);
+            banner.style.opacity = '0';
+            banner.style.transition = 'opacity 0.5s, transform 0.5s';
+            banner.style.transform = 'translateX(-50%) translateY(-10px)';
+            setTimeout(() => banner.remove(), 500);
+        }, 5000);
 
         this.resetTimer();
+    }
+
+    playBellSound() {
+        try {
+            // Use Web Audio API to synthesize a pleasant bell tone offline
+            const ctx = new (window.AudioContext || window.webkitAudioContext)();
+            const playTone = (freq, delay, duration, gain) => {
+                const osc = ctx.createOscillator();
+                const gainNode = ctx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(freq, ctx.currentTime + delay);
+                gainNode.gain.setValueAtTime(gain, ctx.currentTime + delay);
+                gainNode.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + delay + duration);
+                osc.connect(gainNode);
+                gainNode.connect(ctx.destination);
+                osc.start(ctx.currentTime + delay);
+                osc.stop(ctx.currentTime + delay + duration);
+            };
+            // Bell chord: fundamental + harmonics
+            playTone(523.25, 0, 1.8, 0.6);  // C5
+            playTone(659.25, 0, 1.5, 0.4);  // E5
+            playTone(783.99, 0, 1.5, 0.3);  // G5
+            playTone(523.25, 0.15, 1.6, 0.3);  // C5 echo
+        } catch (e) {
+            // Fail silently if audio not available
+        }
     }
 
     updateTimerDisplay() {
@@ -1539,6 +1845,11 @@ ${this.notes}</div>
 
         const holiday = this.holidays[dateStr];
         const eventsForDay = this.events.filter(e => e.date === dateStr);
+
+        // 🔧 FIX: declare modal before using it
+        const modal = document.createElement('div');
+        modal.className = 'modal-overlay';
+
         modal.innerHTML = `
             <div class="modal-content" style="max-width: 450px; padding: 2.5rem; max-height: 85vh; overflow-y: auto;">
                 <h3 style="margin-bottom: 0.5rem; font-family: 'Playfair Display', serif;">Plan for ${dateStr}</h3>
@@ -1888,9 +2199,11 @@ ${this.notes}</div>
         const greeting = document.getElementById('greeting');
         if (greeting) {
             const hour = new Date().getHours();
-            if (hour < 12) greeting.textContent = "Good morning, Zen Seeker";
-            else if (hour < 18) greeting.textContent = "Good afternoon, Zen Seeker";
-            else greeting.textContent = "Good evening, Zen Seeker";
+            const displayName = this.userData.name || 'Friend';
+            if (hour < 12) greeting.textContent = `Good morning, ${displayName} ☀️`;
+            else if (hour < 17) greeting.textContent = `Good afternoon, ${displayName} 🌤️`;
+            else if (hour < 20) greeting.textContent = `Good evening, ${displayName} 🌅`;
+            else greeting.textContent = `Good night, ${displayName} 🌙`;
         }
     }
 
@@ -1948,25 +2261,210 @@ ${this.notes}</div>
     }
 
     showProfileModal() {
+        // Legacy — now routes to color palette
+        this.showColorPalette();
+    }
+
+    // ─── COLOR PALETTE (Avatar click) ───────────────────────────
+    showColorPalette() {
+        const themes = [
+            { id: 'bamboo', name: 'Bamboo', icon: '🍃', color: '#10B981', desc: 'Fresh & calm' },
+            { id: 'sakura', name: 'Sakura', icon: '🌸', color: '#F43F5E', desc: 'Soft & warm' },
+            { id: 'ocean', name: 'Ocean', icon: '🌊', color: '#0EA5E9', desc: 'Deep & cool' },
+            { id: 'sandstone', name: 'Sandstone', icon: '🏕️', color: '#D97706', desc: 'Earthy & cosy' },
+            { id: 'sunset', name: 'Sunset', icon: '🌆', color: '#A855F7', desc: 'Bold & vibrant' },
+            { id: 'peaks', name: 'Peaks', icon: '⛰️', color: '#64748B', desc: 'Quiet & minimal' },
+        ];
+
         const modal = document.createElement('div');
         modal.className = 'modal-overlay';
+        modal.style.cssText = 'background: rgba(0,0,0,0.55); backdrop-filter: blur(6px);';
+        modal.innerHTML = `
+            <div class="modal-content" style="max-width: 440px; padding: 2rem; border-radius: 28px; text-align: center;">
+                <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">🎨</div>
+                <h2 style="margin-bottom: 0.25rem; font-family: 'Playfair Display', serif;">Choose Your Vibe</h2>
+                <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 1.75rem;">Pick a color palette for your sanctuary</p>
+
+                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.85rem; margin-bottom: 1.5rem;">
+                    ${themes.map(t => `
+                        <button class="theme-swatch" data-theme="${t.id}"
+                            style="
+                                padding: 1rem 0.5rem;
+                                border-radius: 18px;
+                                border: 3px solid ${this.theme === t.id ? t.color : 'transparent'};
+                                background: ${this.theme === t.id ? t.color + '18' : 'var(--streak-pill, rgba(0,0,0,0.04))'};
+                                cursor: pointer;
+                                transition: all 0.25s ease;
+                                display: flex; flex-direction: column; align-items: center; gap: 6px;
+                            "
+                            title="${t.name}">
+                            <div style="width: 40px; height: 40px; border-radius: 50%; background: ${t.color}; box-shadow: 0 4px 12px ${t.color}55; display: flex; align-items: center; justify-content: center; font-size: 1.2rem;">${t.icon}</div>
+                            <span style="font-size: 0.8rem; font-weight: 700; color: var(--text-dark);">${t.name}</span>
+                            <span style="font-size: 0.65rem; color: var(--text-muted);">${t.desc}</span>
+                        </button>
+                    `).join('')}
+                </div>
+
+                <button onclick="this.closest('.modal-overlay').remove(); window.organizoApp.showSettingsModal();"
+                    style="width: 100%; padding: 12px; border-radius: 14px; background: none; border: 1.5px solid var(--border-color); color: var(--text-dark); cursor: pointer; font-weight: 600; font-size: 0.9rem; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                    ⚙️ Open Settings
+                </button>
+            </div>
+        `;
+        document.body.appendChild(modal);
+        modal.addEventListener('click', (e) => { if (e.target === modal) modal.remove(); });
+
+        modal.querySelectorAll('.theme-swatch').forEach(btn => {
+            btn.addEventListener('mouseenter', () => {
+                if (btn.dataset.theme !== this.theme) btn.style.transform = 'translateY(-4px) scale(1.04)';
+            });
+            btn.addEventListener('mouseleave', () => { btn.style.transform = ''; });
+            btn.addEventListener('click', () => {
+                const t = themes.find(t => t.id === btn.dataset.theme);
+                if (!t) return;
+                this.setTheme(t.id);
+                modal.querySelectorAll('.theme-swatch').forEach(b => {
+                    const tb = themes.find(x => x.id === b.dataset.theme);
+                    b.style.borderColor = b.dataset.theme === t.id ? tb.color : 'transparent';
+                    b.style.background = b.dataset.theme === t.id ? tb.color + '18' : 'var(--streak-pill, rgba(0,0,0,0.04))';
+                });
+                this.showToast(`${t.icon} ${t.name} theme applied!`);
+            });
+        });
+    }
+
+    // ─── SETTINGS MODAL (Gear icon) ──────────────────────────
+    showSettingsModal() {
+        const modal = document.createElement('div');
+        modal.className = 'modal-overlay';
+        modal.style.cssText = 'background: rgba(0,0,0,0.55); backdrop-filter: blur(6px);';
+        const nameVal = this.sanitize(this.userData.name || '');
+        const emailVal = this.sanitize(this.userData.email || '');
+        const isDark = this.isDarkMode;
+
+        modal.innerHTML = `
+            <div class="modal-content" style="max-width: 420px; padding: 2rem; border-radius: 28px;">
+                <button class="close-modal-btn" onclick="this.closest('.modal-overlay').remove()"
+                    style="position: absolute; top: 14px; right: 14px; background: var(--streak-pill, rgba(0,0,0,0.05)); border: none; width: 32px; height: 32px; border-radius: 50%; font-size: 1.2rem; cursor: pointer; color: var(--text-muted); display: flex; align-items: center; justify-content: center;">×</button>
+
+                <div style="font-size: 1.8rem; margin-bottom: 0.4rem;">⚙️</div>
+                <h2 style="margin-bottom: 0.2rem; font-family: 'Playfair Display', serif;">Settings</h2>
+                <p style="color: var(--text-muted); font-size: 0.82rem; margin-bottom: 1.75rem;">Customize your OrganizO experience</p>
+
+                <!-- Profile Section -->
+                <div style="background: var(--streak-pill, rgba(0,0,0,0.04)); border-radius: 16px; padding: 1.25rem; margin-bottom: 1rem;">
+                    <div style="font-size: 0.7rem; font-weight: 800; letter-spacing: 1.2px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 1rem;">Profile</div>
+                    <input type="text" id="settings-name" value="${nameVal}" placeholder="Your name"
+                        style="width: 100%; padding: 10px 14px; border: 1.5px solid var(--border-color); border-radius: 12px; font-size: 0.95rem; color: var(--text-dark); background: var(--input-bg, white); box-sizing: border-box; outline: none; margin-bottom: 0.75rem;">
+                    <input type="email" id="settings-email" value="${emailVal}" placeholder="Gmail address (optional)"
+                        style="width: 100%; padding: 10px 14px; border: 1.5px solid var(--border-color); border-radius: 12px; font-size: 0.95rem; color: var(--text-dark); background: var(--input-bg, white); box-sizing: border-box; outline: none;">
+                    <button id="settings-save-name" class="btn-focus" style="width: 100%; padding: 10px; border-radius: 12px; margin-top: 0.75rem; font-size: 0.9rem;">Save Profile</button>
+                </div>
+
+                <!-- Dark Mode Toggle -->
+                <div style="background: var(--streak-pill, rgba(0,0,0,0.04)); border-radius: 16px; padding: 1.25rem; margin-bottom: 1rem; display: flex; align-items: center; justify-content: space-between;">
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <span style="font-size: 1.4rem;">${isDark ? '🌙' : '☀️'}</span>
+                        <div>
+                            <div style="font-weight: 700; font-size: 0.92rem; color: var(--text-dark);">Night Mode</div>
+                            <div style="font-size: 0.75rem; color: var(--text-muted);">${isDark ? 'Dark background active' : 'Light mode active'}</div>
+                        </div>
+                    </div>
+                    <label style="position: relative; display: inline-block; width: 52px; height: 28px; cursor: pointer;">
+                        <input type="checkbox" id="settings-dark-mode" ${isDark ? 'checked' : ''} style="opacity:0; width:0; height:0;">
+                        <span id="dark-toggle-track" style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: ${isDark ? 'var(--accent-green)' : '#CBD5E1'}; border-radius: 28px; transition: 0.3s;">
+                            <span id="dark-toggle-thumb" style="position: absolute; width: 20px; height: 20px; background: white; border-radius: 50%; top: 4px; left: ${isDark ? '28px' : '4px'}; transition: 0.3s; box-shadow: 0 2px 6px rgba(0,0,0,0.2);"></span>
+                        </span>
+                    </label>
+                </div>
+
+                <!-- Notifications Toggle -->
+                <div style="background: var(--streak-pill, rgba(0,0,0,0.04)); border-radius: 16px; padding: 1.25rem; margin-bottom: 1rem; display: flex; align-items: center; justify-content: space-between;">
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <span style="font-size: 1.4rem;">🔔</span>
+                        <div>
+                            <div style="font-weight: 700; font-size: 0.92rem; color: var(--text-dark);">Notifications</div>
+                            <div style="font-size: 0.75rem; color: var(--text-muted);">Deadline & end-of-day alerts</div>
+                        </div>
+                    </div>
+                    <button id="settings-notif-btn" onclick="window.organizoApp.requestNotificationPermission()"
+                        style="padding: 7px 14px; border-radius: 10px; border: 1.5px solid var(--accent-green); color: var(--accent-green); background: rgba(16,185,129,0.08); font-size: 0.8rem; font-weight: 700; cursor: pointer;">
+                        ${Notification && Notification.permission === 'granted' ? '✅ Enabled' : 'Enable'}
+                    </button>
+                </div>
+
+                <!-- Export Data -->
+                <button onclick="window.organizoApp.exportData()"
+                    style="width: 100%; padding: 12px; border-radius: 14px; border: 1.5px solid var(--border-color); background: none; color: var(--text-dark); font-weight: 600; font-size: 0.9rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 0.75rem;">
+                    📥 Export Backup (JSON)
+                </button>
+
+                <!-- Open Color Palette -->
+                <button onclick="this.closest('.modal-overlay').remove(); window.organizoApp.showColorPalette();"
+                    style="width: 100%; padding: 12px; border-radius: 14px; border: 1.5px solid var(--border-color); background: none; color: var(--text-dark); font-weight: 600; font-size: 0.9rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                    🎨 Change Theme Color
+                </button>
+            </div>
+        `;
+        document.body.appendChild(modal);
+        modal.addEventListener('click', (e) => { if (e.target === modal) modal.remove(); });
+
+        // Save name handler
+        modal.querySelector('#settings-save-name').addEventListener('click', () => {
+            const name = document.getElementById('settings-name').value.trim();
+            const email = document.getElementById('settings-email').value.trim();
+            if (!name) { document.getElementById('settings-name').style.borderColor = '#EF4444'; return; }
+            const initials = name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+            this.userData = { name, initials, email };
+            this.saveData('userData', this.userData);
+            this.updateUserUI();
+            this.renderDashboard();
+            this.showToast('Profile saved! 🌿');
+        });
+
+        // Dark mode toggle
+        modal.querySelector('#settings-dark-mode').addEventListener('change', (e) => {
+            this.toggleDarkMode(e.target.checked);
+            const thumb = document.getElementById('dark-toggle-thumb');
+            const track = document.getElementById('dark-toggle-track');
+            if (thumb) thumb.style.left = this.isDarkMode ? '28px' : '4px';
+            if (track) track.style.background = this.isDarkMode ? 'var(--accent-green)' : '#CBD5E1';
+        });
+    }
+
+    toggleDarkMode(forceState = null) {
+        this.isDarkMode = forceState !== null ? forceState : !this.isDarkMode;
+        this.saveData('isDarkMode', this.isDarkMode);
+        this.applyTheme();
+        this.updateUserUI();
+        this.showToast(this.isDarkMode ? '🌙 Night mode on' : '☀️ Light mode on');
+        
+        // Update any specific dashboard elements if they exist
+        if (this.currentView === 'dashboard') this.renderDashboard();
+    }
+
+    showProfileEditModal() {
+        const modal = document.createElement('div');
+        modal.className = 'modal-overlay';
+        const initials = this.userData.initials || '??';
+        const emailVal = this.userData.email || '';
         modal.innerHTML = `
             <div class="modal-content" style="max-width: 400px; text-align: center;">
-                <div class="user-avatar" style="width: 80px; height: 80px; font-size: 2rem; margin: 0 auto 1.5rem;">${this.sanitize(this.userData.initials)}</div>
-                <h3 style="margin-bottom: 0.5rem;">Edit Profile</h3>
-                <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.5rem;">Personalize your sanctuary</p>
-                
-                <input type="text" id="edit-user-name" value="${this.sanitize(this.userData.name)}" placeholder="Your Name" class="input-field" style="width: 100%; padding: 12px; border: 1px solid #E2E8F0; border-radius: 8px; margin-bottom: 1rem;">
-                <input type="text" id="edit-user-initials" value="${this.sanitize(this.userData.initials)}" maxlength="2" placeholder="Initials (e.g. JS)" class="input-field" style="width: 100%; padding: 12px; border: 1px solid #E2E8F0; border-radius: 8px; margin-bottom: 1.5rem;">
-                
+                <div style="width: 80px; height: 80px; border-radius: 50%; background: linear-gradient(135deg, var(--accent-green), #059669); display: flex; align-items: center; justify-content: center; font-size: 2rem; font-weight: 800; color: white; margin: 0 auto 1.5rem; box-shadow: 0 8px 24px var(--accent-green-glow);">${this.sanitize(initials)}</div>
+                <h3 style="margin-bottom: 0.25rem;">Edit Profile</h3>
+                <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 1.5rem;">Personalize your sanctuary</p>
+
+                <input type="text" id="edit-user-name" value="${this.sanitize(this.userData.name)}" placeholder="Your Name" class="input-field" style="width: 100%; padding: 12px 16px; border: 1.5px solid var(--border-color); border-radius: 12px; margin-bottom: 1rem; font-size: 0.95rem; color: var(--text-dark); background: var(--input-bg); box-sizing: border-box; outline: none;">
+                <input type="email" id="edit-user-email" value="${this.sanitize(emailVal)}" placeholder="Gmail Address (optional)" class="input-field" style="width: 100%; padding: 12px 16px; border: 1.5px solid var(--border-color); border-radius: 12px; margin-bottom: 1.5rem; font-size: 0.95rem; color: var(--text-dark); background: var(--input-bg); box-sizing: border-box; outline: none;">
+
                 <div style="display: flex; gap: 1rem; margin-bottom: 1.5rem;">
-                    <button id="save-profile-btn" class="btn-primary" style="flex: 1; padding: 12px; border-radius: 8px;">Save Changes</button>
-                    <button id="close-profile-modal" class="btn-secondary" style="flex: 1; padding: 12px; border-radius: 8px; background: #f1f5f9;">Cancel</button>
+                    <button id="save-profile-btn" class="btn-focus" style="flex: 1; padding: 12px; border-radius: 12px;">Save Changes</button>
+                    <button id="close-profile-modal" class="btn-focus" style="flex: 1; padding: 12px; border-radius: 12px; background: var(--card-bg); color: var(--text-dark); border: 1px solid var(--border-color);">Cancel</button>
                 </div>
-                
-                <div style="border-top: 1px solid #E2E8F0; padding-top: 1.5rem;">
-                    <button id="export-data-btn" class="btn-secondary" style="width: 100%; padding: 10px; border-radius: 8px; font-size: 0.9rem; color: var(--text-muted); display: flex; align-items: center; justify-content: center; gap: 8px;">
-                        <span>📥</span> Export Backup (JSON)
+
+                <div style="border-top: 1px solid var(--border-color); padding-top: 1.25rem;">
+                    <button id="export-data-btn" style="width: 100%; padding: 10px; border-radius: 10px; background: none; border: 1px solid var(--border-color); font-size: 0.9rem; color: var(--text-muted); cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                        📥 Export Backup (JSON)
                     </button>
                 </div>
             </div>
@@ -1975,22 +2473,24 @@ ${this.notes}</div>
         modal.querySelector('#close-profile-modal').addEventListener('click', () => modal.remove());
         modal.querySelector('#save-profile-btn').addEventListener('click', () => {
             const newName = document.getElementById('edit-user-name').value.trim();
-            const newInitials = document.getElementById('edit-user-initials').value.trim().toUpperCase();
+            const newEmail = document.getElementById('edit-user-email').value.trim();
 
-            if (newName && newInitials) {
-                this.userData = { name: newName, initials: newInitials };
-                this.saveData('userData', this.userData);
-                this.updateUserUI();
-                modal.remove();
-            } else {
-                alert('Please provide both a name and initials.');
+            if (!newName) {
+                document.getElementById('edit-user-name').style.borderColor = '#EF4444';
+                document.getElementById('edit-user-name').focus();
+                return;
             }
+            const newInitials = newName.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+            this.userData = { name: newName, initials: newInitials, email: newEmail };
+            this.saveData('userData', this.userData);
+            this.updateUserUI();
+            this.renderDashboard();
+            modal.remove();
+            this.showToast('Profile updated! 🌿');
         });
 
-        modal.querySelector('#export-data-btn').addEventListener('click', () => {
-            this.exportData();
-        });
-
+        modal.querySelector('#export-data-btn').addEventListener('click', () => this.exportData());
+        modal.addEventListener('click', (e) => { if (e.target === modal) modal.remove(); });
         document.body.appendChild(modal);
     }
 
@@ -2103,7 +2603,7 @@ ${this.notes}</div>
             template_id: EMAILJS_TEMPLATE_ID,
             user_id: EMAILJS_PUBLIC_KEY,
             template_params: {
-                from_name: this.sanitize(form.querySelector('#feedback-name').value) || 'Anonymous Zen Seeker',
+                from_name: this.sanitize(form.querySelector('#feedback-name').value) || this.userData.name || 'Anonymous User',
                 reply_to: this.sanitize(form.querySelector('#feedback-email').value) || 'No Email Provided',
                 message: this.sanitize(form.querySelector('#feedback-message').value),
                 feature_request: this.sanitize(form.querySelector('#feedback-feature').value) || 'None',
@@ -2143,7 +2643,7 @@ ${this.notes}</div>
     // ─── THEME SYSTEM ───────────────────────────────────────────
     applyTheme() {
         document.body.className = 'app-body'; // reset all
-        
+
         let hexColor = '#10B981'; // bamboo default
 
         if (this.theme !== 'bamboo') {
@@ -2154,7 +2654,7 @@ ${this.notes}</div>
             if (this.theme === 'sunset') hexColor = '#A855F7';
             if (this.theme === 'peaks') hexColor = '#64748B';
         }
-        
+
         if (this.isDarkMode) {
             document.body.classList.add('dark-mode');
             hexColor = '#0F172A'; // Midnight background base
@@ -2178,7 +2678,7 @@ ${this.notes}</div>
         this.applyTheme();
     }
 
-    showProfileModal() {
+    showProfileModal2() {
         const modal = document.createElement('div');
         modal.className = 'modal-overlay';
 
@@ -2200,8 +2700,8 @@ ${this.notes}</div>
                 
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; margin-bottom: 1.5rem;">
                     ${themes.map(t => {
-                        const isLocked = t.id !== 'bamboo' && !this.isPro;
-                        return `
+            const isLocked = t.id !== 'bamboo' && !this.isPro;
+            return `
                         <div class="theme-option" data-theme="${t.id}" data-locked="${isLocked}" style="padding: 12px; border-radius: 12px; border: 2px solid ${this.theme === t.id ? t.color : 'var(--border-color)'}; background: var(--streak-pill); cursor: ${isLocked ? 'pointer' : 'pointer'}; display: flex; align-items: center; gap: 10px; transition: border 0.3s ease; opacity: ${isLocked && this.theme !== t.id ? '0.7' : '1'}; position: relative;">
                             <div style="width: 24px; height: 24px; border-radius: 50%; background: ${t.color}; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; color: white; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">${t.icon}</div>
                             <span style="font-size: 0.85rem; font-weight: 600; color: var(--text-dark);">${t.name}</span>
@@ -2226,9 +2726,12 @@ ${this.notes}</div>
                     </label>
                 </div>
 
-                <div style="margin-top: 1.5rem; border-top: 1px solid var(--border-color); padding-top: 1.5rem;">
-                    <button class="btn-focus" onclick="window.organizoApp.isPro ? window.organizoApp.exportData() : window.organizoApp.showProModal()" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 10px; background: ${this.isPro ? 'var(--accent-green)' : 'var(--card-bg)'}; color: ${this.isPro ? 'white' : 'var(--text-dark)'}; border: ${this.isPro ? 'none' : '1px solid var(--border-color)'};">
+                <div style="margin-top: 1.5rem; border-top: 1px solid var(--border-color); padding-top: 1.5rem; display: flex; flex-direction: column; gap: 0.75rem;">
+                    <button class="btn-focus" onclick="window.organizoApp.isPro ? window.organizoApp.exportData() : window.organizoApp.showProModal()" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 10px; background: ${this.isPro ? 'var(--accent-green)' : 'var(--card-bg)'}; color: ${this.isPro ? 'white' : 'var(--text-dark)'}; border: ${this.isPro ? 'none' : '1px solid var(--border-color)'}; border-radius: 12px; padding: 12px; font-weight: 600;">
                         <span>☁️</span> ${this.isPro ? 'Manual Cloud Sync (Backup)' : 'Unlock Cloud Sync'}
+                    </button>
+                    <button onclick="window.organizoApp.showProfileEditModal(); this.closest('.modal-overlay').remove()" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 10px; background: none; border: 1px solid var(--border-color); border-radius: 12px; padding: 12px; font-weight: 600; cursor: pointer; color: var(--text-dark);">
+                        <span>👤</span> Edit Profile & Name
                     </button>
                 </div>
             </div>
@@ -2263,9 +2766,8 @@ ${this.notes}</div>
             this.isDarkMode = e.target.checked;
             this.saveData('isDarkMode', this.isDarkMode);
             this.applyTheme();
-            // Refresh modal to update switch color
             modal.remove();
-            this.showProfileModal();
+            this.showProfileModal2();
         });
 
         modal.querySelector('.close-modal-btn').addEventListener('click', () => modal.remove());
@@ -2280,38 +2782,197 @@ ${this.notes}</div>
             if (clickCount >= 5) {
                 this.isPro = !this.isPro;
                 this.saveData('isPro', this.isPro);
-                alert(this.isPro ? "🌿 OrganizO Pro Unlocked!" : "OrganizO Free Mode");
+                this.showToast(this.isPro ? '🌿 OrganizO Pro Unlocked!' : 'Switched to Free Mode');
                 this.updateUserUI();
                 modal.remove();
-                this.showProfileModal(); // reopen to see changes
+                this.showProfileModal2();
             }
         });
     }
 
-    toggleAudio() {
-        if (!this.audioPlayer) {
-            this.audioPlayer = new Audio('audio/lofi.mp3');
-            this.audioPlayer.loop = true;
-
-            // Try to extract existing volume if slider is present
-            const slider = document.getElementById('soundscape-volume');
-            this.audioPlayer.volume = slider ? parseFloat(slider.value) : 0.5;
+    // ─── END OF DAY REMINDER ─────────────────────────────────────
+    setupEndOfDayReminder() {
+        // Request notification permission
+        if ('Notification' in window && Notification.permission === 'default') {
+            Notification.requestPermission();
         }
 
-        const statusSpan = document.getElementById('soundscape-status');
+        const scheduleReminder = () => {
+            const now = new Date();
+            const endOfDay = new Date();
+            endOfDay.setHours(22, 0, 0, 0); // 10 PM
+
+            // Also check at 9 PM
+            const reminderTime1 = new Date();
+            reminderTime1.setHours(21, 0, 0, 0);
+
+            const checkAndNotify = () => {
+                const remaining = this.tasks.filter(t => !t.completed);
+                if (remaining.length === 0) return;
+
+                const h = new Date().getHours();
+                // Only notify between 9 PM and 11 PM
+                if (h < 21 || h >= 23) return;
+
+                const alreadyNotified = sessionStorage.getItem('organizo_eod_notified');
+                if (alreadyNotified) return;
+
+                sessionStorage.setItem('organizo_eod_notified', 'true');
+
+                const msg = `You have ${remaining.length} task${remaining.length > 1 ? 's' : ''} remaining today. You've got this! 💪`;
+
+                // In-app banner
+                const banner = document.createElement('div');
+                banner.style.cssText = `
+                    position: fixed; bottom: 5rem; left: 50%; transform: translateX(-50%);
+                    background: linear-gradient(135deg, #F59E0B, #D97706);
+                    color: white; padding: 1rem 1.5rem; border-radius: 16px;
+                    box-shadow: 0 8px 30px rgba(245,158,11,0.4); z-index: 9000;
+                    font-size: 0.92rem; font-weight: 600; cursor: pointer;
+                    display: flex; align-items: center; gap: 10px;
+                    animation: slideUp 0.4s cubic-bezier(0.34,1.56,0.64,1);
+                    max-width: 350px; text-align: left;
+                `;
+                banner.innerHTML = `<span style="font-size:1.5rem;">🌙</span><div><div style="font-size:0.7rem;opacity:0.8;margin-bottom:2px;">END OF DAY REMINDER</div>${msg}</div>`;
+                banner.addEventListener('click', () => { banner.remove(); this.switchView('tasks'); });
+                document.body.appendChild(banner);
+                setTimeout(() => {
+                    banner.style.opacity = '0';
+                    banner.style.transition = 'opacity 0.5s';
+                    setTimeout(() => banner.remove(), 500);
+                }, 8000);
+
+                // Native notification
+                if ('Notification' in window && Notification.permission === 'granted') {
+                    new Notification('OrganizO 🌙 Day ending soon...', {
+                        body: msg,
+                        icon: './images/icon-192.png'
+                    });
+                }
+            };
+
+            // Check every 30 minutes
+            setInterval(checkAndNotify, 30 * 60 * 1000);
+            // Also check immediately in case we're already in that window
+            checkAndNotify();
+        };
+
+        scheduleReminder();
+    }
+
+    // ─── OFFLINE / ONLINE BANNER ─────────────────────────────────
+    setFocusTask(taskId) {
+        this.focusTaskId = taskId ? parseInt(taskId) : null;
+        this.renderTimerView();
+        if (this.focusTaskId) {
+            const task = this.tasks.find(t => t.id === this.focusTaskId);
+            this.showToast(`Target Set: ${task.text} 🎯`);
+        }
+    }
+
+    setupOnlineOfflineBanner() {
+        const showBanner = (online) => {
+            const existing = document.getElementById('network-banner');
+            if (existing) existing.remove();
+            if (online) {
+                const b = document.createElement('div');
+                b.id = 'network-banner';
+                b.style.cssText = `
+                    position: fixed; top: 0; left: 0; right: 0; z-index: 99999;
+                    background: linear-gradient(135deg, var(--accent-green), #059669);
+                    color: white; text-align: center; padding: 8px;
+                    font-size: 0.85rem; font-weight: 600;
+                    animation: slideDown 0.3s ease;
+                `;
+                b.textContent = '✅ Back online — your data is safe locally.';
+                document.body.appendChild(b);
+                setTimeout(() => { b.style.opacity = '0'; b.style.transition = 'opacity 0.5s'; setTimeout(() => b.remove(), 500); }, 3000);
+            } else {
+                const b = document.createElement('div');
+                b.id = 'network-banner';
+                b.style.cssText = `
+                    position: fixed; top: 0; left: 0; right: 0; z-index: 99999;
+                    background: #374151; color: white; text-align: center; padding: 8px;
+                    font-size: 0.85rem; font-weight: 600;
+                `;
+                b.textContent = '📵 You are offline — App works fully offline. All data saved locally.';
+                document.body.appendChild(b);
+            }
+        };
+
+        window.addEventListener('online', () => showBanner(true));
+        window.addEventListener('offline', () => showBanner(false));
+
+        // Show immediately if offline at startup
+        if (!navigator.onLine) showBanner(false);
+    }
+
+    selectZenSound(id) {
+        if (!this.isPro && id !== 'lofi') {
+            this.showProModal();
+            return;
+        }
+        
+        this.selectedSound = id;
+        const wasPlaying = this.audioPlaying;
+        
+        if (this.audioPlayer) {
+            this.audioPlayer.pause();
+            this.audioPlayer = null;
+        }
+        
+        this.audioPlaying = false;
+        
+        const soundUrls = {
+            'lofi': 'audio/lofi.mp3',
+            'rain': 'audio/rain.mp3',
+            'forest': 'audio/forest.mp3',
+            'waves': 'audio/waves.mp3',
+            'guitar': 'audio/guitar.mp3',
+            'piano': 'audio/piano.mp3',
+            'genshin': 'audio/genshin.mp3'
+        };
+        
+        // Handle fallback logic for missing local files
+        const audioSrc = soundUrls[id];
+        this.audioPlayer = new Audio(audioSrc);
+        
+        // Error handling for missing files
+        this.audioPlayer.onerror = () => {
+            console.warn(`Sound missing: ${audioSrc}. Using fallback.`);
+            if (id !== 'lofi') {
+                this.audioPlayer.src = 'audio/lofi.mp3';
+            }
+        };
+        this.audioPlayer.loop = true;
+        const slider = document.getElementById('soundscape-volume');
+        this.audioPlayer.volume = slider ? parseFloat(slider.value) : 0.5;
+        
+        if (wasPlaying) {
+            this.toggleAudio();
+        } else {
+            this.renderTimerView();
+        }
+        this.showToast(`Selected: ${id.charAt(0).toUpperCase() + id.slice(1)} 🍃`);
+    }
+
+    toggleAudio() {
+        if (!this.audioPlayer) {
+            this.selectZenSound(this.selectedSound || 'lofi');
+            return;
+        }
 
         if (this.audioPlaying) {
             this.audioPlayer.pause();
             this.audioPlaying = false;
-            if (statusSpan) statusSpan.textContent = 'Soundscape';
         } else {
             this.audioPlayer.play().then(() => {
                 this.audioPlaying = true;
-                if (statusSpan) statusSpan.textContent = 'Pause Audio';
             }).catch(e => {
-                alert("Browser prevented audio from playing. Interact with the document first.");
+                alert("Please interact with the page first to allow audio playback.");
             });
         }
+        this.renderTimerView();
     }
 
     updateVolume(val) {
@@ -2341,24 +3002,40 @@ ${this.notes}</div>
         const greeting = document.getElementById('greeting');
         if (greeting) {
             const hour = new Date().getHours();
+            const displayName = this.userData.name || 'Friend';
             let g = 'Good morning';
             if (hour >= 12 && hour < 17) g = 'Good afternoon';
-            if (hour >= 17) g = 'Good evening';
-            greeting.textContent = `${g}, ${this.userData.name}`;
+            else if (hour >= 17 && hour < 20) g = 'Good evening';
+            else if (hour >= 20) g = 'Good night';
+            greeting.textContent = `${g}, ${displayName}`;
         }
 
-        // Update all avatars
+        // Update all avatars with gradient & pulsing ring hint
         document.querySelectorAll('.user-avatar').forEach(avatar => {
+            const initials = this.userData.initials || '?';
             avatar.innerHTML = `
-                ${this.sanitize(this.userData.initials)}
-                ${this.isPro ? '<div style="position: absolute; bottom: -2px; right: -2px; font-size: 0.6rem; background: #10B981; color: white; border-radius: 4px; padding: 1px 3px; border: 1px solid white;">PRO</div>' : ''}
+                ${this.sanitize(initials)}
+                ${this.isPro ? '<div style="position: absolute; bottom: -2px; right: -2px; font-size: 0.6rem; background: var(--accent-green); color: white; border-radius: 4px; padding: 1px 3px; border: 1px solid white;">PRO</div>' : ''}
             `;
             avatar.style.position = 'relative';
+            avatar.style.background = 'linear-gradient(135deg, var(--accent-green), #059669)';
+            avatar.style.color = 'white';
+            avatar.style.fontWeight = '700';
+            // Subtle pulsing outline to signal clickability
+            avatar.style.boxShadow = '0 0 0 3px rgba(16,185,129,0.3), 0 0 0 6px rgba(16,185,129,0.1)';
+            avatar.title = 'Click to customize theme & profile';
+            avatar.style.cursor = 'pointer';
         });
 
         // Update Sidebar info
         const nameEl = document.querySelector('.sidebar-user .user-name');
-        if (nameEl) nameEl.textContent = this.userData.name;
+        if (nameEl) nameEl.textContent = this.userData.name || 'Set your name →';
+
+        // Sidebar user section hint
+        const sidebarUser = document.querySelector('.sidebar-user');
+        if (sidebarUser) {
+            sidebarUser.title = 'Click to customize your app';
+        }
     }
 }
 

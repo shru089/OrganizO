@@ -1,12 +1,29 @@
-# 🌿 OrganizO: Calm Productivity
+<div align="center">
+  
+  <img src="images/icon-192.png" alt="OrganizO Icon" width="120" />
 
-> **Structure your life, gently.**
+  <h1>🌿 OrganizO</h1>
+  <p><strong>Calm Productivity & Digital Sanctuary</strong></p>
 
-🌎 **Live App**: [https://shru089.github.io/OrganizO/](https://shru089.github.io/OrganizO/)
+  <p>
+    <a href="https://shru089.github.io/OrganizO/"><img src="https://img.shields.io/badge/Live_App-Visit_Now-2ea44f?style=for-the-badge&logo=googlechrome" alt="Live App" /></a>
+    <a href="#"><img src="https://img.shields.io/badge/PWA-Ready-blue?style=for-the-badge&logo=pwa" alt="PWA Ready" /></a>
+    <a href="#"><img src="https://img.shields.io/badge/Privacy-First-orange?style=for-the-badge&logo=shield" alt="Privacy First" /></a>
+  </p>
 
-OrganizO is a premium, privacy-first productivity progressive web application (PWA) designed to reduce digital anxiety. Built around the philosophy of creating a "Digital Sanctuary", it offers elegant task management, structured routines, a focus timer, and a rich-text journaling experience.
+  <a href="https://shru089.github.io/OrganizO/">
+    <img src="images/preview.png" alt="OrganizO Application Preview" width="800" />
+  </a>
+  <br/>
+  <br/>
+  <i>Structure your life, gently.</i>
+</div>
 
 ---
+
+## 📖 About OrganizO
+
+OrganizO is a premium, privacy-first progressive web application (PWA) built around the philosophy of creating a "Digital Sanctuary". It offers elegant task management, structured routines, a focus timer, and a rich-text journaling experience designed specifically to reduce digital anxiety.
 
 ## ✨ Key Features
 
@@ -25,11 +42,19 @@ OrganizO is a premium, privacy-first productivity progressive web application (P
 
 OrganizO is built on the principle of **Calm Productivity**. Every design choice — from the emerald green tones to the slow easing functions — is intended to reduce stress and invite focus. 
 
-OrganizO intentionally avoids a complex backend to maximize privacy, reduce server anxiety, eliminate loading screens, and allow 100% offline usage. What you log in the app stays securely in your local browser storage. You can manually export and sync your vault anytime.
+OrganizO intentionally avoids a complex backend to maximize privacy, reduce server anxiety, eliminate loading screens, and allow **100% offline usage**. What you log in the app stays securely in your local browser storage. You can manually export and sync your vault anytime.
 
 ---
 
 ## 🛠️ Tech Stack
+
+<div align="center">
+  <img src="https://img.shields.io/badge/HTML5-E34F26?style=for-the-badge&logo=html5&logoColor=white" alt="HTML5" />
+  <img src="https://img.shields.io/badge/CSS3-1572B6?style=for-the-badge&logo=css3&logoColor=white" alt="CSS3" />
+  <img src="https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black" alt="JavaScript" />
+  <img src="https://img.shields.io/badge/PWA-5A0FC8?style=for-the-badge&logo=pwa&logoColor=white" alt="PWA" />
+</div>
+<br>
 
 - **Core**: Vanilla HTML5, CSS3, JavaScript
 - **PWA Framework**: Web Manifest, Service Workers, Offline Caching
@@ -59,10 +84,12 @@ OrganizO/
 
 ## 🚀 Getting Started
 
-1. **Visit the Live Site**: Head over to [https://shru089.github.io/OrganizO/](https://shru089.github.io/OrganizO/) on your phone or laptop.
-2. **Install**: Click "Install App" in your browser menu to download it as a native desktop or mobile application.
+1. **Visit the Live Site**: Head over to [OrganizO Live App](https://shru089.github.io/OrganizO/) on your phone or laptop.
+2. **Install**: Click **"Install App"** in your browser menu to download it as a native desktop or mobile application.
 3. **Immerse**: Set a daily intention, start a focus timer, turn on the built-in soundscape, and reclaim your time gently.
 
 ---
 
-*Built for focus, designed for peace.* 🎋
+<div align="center">
+  <p><i>Built for focus, designed for peace.</i> 🎋</p>
+</div>

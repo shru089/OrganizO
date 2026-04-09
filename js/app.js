@@ -33,6 +33,7 @@ class OrganizOApp {
             mode: 'focus'
         };
         this.selectedSound = 'lofi'; // default sound
+        this.selectedTimerBg = 'default'; // separate bg state
         this.focusTaskId = null; // target task for focus session
         this.calendarDate = new Date();
 
@@ -210,6 +211,9 @@ class OrganizOApp {
                 const taskId = parseInt(e.target.closest('.task-item').dataset.taskId);
                 this.deleteTask(taskId);
             }
+            if (e.target.closest('.clear-completed-btn')) {
+                this.clearCompletedTasks();
+            }
         });
 
         // Timer Controls
@@ -246,6 +250,15 @@ class OrganizOApp {
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Enter' && document.getElementById('intention-input')) {
                 this.saveIntention();
+            }
+        });
+
+        // Zen Mode Event Listener (Handles ESC key exits properly)
+        document.addEventListener('fullscreenchange', () => {
+            if (document.fullscreenElement) {
+                document.body.classList.add('zen-mode-active');
+            } else {
+                document.body.classList.remove('zen-mode-active');
             }
         });
 
@@ -315,6 +328,7 @@ class OrganizOApp {
             mainContent.style.backgroundImage = '';
             mainContent.style.backgroundSize = '';
             mainContent.style.backgroundPosition = '';
+            mainContent.classList.remove('dynamic-bg');
         }
         
         // Handle FAB visibility - only show on TASKS view (mobile only handled by setupFAB)
@@ -369,6 +383,12 @@ class OrganizOApp {
         } else if (last !== today) {
             // Missed a day or first time → reset
             this.streakData.currentStreak = 1;
+        }
+
+        // Daily Habit Reset
+        if (last !== today && this.habits) {
+            this.habits.forEach(h => h.completedToday = false);
+            this.saveData('habits', this.habits);
         }
 
         // Update best streak
@@ -1092,7 +1112,10 @@ ${this.notes}</div>
                     <div class="card">
                         <div class="card-header">
                             <span class="card-title">🍃 Today's Tasks</span>
-                            <a href="#" class="add-btn add-task-btn">+ Add New</a>
+                            <div style="display: flex; gap: 10px; align-items: center;">
+                                <a href="#" class="add-btn clear-completed-btn" style="background: rgba(239, 68, 68, 0.1); color: #ef4444; border-color: rgba(239, 68, 68, 0.2); padding: 4px 10px; border-radius: 8px; font-size: 0.75rem;">Sweep Completed ✨</a>
+                                <a href="#" class="add-btn add-task-btn" style="padding: 4px 10px; border-radius: 8px;">+ Add New</a>
+                            </div>
                         </div>
                         <div class="task-list" id="task-list">
                             ${this.renderTaskList()}
@@ -1380,122 +1403,132 @@ ${this.notes}</div>
         this.renderDashboard();
     }
 
+    clearCompletedTasks() {
+        const initialLen = this.tasks.length;
+        this.tasks = this.tasks.filter(t => !t.completed);
+        const removedCount = initialLen - this.tasks.length;
+        if (removedCount > 0) {
+            this.saveData('tasks', this.tasks);
+            this.renderDashboard();
+            this.showToast(`✨ Swept away ${removedCount} completed tasks!`);
+        } else {
+            this.showToast(`No completed tasks to sweep yet.`);
+        }
+    }
+
     // Timer Functions
     renderTimerView() {
         const mainContent = document.querySelector('.main-content');
         
-        // Dynamic Background Logic for Timer
-        const bgMap = {
-            'lofi': 'images/misty-peaks.png',
-            'rain': 'images/rain-bg.jpg',
-            'forest': 'images/forest-bg.jpg',
-            'waves': 'images/ocean.png',
-            'guitar': 'images/guitar-bg.jpg',
-            'piano': 'images/piano-bg.jpg',
-            'genshin': 'images/genshin-bg.jpg'
-        };
-        
-        const activeBg = bgMap[this.selectedSound] || 'images/misty-peaks.png';
-        
-        // Apply background style to main content for immersive feel
-        mainContent.style.backgroundImage = `linear-gradient(rgba(255,255,255,0.7), rgba(255,255,255,0.7)), url('${activeBg}')`;
-        if (this.isDarkMode) {
-            mainContent.style.backgroundImage = `linear-gradient(rgba(15, 23, 42, 0.8), rgba(15, 23, 42, 0.8)), url('${activeBg}')`;
-        }
-        mainContent.style.backgroundSize = 'cover';
-        mainContent.style.backgroundPosition = 'center';
+        // Clear any custom background from timer — let theme handle it
+        mainContent.style.backgroundImage = '';
+        mainContent.style.backgroundSize = '';
+        mainContent.style.backgroundPosition = '';
+        mainContent.classList.remove('dynamic-bg');
 
         const openTasks = this.tasks.filter(t => !t.completed);
         const currentFocusTask = this.tasks.find(t => t.id === this.focusTaskId);
 
         mainContent.innerHTML = `
-            <div style="max-width: 600px; margin: 0 auto; text-align: center; padding-top: 3rem; min-height: 80vh;">
-                <h1 style="font-size: 2.5rem; margin-bottom: 0.5rem; font-family: 'Playfair Display', serif;">Focus Sanctuary</h1>
-                <p style="color: var(--text-muted); margin-bottom: 2rem; font-size: 0.95rem;">Release all distractions. Be here now.</p>
+            <div style="max-width: 800px; margin: 0 auto; text-align: center; padding: 2rem 1rem; min-height: 85vh; display: flex; flex-direction: column;">
+                
+                <!-- Top Control Bar -->
+                <div style="display: flex; gap: 1rem; justify-content: center; margin-bottom: 2.5rem; flex-wrap: wrap;">
+                    
+                    <!-- Sound Control Button -->
+                    <div style="position: relative;">
+                        <button class="btn-focus glass-panel" onclick="this.nextElementSibling.style.display = this.nextElementSibling.style.display === 'none' ? 'block' : 'none'"
+                            style="display: flex; align-items: center; gap: 10px; padding: 12px 24px; border-radius: 16px; min-width: 200px;">
+                            <span style="font-size: 1.2rem;">🎶</span>
+                            <div style="text-align: left;">
+                                <div style="font-size: 0.65rem; color: var(--text-muted); text-transform: uppercase; font-weight: 800;">Zen Sound</div>
+                                <div style="font-size: 0.9rem; font-weight: 700; color: var(--text-dark);">${this.selectedSound.charAt(0).toUpperCase() + this.selectedSound.slice(1)}</div>
+                            </div>
+                        </button>
+                        <!-- Sound Dropdown -->
+                        <div id="sound-dropdown" style="display: none; position: absolute; top: 110%; left: 0; right: 0; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 16px; padding: 10px; z-index: 100; box-shadow: 0 10px 40px rgba(0,0,0,0.1); backdrop-filter: blur(10px);">
+                            ${['lofi', 'rain', 'forest', 'waves'].map(s => `
+                                <div onclick="window.organizoApp.selectZenSound('${s}'); this.parentElement.style.display='none'" 
+                                    style="padding: 10px; border-radius: 10px; cursor: pointer; text-align: left; background: ${this.selectedSound === s ? 'rgba(16,185,129,0.1)' : 'transparent'}; font-size: 0.85rem; display: flex; align-items: center; gap: 10px;">
+                                    <span>${s === 'lofi' ? '🎧' : s === 'rain' ? '🌧️' : s === 'forest' ? '🌲' : '🌊'}</span>
+                                    <span>${s.charAt(0).toUpperCase() + s.slice(1)}</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+
+                    <!-- Zen Mode Button -->
+                    <button class="btn-focus" onclick="window.organizoApp.isPro ? window.organizoApp.toggleZenMode() : window.organizoApp.showProModal()" 
+                        style="display: flex; align-items: center; gap: 10px; background: var(--accent-green); border: none; color: white; padding: 12px 24px; border-radius: 16px;">
+                        <span style="font-size: 1.2rem;">🧘‍♂️</span>
+                        <span style="font-weight: 700;">Zen Mode</span>
+                    </button>
+
+                </div>
 
                 <!-- Task Selector -->
-                <div style="margin-bottom: 2.5rem; background: var(--card-bg); border-radius: 20px; padding: 1rem; border: 1px solid var(--border-color); backdrop-filter: blur(10px);">
-                    <p style="font-size: 0.75rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 10px; letter-spacing: 1px;">Currently Focusing On</p>
+                <div class="glass-panel" style="margin-bottom: 3rem; align-self: center; width: 100%; max-width: 450px; border-radius: 24px; padding: 1.5rem; border: 1px solid rgba(255,255,255,0.2);">
+                    <div style="text-align: left; margin-bottom: 12px;">
+                        <h2 style="font-size: 1.1rem; margin: 0; color: var(--text-dark); font-family: 'Playfair Display', serif;">Target Session Goal</h2>
+                        <p style="font-size: 0.75rem; color: var(--text-muted); margin: 2px 0 0 0;">Focus on one thing at a time</p>
+                    </div>
                     ${openTasks.length === 0 ? 
-                        `<p style="font-size: 0.9rem; color: var(--text-dark);">No active tasks. Just enjoy the silence. ✨</p>` :
+                        `<p style="font-size: 0.9rem; color: var(--text-dark); margin: 1rem 0;">No active tasks. Just enjoy the silence. ✨</p>` :
                         `<select id="focus-task-select" onchange="window.organizoApp.setFocusTask(this.value)" 
-                            style="width: 100%; max-width: 350px; padding: 12px; border-radius: 12px; border: 1.5px solid var(--border-color); background: var(--input-bg); color: var(--text-dark); font-family: 'Inter', sans-serif; outline: none; cursor: pointer;">
-                            <option value="">-- Choose a goal for this session --</option>
-                            ${openTasks.map(t => `<option value="${t.id}" ${this.focusTaskId === t.id ? 'selected' : ''}>${this.sanitize(t.text)}</option>`).join('')}
+                            style="width: 100%; padding: 14px; border-radius: 14px; border: 2px solid var(--border-color); background: var(--input-bg); color: var(--text-dark); font-family: 'Inter', sans-serif; outline: none; cursor: pointer; font-size: 0.95rem; font-weight: 600;">
+                            <option value="">-- Choose what to achieve --</option>
+                            ${openTasks.map(t => `<option value="${t.id}" ${this.focusTaskId === t.id ? 'selected' : ''}>${this.sanitize(t.name)}</option>`).join('')}
                         </select>`
                     }
-                    ${currentFocusTask ? 
-                        `<div style="margin-top: 12px; font-weight: 700; color: var(--accent-green); animation: fadeIn 0.5s;">🎯 Goal: ${this.sanitize(currentFocusTask.text)}</div>` : ''
-                    }
                 </div>
 
-                <div class="timer-display" style="font-size: 7rem; font-weight: 700; color: var(--accent-green); margin-bottom: 1.5rem; font-family: 'Outfit', sans-serif; text-shadow: 0 0 30px rgba(16, 185, 129, 0.4);">
-                    ${String(this.timer.minutes).padStart(2, '0')}:${String(this.timer.seconds).padStart(2, '0')}
-                </div>
+                <div style="flex: 1; display: flex; flex-direction: column; justify-content: center; gap: 2rem;">
+                    <div class="timer-display" style="font-size: 8rem; font-weight: 800; color: var(--accent-green); line-height: 1; font-family: 'Outfit', sans-serif; text-shadow: 0 0 40px var(--accent-green-glow), 0 0 80px rgba(0,0,0,0.05);">
+                        ${String(this.timer.minutes).padStart(2, '0')}:${String(this.timer.seconds).padStart(2, '0')}
+                    </div>
 
-                <div class="timer-controls" style="display: flex; gap: 1rem; justify-content: center; margin-bottom: 2.5rem;">
-                    <button class="btn-focus start-timer-btn" style="padding: 1.2rem 2.5rem; font-size: 1.1rem; border-radius: 20px;">
-                        ${this.timer.isRunning ? 'Pause Session' : 'Start Session'}
-                    </button>
-                    <button class="btn-focus reset-timer-btn" style="background: var(--card-bg); color: var(--text-dark); border: 1.5px solid var(--border-color); padding: 1.2rem 2rem; border-radius: 20px;">
-                        Reset
-                    </button>
-                </div>
-
-                <!-- Zen Soundscapes Card -->
-                <div style="background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 24px; padding: 1.5rem; max-width: 450px; margin: 0 auto 3rem auto; box-shadow: 0 10px 30px rgba(0,0,0,0.05);">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
-                        <div style="text-align: left;">
-                            <h3 style="margin: 0; font-size: 1rem;">🍃 Zen Soundscapes</h3>
-                            <p style="margin: 2px 0 0 0; font-size: 0.75rem; color: var(--text-muted);">Gentle background focus</p>
-                        </div>
-                        <button class="btn-focus" onclick="window.organizoApp.isPro ? window.organizoApp.toggleAudio() : window.organizoApp.showProModal()" 
-                            style="padding: 8px 16px; border-radius: 12px; font-size: 0.85rem; background: ${this.audioPlaying ? 'var(--accent-green)' : 'var(--card-bg)'}; color: ${this.audioPlaying ? 'white' : 'var(--text-dark)'}; border: 1px solid var(--border-color);">
-                            ${this.audioPlaying ? 'Stop' : 'Play'}
+                    <div class="timer-controls" style="display: flex; gap: 1.5rem; justify-content: center;">
+                        <button class="btn-focus start-timer-btn" style="padding: 1.5rem 3.5rem; font-size: 1.3rem; border-radius: 24px; box-shadow: 0 10px 30px var(--accent-green-glow), inset 4px 4px 10px rgba(255,255,255,0.2), inset -4px -4px 10px rgba(0,0,0,0.1);">
+                            ${this.timer.isRunning ? '⏸ Pause' : '▶ Start Session'}
+                        </button>
+                        <button class="clay-btn reset-timer-btn" style="color: var(--text-dark); padding: 1.5rem 2.5rem; border-radius: 24px; font-weight: 700;">
+                            Reset
                         </button>
                     </div>
 
-                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 1.25rem;">
-                        ${[
-                            {id: 'lofi', icon: '🎧', name: 'Lofi Trio'},
-                            {id: 'rain', icon: '🌧️', name: 'Soft Rain'},
-                            {id: 'forest', icon: '🌲', name: 'Zen Forest'},
-                            {id: 'waves', icon: '🌊', name: 'Waves'},
-                            {id: 'guitar', icon: '🎸', name: 'Acoustic'},
-                            {id: 'piano', icon: '🎹', name: 'Soft Piano'},
-                            {id: 'genshin', icon: '✨', name: 'Genshin'}
-                        ].map(s => {
-                            const isActive = this.selectedSound === s.id;
+                    <div style="display: flex; gap: 0.8rem; justify-content: center; margin-top: 1rem;">
+                        ${['focus', 'shortBreak', 'longBreak'].map(m => {
+                            const label = m === 'focus' ? 'Focus (25m)' : m === 'shortBreak' ? 'Short Break (5m)' : 'Long Break (15m)';
+                            const isActive = this.timer.mode === m;
                             return `
-                            <div class="sound-chip" onclick="window.organizoApp.selectZenSound('${s.id}')" 
-                                style="padding: 10px; border-radius: 14px; background: ${isActive ? 'rgba(16,185,129,0.1)' : 'rgba(0,0,0,0.03)'}; border: 1.5px solid ${isActive ? 'var(--accent-green)' : 'var(--border-color)'}; cursor: pointer; text-align: center; transition: all 0.2s; position: relative;">
-                                <div style="font-size: 1.2rem; margin-bottom: 4px;">${s.icon}</div>
-                                <div style="font-size: 0.65rem; font-weight: 700; color: ${isActive ? 'var(--accent-green)' : 'var(--text-dark)'};">${s.name}</div>
-                                ${isActive ? '<div style="position: absolute; top: 4px; right: 4px; width: 6px; height: 6px; background: var(--accent-green); border-radius: 50%;"></div>' : ''}
-                            </div>
+                                <button class="timer-mode-btn ${isActive ? 'btn-focus' : 'clay-btn'}" data-mode="${m}" 
+                                    style="padding: 10px 20px; border-radius: 16px; cursor: pointer; font-size: 0.85rem; font-weight: 700; color: ${isActive ? 'white' : 'var(--text-dark)'};">
+                                    ${label}
+                                </button>
                             `;
                         }).join('')}
                     </div>
-
-                    <div style="display: flex; align-items: center; gap: 12px; padding: 0 5px;">
-                        <span style="font-size: 0.9rem; opacity: 0.5;">🔈</span>
-                        <input type="range" id="soundscape-volume" min="0" max="1" step="0.05" value="${this.audioPlayer ? this.audioPlayer.volume : 0.5}" 
-                            style="flex: 1; cursor: pointer; accent-color: var(--accent-green);" 
-                            oninput="window.organizoApp.updateVolume(this.value)">
-                        <span style="font-size: 0.9rem; opacity: 0.5;">🔊</span>
-                    </div>
                 </div>
 
-                <div style="display: flex; gap: 1rem; justify-content: center;">
-                    <button class="timer-mode-btn ${this.timer.mode === 'focus' ? 'active' : ''}" data-mode="focus" style="padding: 8px 16px; border-radius: 8px; border: 1px solid var(--border-color); background: ${this.timer.mode === 'focus' ? 'var(--accent-green)' : 'var(--card-bg)'}; color: ${this.timer.mode === 'focus' ? 'white' : 'var(--text-dark)'}; cursor: pointer;">
-                        Focus (25min)
-                    </button>
-                    <button class="timer-mode-btn ${this.timer.mode === 'shortBreak' ? 'active' : ''}" data-mode="shortBreak" style="padding: 8px 16px; border-radius: 8px; border: 1px solid var(--border-color); background: ${this.timer.mode === 'shortBreak' ? 'var(--accent-green)' : 'var(--card-bg)'}; color: ${this.timer.mode === 'shortBreak' ? 'white' : 'var(--text-dark)'}; cursor: pointer;">
-                        Short Break (5min)
-                    </button>
-                    <button class="timer-mode-btn ${this.timer.mode === 'longBreak' ? 'active' : ''}" data-mode="longBreak" style="padding: 8px 16px; border-radius: 8px; border: 1px solid var(--border-color); background: ${this.timer.mode === 'longBreak' ? 'var(--accent-green)' : 'var(--card-bg)'}; color: ${this.timer.mode === 'longBreak' ? 'white' : 'var(--text-dark)'}; cursor: pointer;">
-                        Long Break (15min)
-                    </button>
+                <!-- Custom Sound Volume & Play Control -->
+                <div style="margin-top: auto; padding-top: 2rem;">
+                    <div class="glass-panel" style="display: flex; gap: 1rem; justify-content: center; align-items: center; max-width: 380px; margin: 0 auto; padding: 12px 20px; border-radius: 40px; border: 1px solid var(--border-color);">
+                        
+                        <!-- Play/Pause Button -->
+                        <button onclick="window.organizoApp.toggleAudio()" style="background: var(--accent-green); border: none; color: white; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 2px 10px var(--accent-green-glow);">
+                            <span style="font-size: 1.1rem; margin-left: ${this.audioPlaying ? '0' : '2px'};">${this.audioPlaying ? '⏸' : '▶'}</span>
+                        </button>
+                        
+                        <div style="width: 1px; height: 24px; background: var(--border-color); margin: 0 4px;"></div>
+                        
+                        <!-- Volume Slider -->
+                        <span style="font-size: 0.9rem; opacity: 0.6;">🔉</span>
+                        <input type="range" id="soundscape-volume" min="0" max="1" step="0.05" value="${this.audioPlayer ? this.audioPlayer.volume : 0.5}" 
+                            style="flex: 1; min-width: 150px; cursor: pointer; accent-color: var(--accent-green);" 
+                            oninput="window.organizoApp.updateVolume(this.value)">
+                        <span style="font-size: 0.9rem; opacity: 0.6;">🔊</span>
+                        
+                    </div>
                 </div>
             </div>
         `;
@@ -2870,6 +2903,12 @@ ${this.notes}</div>
         }
     }
 
+    selectTimerBg(bgId) {
+        this.selectedTimerBg = bgId;
+        this.renderTimerView();
+        this.showToast(`Atmosphere: ${bgId === 'default' ? 'Theme Default' : bgId.charAt(0).toUpperCase() + bgId.slice(1)} ⛰️`);
+    }
+
     setupOnlineOfflineBanner() {
         const showBanner = (online) => {
             const existing = document.getElementById('network-banner');
@@ -2925,12 +2964,9 @@ ${this.notes}</div>
         
         const soundUrls = {
             'lofi': 'audio/lofi.mp3',
-            'rain': 'audio/rain.mp3',
+            'rain': 'audio/rain.m4a',
             'forest': 'audio/forest.mp3',
-            'waves': 'audio/waves.mp3',
-            'guitar': 'audio/guitar.mp3',
-            'piano': 'audio/piano.mp3',
-            'genshin': 'audio/genshin.mp3'
+            'waves': 'audio/waves.mp3'
         };
         
         // Handle fallback logic for missing local files
@@ -2984,10 +3020,14 @@ ${this.notes}</div>
     toggleZenMode() {
         if (!document.fullscreenElement) {
             document.documentElement.requestFullscreen().catch(err => {
-                alert("Fullscreen Zen Mode not supported by your browser.");
+                console.warn("Fullscreen error:", err);
             });
+            this.showToast('🧘‍♂️ Entering Zen Mode...');
         } else {
-            document.exitFullscreen();
+            if (document.exitFullscreen) {
+                document.exitFullscreen();
+                this.showToast('Leaving Zen Mode ✨');
+            }
         }
     }
 

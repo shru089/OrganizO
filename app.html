@@ -201,6 +201,26 @@
         body.dark-mode .info-box { background: rgba(255, 255, 255, 0.05); color: white; }
         body.dark-mode .info-box div { color: #E2E8F0; }
 
+        .dynamic-bg {
+            background-size: cover !important;
+            background-repeat: no-repeat !important;
+            background-position: center !important;
+            transition: background-image 1.5s ease;
+        }
+
+        /* Zen Mode Enhancements */
+        body.zen-mode-active .sidebar,
+        body.zen-mode-active .mobile-nav,
+        body.zen-mode-active header {
+            display: none !important;
+        }
+        body.zen-mode-active .main-content {
+            border-radius: 0 !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            height: 100vh !important;
+        }
+
         .app-container {
             display: flex;
             height: 100vh;
@@ -502,27 +522,58 @@
             max-width: 600px;
             margin-left: auto;
             margin-right: auto;
-        }
-
-        .btn-focus {
+        }        .btn-focus {
             background: var(--accent-green);
             color: white;
             border: none;
             padding: 10px 24px;
             border-radius: 50px;
-            font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s;
-            box-shadow: 8px 8px 16px var(--accent-green-glow),
-                inset 4px 4px 8px rgba(255, 255, 255, 0.3),
-                inset -4px -4px 8px rgba(0, 0, 0, 0.1);
+            font-weight: 700;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 15px var(--accent-green-glow),
+                        inset 4px 4px 10px rgba(255, 255, 255, 0.3),
+                        inset -4px -4px 10px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(8px);
         }
 
         .btn-focus:hover {
-            transform: scale(1.05);
-            box-shadow: 12px 12px 20px var(--accent-green-glow),
-                inset 6px 6px 12px rgba(255, 255, 255, 0.4),
-                inset -6px -6px 12px rgba(0, 0, 0, 0.15);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px var(--accent-green-glow),
+                        inset 6px 6px 12px rgba(255, 255, 255, 0.4),
+                        inset -6px -6px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05);
+        }
+        
+        body.dark-mode .glass-panel {
+            background: rgba(15, 23, 42, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .clay-btn {
+            background: var(--card-bg);
+            border-radius: 24px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05),
+                        inset 4px 4px 8px rgba(255,255,255,0.4),
+                        inset -4px -4px 8px rgba(0,0,0,0.05);
+            transition: all 0.3s;
+            border: 1px solid var(--border-color);
+        }
+        body.dark-mode .clay-btn {
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2),
+                        inset 4px 4px 8px rgba(255,255,255,0.05),
+                        inset -4px -4px 8px rgba(0,0,0,0.3);
+        }
+        .clay-btn:active {
+            transform: scale(0.98);
+            box-shadow: inset 6px 6px 10px rgba(0,0,0,0.1), inset -6px -6px 10px rgba(255,255,255,0.1);
         }
 
         .btn-secondary {

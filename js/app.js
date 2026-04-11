@@ -1515,8 +1515,11 @@ ${this.notes}</div>
                     <div class="glass-panel" style="display: flex; gap: 1rem; justify-content: center; align-items: center; max-width: 380px; margin: 0 auto; padding: 12px 20px; border-radius: 40px; border: 1px solid var(--border-color);">
                         
                         <!-- Play/Pause Button -->
-                        <button onclick="window.organizoApp.toggleAudio()" style="background: var(--accent-green); border: none; color: white; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 2px 10px var(--accent-green-glow);">
-                            <span style="font-size: 1.1rem; margin-left: ${this.audioPlaying ? '0' : '2px'};">${this.audioPlaying ? '⏸' : '▶'}</span>
+                        <button onclick="window.organizoApp.toggleAudio()" id="zen-play-pause-btn" style="background: var(--accent-green); border: none; color: white; width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 12px var(--accent-green-glow); transition: all 0.3s ease;">
+                            ${this.audioPlaying 
+                                ? `<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>` 
+                                : `<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="margin-left: 3px;"><path d="M8 5v14l11-7z"/></svg>`
+                            }
                         </button>
                         
                         <div style="width: 1px; height: 24px; background: var(--border-color); margin: 0 4px;"></div>
@@ -3001,14 +3004,16 @@ ${this.notes}</div>
         if (this.audioPlaying) {
             this.audioPlayer.pause();
             this.audioPlaying = false;
+            this.renderTimerView();
         } else {
             this.audioPlayer.play().then(() => {
                 this.audioPlaying = true;
+                this.renderTimerView();
             }).catch(e => {
-                alert("Please interact with the page first to allow audio playback.");
+                console.error("Audio playback failed:", e);
+                this.showToast("⚠️ Interaction required for audio");
             });
         }
-        this.renderTimerView();
     }
 
     updateVolume(val) {

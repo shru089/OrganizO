@@ -786,17 +786,26 @@
             bottom: 0;
             left: 0;
             right: 0;
-            background: rgba(255, 255, 255, 0.9);
+            background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(20px);
             border-top: 1px solid rgba(0, 0, 0, 0.05);
             padding: 10px 0;
             z-index: 1000;
-            justify-content: space-around;
+            /* Scrollable horizontal nav for 7+ items */
+            overflow-x: auto;
+            overflow-y: hidden;
+            justify-content: flex-start;
             align-items: center;
+            gap: 0;
+            scrollbar-width: none; /* Firefox */
+            -ms-overflow-style: none; /* IE/Edge */
+            -webkit-overflow-scrolling: touch;
         }
 
+        .mobile-nav::-webkit-scrollbar { display: none; } /* Chrome/Safari */
+
         body.theme-midnight .mobile-nav {
-            background: rgba(15, 23, 42, 0.9);
+            background: rgba(15, 23, 42, 0.95);
             border-top-color: rgba(255, 255, 255, 0.1);
         }
 
@@ -810,14 +819,21 @@
             font-size: 0.65rem;
             font-weight: 600;
             opacity: 0.6;
+            flex: 0 0 75px; /* Fixed width for better horizontal scrolling */
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            padding: 5px 0;
         }
 
         .mobile-nav-link.active {
             color: var(--accent-green);
             opacity: 1;
+            transform: translateY(-2px);
         }
 
-        .mobile-nav-icon { font-size: 1.25rem; }
+        .mobile-nav-icon { 
+            font-size: 1.3rem;
+            margin-bottom: 2px;
+        }
 
         @media (max-width: 768px) {
             .app-container { flex-direction: column; }
@@ -989,6 +1005,14 @@
         <a href="#" class="mobile-nav-link" data-view="timer">
             <span class="mobile-nav-icon">⏱️</span>
             <span>Focus</span>
+        </a>
+        <a href="#" class="mobile-nav-link" data-view="insights">
+            <span class="mobile-nav-icon">💡</span>
+            <span>Insights</span>
+        </a>
+        <a href="#" class="mobile-nav-link" data-view="templates">
+            <span class="mobile-nav-icon">🎯</span>
+            <span>Templates</span>
         </a>
         <a href="#" class="mobile-nav-link" data-view="notes">
             <span class="mobile-nav-icon">📓</span>
